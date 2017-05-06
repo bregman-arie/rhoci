@@ -1,0 +1,2 @@
+recursive-include rhoci/templates *
+recursive-include rhoci/static *

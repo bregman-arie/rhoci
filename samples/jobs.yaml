@@ -1,0 +1,19 @@
+- table: 'neutron'
+  jobs:
+    - title: 'RHOSP 5'
+      name: 'neutron-nightly-rhos-5.0-coreci'
+
+    - title: 'RHOSP 6'
+      name: 'neutron-nightly-rhos-6.0-coreci'
+
+    - title: 'RHOSP 7'
+      name: 'neutron-nightly-rhos-7.0-coreci'
+
+    - title: 'RHOSP 8'
+      name: 'neutron-nightly-rhos-8.0-coreci'
+
+    - title: 'RHOSP 9'
+      name: 'neutron-nightly-rhos-9.0-coreci'
+
+    - title: 'RHOSP 10'
+      name: 'neutron-nightly-rhos-10.0-coreci'

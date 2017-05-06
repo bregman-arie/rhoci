@@ -1,0 +1,6 @@
+configparser
+flask
+Flask-SQLAlchemy
+gevent
+python-jenkins
+sqlalchemy-migrate
