@@ -33,7 +33,7 @@ You can specify it by using the CLI: --conf <conf_file_path>
 
 You can find sample in samples/rhoci.conf
 
-## The technologies behind Jino
+## The technologies behind RHOCI
 
 * Flask
 * SQLite
