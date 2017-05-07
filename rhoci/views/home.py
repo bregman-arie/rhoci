@@ -1,0 +1,46 @@
+# Copyright 2017 Arie Bregman
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+from flask import render_template
+from flask import Blueprint
+import logging
+
+import rhoci.models.agent as agent_model
+import rhoci.models.release as release_model
+import rhoci.models.job as job_model
+
+logger = logging.getLogger(__name__)
+
+home = Blueprint('home', __name__)
+
+
+@home.route('/')
+def index():
+    """Home page."""
+    releases = release_model.Release.query.all()
+    jobs = {}
+    jobs['phase1'] = job_model.Job.query.filter_by(job_type='phase1')
+    jobs['phase2'] = job_model.Job.query.filter_by(job_type='phase2')
+    jobs['dfg'] = job_model.Job.query.filter_by(job_type='dfg')
+    agent = agent_model.Agent.query.one()
+
+    print jobs['phase1']
+    print jobs['phase2']
+    print jobs['dfg']
+
+    return render_template('home.html',
+                           releases=releases,
+                           agent=agent,
+                           phase1=jobs['phase1'],
+                           phase2=jobs['phase2'],
+                           dfg=jobs['dfg'])

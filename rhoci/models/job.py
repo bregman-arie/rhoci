@@ -43,4 +43,4 @@ class Job(db.Model):
             return self
 
     def __repr__(self):
-        return "<Job %r" % (self.name)
+        return "<Job %r\nJob Type: %s" % (self.name, self.job_type)

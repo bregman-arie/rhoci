@@ -112,6 +112,9 @@
       <div class="row">
         <div class="col-md-3">
           <ul>
+            {% for job in dfg %}
+            <li>{{ job.name }}</li>
+            {% endfor %}
             <li>Cluster 1</li>
             <li>Cluster 2</li>
             <li>Cluster 3</li>

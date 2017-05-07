@@ -85,12 +85,14 @@ class JenkinsAgent(agent.Agent):
 
         plugins.
         """
-        agent_model.Agent.query.filter_by(name=self.name).update(
-            dict(number_of_jobs=jobs_num,
-                 number_of_nodes=nodes_num,
-                 number_of_plugins=plugins_num))
-        LOG.debug("Updated number of jobs, nodes and plugins")
-        db.session.commit()
+        with self.app.app_context():
+            agent_model.Agent.query.filter_by(name=self.name).update(
+                dict(number_of_jobs=jobs_num,
+                     number_of_nodes=nodes_num,
+                     number_of_plugins=plugins_num))
+            LOG.debug("Updated number of jobs, nodes and plugins")
+            db.session.commit()
+            print agent_model.Agent.query.filter_by(name=self.name)
 
     def shallow_db_update(self):
         """Insert jobs and nodes with only their names."""
@@ -103,11 +105,14 @@ class JenkinsAgent(agent.Agent):
                                                  len(all_plugins))
 
         for job in all_jobs:
-            for job_type in ['phase1', 'phase2', 'dfg']:
-                if job_type in job['name']:
-                    job_t = job_type
-                else:
-                    job_t = "Other"
+            if 'phase1' in job['name']:
+                job_t = 'phase1'
+            elif 'phase2' in job['name']:
+                job_t = 'phase2'
+            elif 'dfg' in job['name']:
+                job_t = 'dfg'
+            else:
+                job_t = 'other'
 
             db_job = job_model.Job(name=job['name'],
                                    job_type=job_t)

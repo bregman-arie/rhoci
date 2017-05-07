@@ -33,6 +33,7 @@ import rhoci.agent.jenkins_agent as j_agent  # noqa
 
 views = (
     (rhoci.views.home, ''),
+    (rhoci.views.nodes, '/nodes'),
     (rhoci.views.add_job, '/add_job'),
 )
 
