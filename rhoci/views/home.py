@@ -13,6 +13,7 @@
 #    under the License.
 from flask import render_template
 from flask import Blueprint
+from flask import jsonify
 import logging
 
 import rhoci.models.agent as agent_model
@@ -34,13 +35,23 @@ def index():
     jobs['dfg'] = job_model.Job.query.filter_by(job_type='dfg')
     agent = agent_model.Agent.query.one()
 
-    print jobs['phase1']
-    print jobs['phase2']
-    print jobs['dfg']
-
     return render_template('home.html',
                            releases=releases,
                            agent=agent,
                            phase1=jobs['phase1'],
                            phase2=jobs['phase2'],
                            dfg=jobs['dfg'])
+
+
+@home.route('/releases/ajax/jobs/<job_type>')
+def ajax_jobs(job_type):
+
+    results = dict()
+    results['data'] = list()
+
+    jobs = job_model.Job.query.filter_by(job_type=job_type)
+
+    for job in jobs:
+        results['data'].append([job.name, job.last_build_result])
+
+    return jsonify(results)

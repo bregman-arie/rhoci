@@ -38,3 +38,13 @@ You can find sample in samples/rhoci.conf
 * Flask
 * SQLite
 * Patternfly
+
+## Screenshots
+
+### Home page
+
+<div align="center"><img src="./doc/home_page.png" alt="RHOCI Home Page"></div><hr />
+
+### Jobs page
+
+<div align="center"><img src="./doc/jobs_page.png" alt="RHOCI Jobs Page"></div><hr />

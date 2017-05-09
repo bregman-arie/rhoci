@@ -33,6 +33,7 @@ import rhoci.agent.jenkins_agent as j_agent  # noqa
 
 views = (
     (rhoci.views.home, ''),
+    (rhoci.views.jobs, '/jobs'),
     (rhoci.views.nodes, '/nodes'),
     (rhoci.views.add_job, '/add_job'),
 )
@@ -54,7 +55,6 @@ class WebApp(object):
         if self.config['DEBUG']:
             self._update_logging_level(logging.DEBUG)
 
-        print self.config
         self._register_blueprints()
         self._setup_database()
         self._setup_releases()

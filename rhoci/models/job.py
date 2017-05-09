@@ -32,6 +32,7 @@ class Job(db.Model):
     last_build_number = db.Column(db.Integer)
     last_build_result = db.Column(db.String(64))
     job_type = db.Column(db.String(64))
+#   release = db.relationship("Release", uselist=False, backref="release")
 
     def is_sub_job(self, job):
         return self.sub_jobs.filter(

@@ -11,7 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa
+import os
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'jino.db')
+SQLALCHEMY_MIGRATE_REPO = os.path.join(BASEDIR, 'db_repository')

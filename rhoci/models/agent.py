@@ -24,6 +24,7 @@ class Agent(db.Model):
     number_of_jobs = db.Column(db.Integer)
     number_of_nodes = db.Column(db.Integer)
     number_of_plugins = db.Column(db.Integer)
+    active = db.Column(db.Boolean)
 
     def __repr__(self):
         return "<Agent %r\nNumber of jobs: %s\nNumber of \

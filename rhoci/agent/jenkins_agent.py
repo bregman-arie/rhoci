@@ -36,10 +36,11 @@ class JenkinsAgent(agent.Agent):
         self.url = url
         self.app = app
         self.pre_run_process = Process(target=self.pre_start)
-        if user and password:
+        try:
             self.conn = jenkins.Jenkins(self.url, self.user, self.password)
-        else:
-            self.conn = jenkins.Jenkins(self.url)
+            self.active = True
+        except Exception:
+            self.active = False
         self.add_agent_to_db()
 
     def start(self):
@@ -89,10 +90,10 @@ class JenkinsAgent(agent.Agent):
             agent_model.Agent.query.filter_by(name=self.name).update(
                 dict(number_of_jobs=jobs_num,
                      number_of_nodes=nodes_num,
-                     number_of_plugins=plugins_num))
+                     number_of_plugins=plugins_num,
+                     active=self.active))
             LOG.debug("Updated number of jobs, nodes and plugins")
             db.session.commit()
-            print agent_model.Agent.query.filter_by(name=self.name)
 
     def shallow_db_update(self):
         """Insert jobs and nodes with only their names."""

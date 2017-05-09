@@ -21,12 +21,12 @@
     <div class="list-view-pf-main-info">
       <div class="list-view-pf-body">
         <div class="list-view-pf-description">
-          <div class="list-group-item-heading">
+          <div class="list-group-item-heading" style="font-size:20px">
             RHOSP {{ release.number }}
           </div>
           <div class="list-group-item-text">
             Red Hat OpenStack {{ release.number }}. <br>
-            Corresponding upstream release is {{ release.name }}
+            Upstream release is {{ release.name }}
           </div>
         </div>
         <div class="list-view-pf-additional-info">
@@ -34,204 +34,131 @@
             <div class="list-view-pf-expand">
               <span class="fa fa-angle-right"></span>
               <span class="pficon pficon-screen"></span>
-              <strong>8</strong> Phase1
+              <strong>{{ phase1.count() }}</strong> Phase1
             </div>
           </div>
           <div class="list-view-pf-additional-info-item">
             <div class="list-view-pf-expand">
               <span class="fa fa-angle-right"></span>
               <span class="pficon pficon-cluster"></span>
-              <strong>6</strong> Phase2
+              <strong>{{ phase2.count() }}</strong> Phase2
             </div>
           </div>
           <div class="list-view-pf-additional-info-item">
             <div class="list-view-pf-expand">
               <span class="fa fa-angle-right"></span>
               <span class="pficon pficon-container-node"></span>
-              <strong>10</strong> DFG
-            </div>
-          </div>
-          <div class="list-view-pf-additional-info-item">
-            <div class="list-view-pf-expand">
-              <span class="fa fa-angle-right"></span>
-              <span class="pficon pficon-image"></span>
-              <strong>8</strong> Nightly
+              <strong>{{ dfg.count() }}</strong> DFG
             </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- Begin Phase 1 -->
     <div class="list-group-item-container container-fluid hidden">
       <div class="close">
         <span class="pficon pficon-close"></span>
       </div>
       <div class="row">
-        <div class="col-md-3">
-          <ul>
-            {% for job in phase1 %}
-            <li>{{ job.name }}</li>
-            {% endfor %}
-            <li>Host 2</li>
-            <li>Host 3</li>
-            <li>Host 4</li>
-            <li>Host 5</li>
-            <li>Host 6</li>
-            <li>Host 7</li>
-            <li>Host 8</li>
-            <li>Host 9</li>
-          </ul>
-        </div>
-        <div class="col-md-9">
-          <dl class="dl-horizontal">
-            <dt>Host Name</dt>
-            <dd>file1.nay.redhat.com</dd>
-            <dt>Device Path</dt>
-            <dd>/dev/disk/pci-0000.05:00-sas-0.2-part1</dd>
-            <dt>Time</dt>
-            <dd>January 15, 2016 10:45:11 AM</dd>
-            <dt>Severity</dt>
-            <dd>Warning</dd>
-            <dt>Cluster</dt>
-            <dd>Cluster 1</dd>
-          </dl>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+        <div class="col-md-8 col-md-offset-2">
+          <h3>
+              <strong>Phase 1 Jobs</strong>
+          </h3>
+          <table class="table table-striped table-bordered table-hover" id="phase1_{{ release.number }}">
+            <thead>
+              <tr>
+                <th>Job Name</th>
+                <th>Last build result</th>
+              </tr>
+            </thead>
+          </table>
         </div>
       </div>
     </div>
+
     <div class="list-group-item-container container-fluid hidden">
       <div class="close">
         <span class="pficon pficon-close"></span>
       </div>
       <div class="row">
-        <div class="col-md-3">
-          <ul>
-            {% for job in dfg %}
-            <li>{{ job.name }}</li>
-            {% endfor %}
-            <li>Cluster 1</li>
-            <li>Cluster 2</li>
-            <li>Cluster 3</li>
-            <li>Cluster 4</li>
-            <li>Cluster 5</li>
-            <li>Cluster 6</li>
-            <li>Cluster 7</li>
-            <li>Cluster 8</li>
-            <li>Cluster 9</li>
-          </ul>
-        </div>
-        <div class="col-md-9">
-          <dl class="dl-horizontal">
-            <dt>Cluster Name</dt>
-            <dd>file2.nay.redhat.com</dd>
-            <dt>Device Path</dt>
-            <dd>/dev/disk/pci-0000.05:00-sas-0.2-part1</dd>
-            <dt>Time</dt>
-            <dd>January 15, 2016 10:45:11 AM</dd>
-            <dt>Severity</dt>
-            <dd>Warning</dd>
-            <dt>Cluster</dt>
-            <dd>Cluster 1</dd>
-          </dl>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+        <div class="col-md-8 col-md-offset-2">
+          <h3>
+              <strong>Phase 2 Jobs</strong>
+          </h3>
+          <table class="table table-striped table-bordered table-hover" id="phase2_{{ release.number }}">
+            <thead>
+              <tr>
+                <th>Job Name</th>
+                <th>Last build result</th>
+              </tr>
+            </thead>
+          </table>
         </div>
       </div>
     </div>
+
+
     <div class="list-group-item-container container-fluid hidden">
       <div class="close">
         <span class="pficon pficon-close"></span>
       </div>
       <div class="row">
-        <div class="col-md-3">
-          <ul>
-            <li>Nodes 1</li>
-            <li>Nodes 2</li>
-            <li>Nodes 3</li>
-            <li>Nodes 4</li>
-            <li>Nodes 5</li>
-            <li>Nodes 6</li>
-            <li>Nodes 7</li>
-            <li>Nodes 8</li>
-            <li>Nodes 9</li>
-          </ul>
-        </div>
-        <div class="col-md-9">
-          <dl class="dl-horizontal">
-            <dt>Node Name</dt>
-            <dd>file3.nay.redhat.com</dd>
-            <dt>Device Path</dt>
-            <dd>/dev/disk/pci-0000.05:00-sas-0.2-part1</dd>
-            <dt>Time</dt>
-            <dd>January 15, 2016 10:45:11 AM</dd>
-            <dt>Severity</dt>
-            <dd>Warning</dd>
-            <dt>Cluster</dt>
-            <dd>Cluster 1</dd>
-          </dl>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+        <div class="col-md-8 col-md-offset-2">
+          <h3>
+              <strong>DFG Jobs</strong>
+          </h3>
+          <table class="table table-striped table-bordered table-hover" id="dfg_{{ release.number }}">
+            <thead>
+              <tr>
+                <th>Job Name</th>
+                <th>Last build result</th>
+              </tr>
+            </thead>
+          </table>
         </div>
       </div>
     </div>
-    <div class="list-group-item-container container-fluid hidden">
-      <div class="close">
-        <span class="pficon pficon-close"></span>
-      </div>
-      <div class="row">
-        <div class="col-md-3">
-          <ul>
-            <li>Image 1</li>
-            <li>Image 2</li>
-            <li>Image 3</li>
-            <li>Image 4</li>
-            <li>Image 5</li>
-            <li>Image 6</li>
-            <li>Image 7</li>
-            <li>Image 8</li>
-            <li>Image 9</li>
-          </ul>
-        </div>
-        <div class="col-md-9">
-          <dl class="dl-horizontal">
-            <dt>Image Name</dt>
-            <dd>file4.nay.redhat.com</dd>
-            <dt>Device Path</dt>
-            <dd>/dev/disk/pci-0000.05:00-sas-0.2-part1</dd>
-            <dt>Time</dt>
-            <dd>January 15, 2016 10:45:11 AM</dd>
-            <dt>Severity</dt>
-            <dd>Warning</dd>
-            <dt>Cluster</dt>
-            <dd>Cluster 1</dd>
-          </dl>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+
+</div>
+
+<!-- Begin data table javascript -->
+<script>
+    $("#phase1_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
+        console.log( 'An error has been reported by DataTables: ', message );
+    }).DataTable({
+        "ajax": "{{ url_for('home.ajax_jobs', job_type='phase1') }}",
+    });
+    $("#phase2_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
+        console.log( 'An error has been reported by DataTables: ', message );
+    }).DataTable({
+        "ajax": "{{ url_for('home.ajax_jobs', job_type='phase2') }}",
+    });
+    $("#dfg_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
+        console.log( 'An error has been reported by DataTables: ', message );
+    }).DataTable({
+        "ajax": "{{ url_for('home.ajax_jobs', job_type='dfg') }}",
+    });
+</script>
+<!-- End data table javascript -->
+
+<script>
+    $('.modal').on('show.bs.modal', function(e) {
+        /* Only load the iframe content when the modal is opened */
+        var load = $(e.relatedTarget).data('load');
+        $(this).find('a').prop('href', function() {
+            // Set their src attribute to the value of data-src
+            return $(this).data('href').replace('index.html','').concat(load);
+        });
+        $(this).find('iframe').prop('src', function() {
+            // Set their src attribute to the value of data-src
+            return $(this).data('src').replace('index.html','').concat(load);
+        });
+
+        /* Adjust modal and iframe height based on window size */
+        $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
+        $('.embed-responsive-item').css('height', $(window).height() * 0.7);
+    });
+
+    /* Disable default error alerts from datatables, fold them to the javascript console instead */
+    $.fn.dataTable.ext.errMode = 'none';
+</script>

@@ -11,7 +11,3 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa

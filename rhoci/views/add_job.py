@@ -24,4 +24,4 @@ add_job = Blueprint('add_job', __name__)
 @add_job.route('/')
 def index():
     """Home page."""
-    return render_template('home.html')
+    return render_template('add_job.html')

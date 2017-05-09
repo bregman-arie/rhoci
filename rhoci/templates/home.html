@@ -2,6 +2,14 @@
 
 {% block content %}
 
+<br>
+{% if not agent.active %}
+  <div class="container">
+  <div class="alert alert-warning">
+    <strong>Couldn't reach RHOSP Jenkins</strong>
+  </div>
+  </div>
+{% endif %}
 <!-- Main container -->
 
 <div class="container-fluid col-md-custom col-md-offset-custom">

@@ -9,30 +9,22 @@
   <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.dataTables.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.matchHeight-min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.matchHeight-min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfPagination.js') }}"></script>
   <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfPagination.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfFilter.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap-treeview.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap-select.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/patternfly.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/patternfly.js') }}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
-
-  <script src="{{ url_for('static', filename='js/bug.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/controllers/BugCtrl.js') }}"></script>
 
   {% endblock %}
 
   {% block stylesheets %}
-  <link href="{{ url_for('static', filename='css/jquery.dataTables.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/patternfly.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/patternfly-additions.min.css') }}" rel="stylesheet">
-  <script src="{{ url_for('static', filename='css/bootstrap-treeview.css') }}"></script>
-  <script src="{{ url_for('static', filename='css/bootstrap-select.js') }}"></script>
-  <link href="{{ url_for('static', filename='css/rhoci.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}"></script>
   {% endblock %}
 
   <title>{% block title %}RHOCI - RHOSP CI Management System{% endblock %}</title>
