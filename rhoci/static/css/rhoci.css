@@ -1,0 +1,156 @@
+/* Main container layout size and offset */
+.col-md-custom {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 84%;
+        -ms-flex: 0 0 84%;
+            flex: 0 0 84%;
+    max-width: 84%;
+}
+
+.col-md-offset-custom {
+    margin-left: 8%;
+}
+
+/* Home stat highlight badges */
+.stat-highlight {
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Status text styling */
+.failed, .unreachable {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 90%;
+    font-family: monospace;
+    display: inline-block;
+    width: 8em;
+    background-color: #a30000;
+}
+.skipped, .ignored {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 90%;
+    font-family: monospace;
+    display: inline-block;
+    width: 8em;
+    background-color: #047a7b;
+}
+.ok {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 90%;
+    font-family: monospace;
+    display: inline-block;
+    width: 8em;
+    background-color: #3e7b04;
+}
+.changed {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 90%;
+    font-family: monospace;
+    display: inline-block;
+    width: 8em;
+    background-color: #9d8000;
+}
+
+/* Table styling */
+/* Wrap pre tags so they don't print endlessly horizontally */
+.table pre, .results pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+.iframe-spinner {
+    margin-top: 32px;
+}
+
+.table-spinner {
+    display: inline-block;
+    margin-top: 32px;
+    width: 32px;
+    height: 32px;
+}
+
+.table th {
+    font-size: 120%;
+}
+
+.table table, .table th, .table td {
+    text-align: center;
+}
+
+.table td a {
+    width: 100%;
+    font-weight: bold;
+}
+
+.table tbody>tr>td.vert-align{
+    vertical-align: middle;
+}
+
+/* Tooltips */
+.tooltip-inner {
+    max-width: 100%;
+}
+
+/* Permanent link and status icon on left side of report list */
+.list-view-pf-left {
+    min-width: 90px;
+}
+
+/* Width of date on left side of report list */
+.timestamp-heading {
+    max-width: 125px;
+}
+
+/* Combined width of date and playbook path in report list */
+.list-view-pf-description {
+    max-width: 30%;
+}
+
+/* Combined width of playbook highlights/panel items in report list */
+.list-view-pf-additional-info {
+    max-width: 70%;
+}
+
+.link-report {
+    float: left;
+    padding-top: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+.link-modal {
+    float: right;
+    margin-right: 12px;
+    padding-top: 3px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.link:hover,
+.link:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+button.link {
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+}
+
+.help-icon {
+    font-size: 18px;
+}

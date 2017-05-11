@@ -14,6 +14,7 @@
 import jenkins
 import logging
 from multiprocessing import Process
+import re
 import time
 
 from rhoci.agent import agent
@@ -95,6 +96,22 @@ class JenkinsAgent(agent.Agent):
             LOG.debug("Updated number of jobs, nodes and plugins")
             db.session.commit()
 
+    def get_job_type(self, name):
+        """Returns job type based on its name."""
+        if 'phase1' in name:
+            return 'phase1'
+        elif 'phase2' in name:
+            return 'phase2'
+        elif 'dfg' in name:
+            return 'dfg'
+        else:
+            return 'other'
+
+    def get_job_release(self, name):
+        m = re.search('\d+', name)
+        print m
+        return m.group() if m else 0
+
     def shallow_db_update(self):
         """Insert jobs and nodes with only their names."""
 
@@ -106,17 +123,12 @@ class JenkinsAgent(agent.Agent):
                                                  len(all_plugins))
 
         for job in all_jobs:
-            if 'phase1' in job['name']:
-                job_t = 'phase1'
-            elif 'phase2' in job['name']:
-                job_t = 'phase2'
-            elif 'dfg' in job['name']:
-                job_t = 'dfg'
-            else:
-                job_t = 'other'
+            job_t = self.get_job_type(job['name'].lower())
+            rel = self.get_job_release(job['name'])
 
             db_job = job_model.Job(name=job['name'],
-                                   job_type=job_t)
+                                   job_type=job_t,
+                                   release_number=int(rel))
             db.session.add(db_job)
             db.session.commit()
             LOG.debug("Added job: %s to the DB" % (job['name']))
