@@ -11,8 +11,11 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa
+
+
+def configure_template_filters(app):
+
+    @app.template_filter('count_per_release')
+    def count_per_release_filter(jobs_query, release):
+        """Returns count of jobs per given release."""
+        return (jobs_query.filter_by(release_number=release)).count()

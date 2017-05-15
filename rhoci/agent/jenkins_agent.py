@@ -22,6 +22,7 @@ import rhoci.lib.jenkins as jenkins_lib
 import rhoci.models.job as job_model
 import rhoci.models.agent as agent_model
 import rhoci.models.node as node_model
+import rhoci.models.plugin as plugin_model
 from rhoci.db.base import db
 
 LOG = logging.getLogger(__name__)
@@ -58,8 +59,13 @@ class JenkinsAgent(agent.Agent):
 
             for job in all_jobs:
                 # Now pull specific information for each job
-                job_info = self.conn.get_job_info(job['name'])
-                last_build_number = jenkins_lib.get_last_build_number(job_info)
+                try:
+                    job_info = self.conn.get_job_info(job['name'])
+                    last_build_number = jenkins_lib.get_last_build_number(
+                        job_info)
+                except Exception:
+                    LOG.info(
+                        "Unable to fetch informatino for %s" % job['name'])
                 if last_build_number:
                     last_build_result = jenkins_lib.get_build_result(
                         self.conn, job['name'], last_build_number)
@@ -108,16 +114,15 @@ class JenkinsAgent(agent.Agent):
             return 'other'
 
     def get_job_release(self, name):
-        m = re.search('\d+', name)
-        print m
-        return m.group() if m else 0
+        m = re.search('-\d{1,2}', name)
+        return m.group().split('-')[1] if m else 0
 
     def shallow_db_update(self):
         """Insert jobs and nodes with only their names."""
 
         all_jobs = self.conn.get_all_jobs()
         all_nodes = self.conn.get_nodes()
-        all_plugins = self.conn.get_plugins(depth=1)
+        all_plugins = self.conn.get_plugins()
 
         self.update_number_of_jobs_plugins_nodes(len(all_jobs), len(all_nodes),
                                                  len(all_plugins))
@@ -125,7 +130,6 @@ class JenkinsAgent(agent.Agent):
         for job in all_jobs:
             job_t = self.get_job_type(job['name'].lower())
             rel = self.get_job_release(job['name'])
-
             db_job = job_model.Job(name=job['name'],
                                    job_type=job_t,
                                    release_number=int(rel))
@@ -138,5 +142,11 @@ class JenkinsAgent(agent.Agent):
             db.session.add(db_node)
             db.session.commit()
             LOG.debug("Added node: %s to the DB" % (node['name']))
+
+        for plugin in all_plugins.iteritems():
+            db_plugin = plugin_model.Plugin(name=plugin[1]['longName'])
+            db.session.add(db_plugin)
+            db.session.commit()
+            LOG.debug("Added plugin: %s to the DB" % (plugin[1]['longName']))
 
         return all_jobs

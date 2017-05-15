@@ -11,8 +11,20 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa
+from flask import render_template
+from flask import Blueprint
+import logging
+
+import rhoci.models.job as job_model
+
+
+logger = logging.getLogger(__name__)
+
+jobs = Blueprint('jobs', __name__)
+
+
+@jobs.route('/')
+def index():
+    """Jenkins Jobs page."""
+    jobs = job_model.Job.query.all()
+    return render_template('jobs.html', jobs=jobs)

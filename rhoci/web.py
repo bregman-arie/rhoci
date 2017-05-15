@@ -19,12 +19,14 @@ import os
 
 from rhoci.db.base import db
 from rhoci.db.versioning import setup_versioning
+from rhoci.filters import configure_template_filters
 import rhoci.models.release as release_model
 import rhoci.views
 from rhoci.rhosp.release import RELEASE_MAP
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
+configure_template_filters(app)
 db.init_app(app)
 with app.app_context():
     db.create_all()
@@ -35,6 +37,7 @@ views = (
     (rhoci.views.home, ''),
     (rhoci.views.jobs, '/jobs'),
     (rhoci.views.nodes, '/nodes'),
+    (rhoci.views.plugins, '/plugins'),
     (rhoci.views.add_job, '/add_job'),
 )
 

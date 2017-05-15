@@ -11,8 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa
+RELEASE_MAP = {'6': 'juno',
+               '7': 'kilo',
+               '8': 'liberty',
+               '9': 'mitaka',
+               '10': 'newton',
+               '11': 'ocata',
+               '12': 'pike'}

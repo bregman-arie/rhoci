@@ -11,8 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa
+from rhoci.db.base import db
+
+
+class Plugin(db.Model):
+    """Represents Jenkins plugin."""
+
+    __tablename__ = 'plugin'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True)
+
+    def __repr__(self):
+        return "<Plugin %r" % (self.name)

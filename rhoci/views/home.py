@@ -43,14 +43,14 @@ def index():
                            dfg=jobs['dfg'])
 
 
-@home.route('/releases/ajax/jobs/<job_type>')
+@home.route('/releases/ajax/jobs/<job_type>_<release>')
 def ajax_jobs(job_type, release):
 
     results = dict()
     results['data'] = list()
 
     jobs = job_model.Job.query.filter_by(job_type=job_type,
-                                         release_number=release)
+                                         release_number=int(release))
 
     for job in jobs:
         results['data'].append([job.name, job.last_build_result])

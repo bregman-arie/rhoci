@@ -33,22 +33,22 @@
           <div class="list-view-pf-additional-info-item">
             <div class="list-view-pf-expand">
               <span class="fa fa-angle-right"></span>
-              <span class="pficon pficon-screen"></span>
-              <strong>{{ phase1.count() }}</strong> Phase1
+              <span class="pficon pficon-repository"></span>
+              <strong>{{ phase1 | count_per_release(release.number) }}</strong> Phase1
             </div>
           </div>
           <div class="list-view-pf-additional-info-item">
             <div class="list-view-pf-expand">
               <span class="fa fa-angle-right"></span>
-              <span class="pficon pficon-cluster"></span>
-              <strong>{{ phase2.count() }}</strong> Phase2
+              <span class="pficon pficon-repository"></span>
+              <strong>{{ phase2 | count_per_release(release.number)  }}</strong> Phase2
             </div>
           </div>
           <div class="list-view-pf-additional-info-item">
             <div class="list-view-pf-expand">
               <span class="fa fa-angle-right"></span>
-              <span class="pficon pficon-container-node"></span>
-              <strong>{{ dfg.count() }}</strong> DFG
+              <span class="pficon pficon-repository"></span>
+              <strong>{{ dfg | count_per_release(release.number) }}</strong> DFG
             </div>
           </div>
         </div>
@@ -126,17 +126,17 @@
     $("#phase1_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
-        "ajax": "{{ url_for('home.ajax_jobs', job_type='phase1', release={{ release.number }}) }}",
+        "ajax": "{{ url_for('home.ajax_jobs', job_type='phase1', release=release.number) }}",
     });
     $("#phase2_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
-        "ajax": "{{ url_for('home.ajax_jobs', job_type='phase2', release={{ release.number }}) }}",
+        "ajax": "{{ url_for('home.ajax_jobs', job_type='phase2', release=release.number) }}",
     });
     $("#dfg_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
-        "ajax": "{{ url_for('home.ajax_jobs', job_type='dfg', release={{ release.number }}) }}",
+        "ajax": "{{ url_for('home.ajax_jobs', job_type='dfg', release=release.number) }}",
     });
 </script>
 <!-- End data table javascript -->

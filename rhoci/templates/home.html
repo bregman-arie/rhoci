@@ -25,7 +25,9 @@
   <h2 class="card-pf-title">
     <a href="#">
       <span class="pficon pficon-registry"></span>
-      <span class="card-pf-aggregate-status-count">{{ agent.number_of_jobs }} Jobs</span>
+      <a href="{{ url_for('jobs.index') }}">
+          <span class="card-pf-aggregate-status-count">{{ agent.number_of_jobs }} Jobs</span>
+      </a>
     </a>
   </h2>
   <div class="card-pf-body">
@@ -41,7 +43,9 @@
   <h2 class="card-pf-title">
     <a href="#">
       <span class="pficon pficon-cluster"></span>
-      <span class="card-pf-aggregate-status-count">{{ agent.number_of_nodes }} Nodes</span>
+      <a href="{{ url_for('nodes.index') }}">
+          <span class="card-pf-aggregate-status-count">{{ agent.number_of_nodes }} Nodes</span>
+      </a>
     </a>
   </h2>
   <div class="card-pf-body">
@@ -56,7 +60,9 @@
   <h2 class="card-pf-title">
     <a href="#">
       <span class="pficon pficon-bundle"></span>
-      <span class="card-pf-aggregate-status-count">{{ agent.number_of_plugins }} Plugins</span>
+      <a href="{{ url_for('plugins.index') }}">
+          <span class="card-pf-aggregate-status-count">{{ agent.number_of_plugins }} Plugins</span>
+      </a>
     </a>
   </h2>
   <div class="card-pf-body">
