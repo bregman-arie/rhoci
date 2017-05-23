@@ -1,45 +1,81 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<br>
 
+<div class="container">
 
-<div class="modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Modal title</h4>
-      </div>
-      <div class="modal-body">
-        
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="modalInput">Default</label>
-            <div class="col-sm-10">
-              <input type="text" id="modalInput" class="form-control"></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="modalInputDisabled">Disabled</label>
-            <div class="col-sm-10">
-              <input type="text" id="modalInputDisabled" class="form-control" disabled></div>
-          </div>
-          <div class="form-group ">
-            <label class="col-sm-2 control-label" for="modalInputError">No error</label>
-            <div class="col-sm-10">
-              <input type="text" id="modalInputError" class="form-control">
+<form class="form-horizontal" id="jjb_data">
+  <!-- form start-->
 
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+  <!-- DFG input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">DFG</label>
+    <div class="col-sm-3">
+      <input type="text" id="dfg_input" class="form-control">
+    </div>
+  </div>
+  <!-- DFG input end -->
 
-  
-<!-- -->
+  <!-- component input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Component</label>
+    <div class="col-sm-3">
+      <input type="text" id="component_input" class="form-control">
+    </div>
+  </div>
+  <!-- component input end -->
+
+  <!-- tester input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Tester</label>
+    <div class="col-sm-3">
+      <input type="text" id="tester_input" class="form-control">
+    </div>
+  </div>
+  <!-- tester input end -->
+
+  <!-- button start -->
+  <div class="form-group">
+    <div class="col-sm-offset-5 col-sm-5">
+      <button type="button" class="btn btn-primary" id="generate">Generate</button>
+    </div>
+  </div>
+  <!-- button end -->
+
+  <!-- form end-->
+</form>
+
+<div class='printchatbox' id='printchatbox'></div>
+
+    <div style="display:none;" id="output_div" class="container">
+		  <h2>Jenkins Job Definition</h2>
+		  <div class="alert alert-info">
+			  <pre id="output"></pre>
+		  </div>
+	  </div>
+
+</div>
+
+<script>
+
+$(function() {
+	$('button#generate').click(function(){
+		$.ajax({
+      url: "{{ url_for('add_job.generate_jjb') }}",
+      data: $('#dfg_input'),
+			type: 'POST',
+			success: function(response){
+         $("#output_div").show();
+         $("#output").text(response.output);
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
+	});
+});
+
+</script>
+
 {% endblock %}
