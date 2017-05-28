@@ -11,7 +11,7 @@
   <!-- DFG input start -->
   <div class="form-group center-block">
     <label class="col-sm-4 col-md-4 control-label" for="exampleInput">DFG</label>
-    <div class="col-sm-3">
+    <div class="col-sm-4">
       <input type="text" id="dfg_input" class="form-control">
     </div>
   </div>
@@ -20,7 +20,7 @@
   <!-- component input start -->
   <div class="form-group center-block">
     <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Component</label>
-    <div class="col-sm-3">
+    <div class="col-sm-4">
       <input type="text" id="component_input" class="form-control">
     </div>
   </div>
@@ -29,25 +29,43 @@
   <!-- tester input start -->
   <div class="form-group center-block">
     <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Tester</label>
-    <div class="col-sm-3">
-      <input type="text" id="tester_input" class="form-control">
+    <div class="col-sm-4">
+      <input type="text" id="tester_input" class="form-control" required>
     </div>
   </div>
   <!-- tester input end -->
 
-  <!-- button start -->
+  <!-- generate button start -->
   <div class="form-group">
-    <div class="col-sm-offset-5 col-sm-5">
-      <button type="button" class="btn btn-primary" id="generate">Generate</button>
+    <div class="col-sm-offset-4 col-sm-4">
+      <button type="button" class="btn btn-primary" id="generate">Generate Job Definition</button>
+      <button type="button" class="btn btn-info" id="job_exists">Check if job exists</button>
     </div>
   </div>
-  <!-- button end -->
+  <!-- generate button end -->
 
   <!-- form end-->
 </form>
 
 <div class='printchatbox' id='printchatbox'></div>
 
+
+  <!-- Alert for already existing job -->
+  <div style="display:none;" id="existing_job_error" class="container">
+    <div class="alert alert-danger">
+      <span class="pficon pficon-degraded"></span>
+      <strong>The job already exists!.</strong> You should avoid submitting two duplicated jobs
+    </div>
+  </div>
+
+  <!-- Alert for missing input -->
+  <div style="display:none;" id="missing_input_div" class="container">
+    <div class="alert alert-danger">
+      <strong>Missing input!</strong> Please fill in all the details
+    </div>
+  </div>
+
+    <!-- Jenkins job definition -->
     <div style="display:none;" id="output_div" class="container">
 		  <h2>Jenkins Job Definition</h2>
 		  <div class="alert alert-info">
@@ -61,9 +79,21 @@
 
 $(function() {
 	$('button#generate').click(function(){
+
+    var dfg = $('#dfg_input').val();
+    var tester = $('#tester_input').val();
+    var component = $('#component_input').val();
+
+
+    if (dfg && tester && component)
+    {
+         $("#missing_input_div").hide();
+
 		$.ajax({
       url: "{{ url_for('add_job.generate_jjb') }}",
-      data: $('#dfg_input'),
+      data: {"dfg":dfg,
+             "component":component,
+             "tester":tester},
 			type: 'POST',
 			success: function(response){
          $("#output_div").show();
@@ -72,7 +102,15 @@ $(function() {
 			error: function(error){
 				console.log(error);
 			}
-		});
+		       });
+    }
+
+    else
+    {
+         $("#missing_input_div").show();
+         $("#output_div").hide();
+    }
+
 	});
 });
 

@@ -1,0 +1,10 @@
+- project:
+    name: {{ component }}-single-node-jobs
+    defaults: single_node_defaults
+    jobs:
+        - 'DFG-{dfg}-{component}-{tester}-rhos':
+            component: '{{ component }}'
+            image: 'rhel-7.4-server-x86_64-updated'
+            nodes: 'tester:1'
+            dfg: '{{ dfg }}'
+            tester: '{{ tester }}'

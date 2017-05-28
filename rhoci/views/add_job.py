@@ -17,6 +17,8 @@ from flask import jsonify
 from flask import request
 import logging
 
+from rhoci.lib.jenkins.jjb import generate_job_definition
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,11 +31,10 @@ def index():
     return render_template('add_job.html')
 
 
-@add_job.route('/add_job/generate_jjb', methods=['GET', 'POST'])
+@add_job.route('/add_job/generate_jjb/', methods=['GET', 'POST'])
 def generate_jjb():
-    print "HHHHHHHHHHHHHHHHHHHHHHHHH"
-    print dir(request)
-    print request.form
-    print request.data
-    print request.values
-    return jsonify(output="ITS WORKING")
+    output = generate_job_definition(request.form['dfg'],
+                                     request.form['component'],
+                                     request.form['tester'])
+
+    return jsonify(output=output)

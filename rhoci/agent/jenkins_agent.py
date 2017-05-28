@@ -18,7 +18,7 @@ import re
 import time
 
 from rhoci.agent import agent
-import rhoci.lib.jenkins as jenkins_lib
+import rhoci.lib.jenkins.build as jenkins_lib
 import rhoci.models.job as job_model
 import rhoci.models.agent as agent_model
 import rhoci.models.node as node_model

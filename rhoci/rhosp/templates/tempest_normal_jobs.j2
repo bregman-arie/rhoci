@@ -1,0 +1,10 @@
+- project:
+    defaults: tripleo_tempest_defaults
+    name: 'DFG-{{ dfg }}-{{ component }}-{product_version}'
+    dfg: '{{ dfg }}'
+    component: '{{ component }}'
+    ir_tempest_run_override_options: |
+        --config-options image.http_image='http://rhos-qe-mirror-tlv.usersys.redhat.com/images/cirros-0.3.4-x86_64-uec.tar.gz' \
+    product_version: '{{ version }}'
+    jobs:
+        - 'DFG-{dfg}-{component}-{product_version}_director-{rhel_version}-virthost-{ir_virsh_topology_str}-{ir_tripleo_overcloud_network_protocol}-{ir_tripleo_overcloud_network_backend}{job_name_suffix}'

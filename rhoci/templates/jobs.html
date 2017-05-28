@@ -21,8 +21,8 @@
             <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Job Name <span class="caret"></span></button>
             <ul class="dropdown-menu">
               <li><a href="#" id="filter1">Job Name</a></li>
-              <li><a href="#" id="filter2">Last build number</a></li>
               <li><a href="#" id="filter3">Last build result</a></li>
+              <li><a href="#" id="filter2">Last build number</a></li>
               <li><a href="#" id="filter4">Jenkins Server</a></li>
             </ul>
           </div>
@@ -156,8 +156,8 @@ var dataSet = [
 {% for job in jobs %}
 {
   job_name: "{{ job.name }}",
-  last_build_number: "{{ job.last_build_number }}",
   last_build_result: "{{ job.last_build_result }}",
+  last_build_number: "{{ job.last_build_number }}",
   jenkins_server: "{{ job.jenkins_server }}"
 },
 {% endfor %}
@@ -177,8 +177,8 @@ $("#table1").DataTable({
       sortable: false
     },
     { data: "job_name" },
-    { data: "last_build_number" },
     { data: "last_build_result" },
+    { data: "last_build_number" },
     { data: "jenkins_server" },
     { data: null,
       className: "table-view-pf-actions",
@@ -204,6 +204,20 @@ $("#table1").DataTable({
     }
   ],
   data: dataSet,
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            if ( aData['last_build_result'] == "FAILURE" )
+            {
+            $('td', nRow).css('background-color', '#f2dede' );
+            }
+            else if ( aData['last_build_result'] == "SUCCESS" )
+            {
+            $('td', nRow).css('background-color', '#dff0d8');
+            }
+            else if ( aData['last_build_result'] == "UNSTABLE" )
+            {
+            $('td', nRow).css('background-color', '#fcf8e3');
+            }
+        },
   dom: "t",
   language: {
     zeroRecords: "No records found"

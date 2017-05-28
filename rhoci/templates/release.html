@@ -127,16 +127,70 @@
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
         "ajax": "{{ url_for('home.ajax_jobs', job_type='phase1', release=release.number) }}",
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            if ( aData[1] == "FAILURE" )
+            {
+            $('td', nRow).css('background-color', '#f2dede' );
+            }
+            else if ( aData[1] == "SUCCESS" )
+            {
+            $('td', nRow).css('background-color', '#dff0d8');
+            }
+            else if ( aData[1] == "UNSTABLE" )
+            {
+            $('td', nRow).css('background-color', '#fcf8e3');
+            }
+            else
+            {
+            $('td', nRow).css('background-color', '#d9edf7');
+            }
+        }
     });
     $("#phase2_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
         "ajax": "{{ url_for('home.ajax_jobs', job_type='phase2', release=release.number) }}",
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            if ( aData[1] == "FAILURE" )
+            {
+            $('td', nRow).css('background-color', '#f2dede' );
+            }
+            else if ( aData[1] == "SUCCESS" )
+            {
+            $('td', nRow).css('background-color', '#dff0d8');
+            }
+            else if ( aData[1] == "UNSTABLE" )
+            {
+            $('td', nRow).css('background-color', '#fcf8e3');
+            }
+            else
+            {
+            $('td', nRow).css('background-color', '#d9edf7');
+            }
+        }
     });
     $("#dfg_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
         "ajax": "{{ url_for('home.ajax_jobs', job_type='dfg', release=release.number) }}",
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            if ( aData[1] == "FAILURE" )
+            {
+            $('td', nRow).css('background-color', '#f2dede' );
+            }
+            else if ( aData[1] == "SUCCESS" )
+            {
+            $('td', nRow).css('background-color', '#dff0d8');
+            }
+            else if ( aData[1] == "UNSTABLE" )
+            {
+            $('td', nRow).css('background-color', '#fcf8e3');
+            }
+            else
+            {
+            $('td', nRow).css('background-color', '#d9edf7');
+            }
+        }
     });
 </script>
 <!-- End data table javascript -->
