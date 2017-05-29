@@ -5,9 +5,10 @@
 <br>
 {% if not agent.active %}
   <div class="container">
-  <div class="alert alert-warning">
-    <strong>Couldn't reach RHOSP Jenkins</strong>
-  </div>
+    <div class="alert alert-danger">
+  <span class="pficon pficon-error-circle-o"></span>
+  <strong>Couldn't reach RHOSP Jenkins.</strong> Make sure you have connectivity and credentials to reach and use RHOSP Jenkins.
+    </div>
   </div>
 {% endif %}
 <!-- Main container -->

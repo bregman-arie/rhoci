@@ -16,8 +16,10 @@ from flask import Blueprint
 from flask import jsonify
 from flask import request
 import logging
+import re
 
 from rhoci.lib.jenkins.jjb import generate_job_definition
+import rhoci.models.job as job_model
 
 
 logger = logging.getLogger(__name__)
@@ -38,3 +40,18 @@ def generate_jjb():
                                      request.form['tester'])
 
     return jsonify(output=output)
+
+
+@add_job.route('/add_job/job_exists/', methods=['GET', 'POST'])
+def job_exists():
+    jobs_match = []
+    pattern = re.compile('.*(%s).*(%s).*(%s).*' % (request.form['dfg'],
+                                                   request.form['component'],
+                                                   request.form['tester']))
+
+    jobs = job_model.Job.query.all()
+    for job in jobs:
+        if pattern.match(job.name):
+            jobs_match.append(job.name)
+
+    return jsonify(output='\n'.join(jobs_match))

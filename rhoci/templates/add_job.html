@@ -65,11 +65,25 @@
     </div>
   </div>
 
+  <!-- Alert for couldn't find any job -->
+  <div style="display:none;" id="no_job_div" class="container">
+    <div class="alert alert-danger">
+      <strong>Couldn't find any job.</strong> Try to reduce input.
+    </div>
+  </div>
+
     <!-- Jenkins job definition -->
-    <div style="display:none;" id="output_div" class="container">
+    <div style="display:none;" id="jjb_output_div" class="container">
 		  <h2>Jenkins Job Definition</h2>
 		  <div class="alert alert-info">
-			  <pre id="output"></pre>
+			  <pre id="jjb_output"></pre>
+		  </div>
+	  </div>
+
+    <!-- Jenkins job exists -->
+    <div style="display:none;" id="job_exists_output_div" class="container">
+		  <div class="alert alert-info">
+			  <pre id="job_exists_output"></pre>
 		  </div>
 	  </div>
 
@@ -84,6 +98,8 @@ $(function() {
     var tester = $('#tester_input').val();
     var component = $('#component_input').val();
 
+    $("#job_exists_output_div").hide();
+    $("#no_job_div").hide();
 
     if (dfg && tester && component)
     {
@@ -96,8 +112,8 @@ $(function() {
              "tester":tester},
 			type: 'POST',
 			success: function(response){
-         $("#output_div").show();
-         $("#output").text(response.output);
+         $("#jjb_output_div").show();
+         $("#jjb_output").text(response.output);
 			},
 			error: function(error){
 				console.log(error);
@@ -108,11 +124,50 @@ $(function() {
     else
     {
          $("#missing_input_div").show();
-         $("#output_div").hide();
+         $("#jjb_output_div").hide();
     }
 
 	});
 });
+
+
+$(function() {
+	$('button#job_exists').click(function(){
+
+    var dfg = $('#dfg_input').val();
+    var tester = $('#tester_input').val();
+    var component = $('#component_input').val();
+
+    $("#missing_input_div").hide();
+    $("#jjb_output_div").hide();
+
+		$.ajax({
+      url: "{{ url_for('add_job.job_exists') }}",
+      data: {"dfg":dfg,
+             "component":component,
+             "tester":tester},
+			type: 'POST',
+			success: function(response){
+
+        if (response.output) {
+         $("#no_job_div").hide();
+         $("#job_exists_output_div").show();
+         $("#job_exists_output").text(response.output);
+                             }
+        else {
+         $("#no_job_div").show();
+         $("#job_exists_output_div").hide();
+             }
+			                           },
+			error: function(error){
+				console.log(error);
+			                      }
+		       });
+
+	});
+});
+
+
 
 </script>
 
