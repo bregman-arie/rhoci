@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+<div class="container">
+
+<form class="form-horizontal" id="jjb_data">
+  <!-- form start-->
+
+  <!-- Job input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Job</label>
+    <div class="col-sm-4">
+      <input type="text" id="job_input" class="form-control">
+    </div>
+  </div>
+  <!-- Job input end -->
+
+  <!-- build input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Build number</label>
+    <div class="col-sm-4">
+      <input type="text" id="build_input" class="form-control" required>
+    </div>
+  </div>
+  <!-- build input end -->
+
+  <!-- buttons start -->
+  <div class="form-group">
+    <div class="col-sm-offset-4 col-sm-4">
+      <button type="button" class="btn btn-info" id="analyze">Analyze</button>
+    </div>
+  </div>
+  <!-- buttons end -->
+
+  <!-- form end-->
+</form>
+
+<div class='printchatbox' id='printchatbox'></div>
+
+
+  <!-- Alert for already existing job -->
+  <div style="display:none;" id="existing_job_error" class="container">
+    <div class="alert alert-danger">
+      <span class="pficon pficon-degraded"></span>
+      <strong>The job already exists!.</strong> You should avoid submitting two duplicated jobs
+    </div>
+  </div>
+
+  <!-- Alert for missing input -->
+  <div style="display:none;" id="missing_input_div" class="container">
+    <div class="alert alert-danger">
+      <strong>Missing input!</strong> Please fill in all the details
+    </div>
+  </div>
+
+  <!-- Alert for couldn't find any job -->
+  <div style="display:none;" id="no_job_div" class="container">
+    <div class="alert alert-danger">
+      <strong>Couldn't find any job.</strong> Try to reduce input.
+    </div>
+  </div>
+
+    <!-- Jenkins job definition -->
+    <div style="display:none;" id="jjb_output_div" class="container">
+		  <h2>Jenkins Job Definition</h2>
+		  <div class="alert alert-info">
+			  <pre id="jjb_output"></pre>
+		  </div>
+	  </div>
+
+    <!-- Jenkins job exists -->
+    <div style="display:none;" id="job_exists_output_div" class="container">
+		  <div class="alert alert-info">
+			  <pre id="job_exists_output"></pre>
+		  </div>
+	  </div>
+
+</div>
+
+<script>
+
+$(function() {
+	$('button#generate').click(function(){
+
+    var dfg = $('#dfg_input').val();
+    var tester = $('#tester_input').val();
+    var component = $('#component_input').val();
+
+    $("#job_exists_output_div").hide();
+    $("#no_job_div").hide();
+
+    if (dfg && tester && component)
+    {
+         $("#missing_input_div").hide();
+
+		$.ajax({
+      url: "{{ url_for('add_job.generate_jjb') }}",
+      data: {"dfg":dfg,
+             "component":component,
+             "tester":tester},
+			type: 'POST',
+			success: function(response){
+         $("#jjb_output_div").show();
+         $("#jjb_output").text(response.output);
+			},
+			error: function(error){
+				console.log(error);
+			}
+		       });
+    }
+
+    else
+    {
+         $("#missing_input_div").show();
+         $("#jjb_output_div").hide();
+    }
+
+	});
+});
+
+
+$(function() {
+	$('button#job_exists').click(function(){
+
+    var dfg = $('#dfg_input').val();
+    var tester = $('#tester_input').val();
+    var component = $('#component_input').val();
+
+    $("#missing_input_div").hide();
+    $("#jjb_output_div").hide();
+
+		$.ajax({
+      url: "{{ url_for('add_job.job_exists') }}",
+      data: {"dfg":dfg,
+             "component":component,
+             "tester":tester},
+			type: 'POST',
+			success: function(response){
+
+        if (response.output) {
+         $("#no_job_div").hide();
+         $("#job_exists_output_div").show();
+         $("#job_exists_output").text(response.output);
+                             }
+        else {
+         $("#no_job_div").show();
+         $("#job_exists_output_div").hide();
+             }
+			                           },
+			error: function(error){
+				console.log(error);
+			                      }
+		       });
+
+	});
+});
+
+
+
+</script>
+
+{% endblock %}

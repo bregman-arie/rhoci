@@ -48,3 +48,10 @@ You can find sample in samples/rhoci.conf
 ### Jobs page
 
 <div align="center"><img src="./doc/jobs_page.png" alt="RHOCI Jobs Page"></div><hr />
+
+## How to add a new page
+
+* Create the html templates in rhoci/rhoci/templates/<new_page_name>.html
+* Add a new entry in rhoci/rhoci/views/__init__.py
+* Add a new view in rhoci/rhoci/views/<new_page_name>.html
+* Add a new item to 'views' variable in rhoci/rhoci/web.py

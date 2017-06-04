@@ -39,6 +39,7 @@ views = (
     (rhoci.views.nodes, '/nodes'),
     (rhoci.views.plugins, '/plugins'),
     (rhoci.views.add_job, '/add_job'),
+    (rhoci.views.failure_analyzer, '/failure_analyzer'),
 )
 
 

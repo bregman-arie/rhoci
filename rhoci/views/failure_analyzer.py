@@ -11,9 +11,17 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .add_job import add_job  # noqa
-from .failure_analyzer import failure_analyzer  # noqa
+from flask import render_template
+from flask import Blueprint
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+add_job = Blueprint('failure_analyzer', __name__)
+
+
+@add_job.route('/')
+def index():
+    """Failure Analyzer page."""
+    return render_template('failure_analyzer.html')
