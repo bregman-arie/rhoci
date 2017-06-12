@@ -163,4 +163,3 @@ class WebApp(object):
                                      app=app)
         logging.debug("Starting connection to RHOSP Jenkins")
         agent.pre_run_process.start()
-        # agent.run_process.start()

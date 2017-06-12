@@ -53,6 +53,7 @@ def ajax_jobs(job_type, release):
                                          release_number=int(release))
 
     for job in jobs:
-        results['data'].append([job.name, job.last_build_result])
+        results['data'].append([job.name, job.last_build_result,
+                                job.last_build_number])
 
     return jsonify(results)

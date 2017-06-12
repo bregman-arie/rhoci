@@ -14,6 +14,7 @@
 import jenkins
 import logging
 from multiprocessing import Process
+from concurrent.futures import ThreadPoolExecutor
 import re
 import time
 
@@ -40,9 +41,8 @@ class JenkinsAgent(agent.Agent):
         self.pre_run_process = Process(target=self.pre_start)
         try:
             self.conn = jenkins.Jenkins(self.url, self.user, self.password)
-            self.active = True
-        except Exception:
-            self.active = False
+        except Exception as e:
+            LOG.error("Failed to retrieve data from Jenkins: %s", e)
         self.add_agent_to_db()
 
     def start(self):
@@ -57,33 +57,38 @@ class JenkinsAgent(agent.Agent):
 
             all_jobs = self.shallow_db_update()
 
-            for job in all_jobs:
-                # Now pull specific information for each job
-                try:
-                    job_info = self.conn.get_job_info(job['name'])
-                    last_build_number = jenkins_lib.get_last_build_number(
-                        job_info)
-                except Exception:
-                    LOG.info(
-                        "Unable to fetch informatino for %s" % job['name'])
-                if last_build_number:
-                    last_build_result = jenkins_lib.get_build_result(
-                        self.conn, job['name'], last_build_number)
-                else:
-                    last_build_result = "None"
+            with ThreadPoolExecutor(50) as executor:
+                for job in all_jobs:
+                    executor.submit(self.update_job_in_db, job)
 
-                # Update entry in database
-                job_model.Job.query.filter_by(
-                    name=job['name']).update(
-                        dict(last_build_number=last_build_number,
-                             last_build_result=last_build_result))
-                db.session.commit()
-                LOG.debug("Updated job from %s: %s" % (self.name, job['name']))
+    def update_job_in_db(self, job):
+        with self.app.app_context():
+            try:
+                job_info = self.conn.get_job_info(job['name'])
+                last_build_number = jenkins_lib.get_last_build_number(
+                    job_info)
+            except Exception:
+                LOG.info(
+                    "Unable to fetch informatino for %s" % job['name'])
+            if last_build_number:
+                last_build_result = jenkins_lib.get_build_result(
+                    self.conn, job['name'], last_build_number)
+            else:
+                last_build_result = "None"
+
+            # Update entry in database
+            job_model.Job.query.filter_by(
+                name=job['name']).update(
+                    dict(last_build_number=last_build_number,
+                         last_build_result=last_build_result))
+            db.session.commit()
+            LOG.debug("Updated job from %s: %s" % (self.name, job['name']))
 
     def add_agent_to_db(self):
         """Adds the agent to the database."""
         with self.app.app_context():
-            db_agent = agent_model.Agent(name=self.name)
+            db_agent = agent_model.Agent(name=self.name,
+                                         url=self.url)
             db.session.add(db_agent)
             db.session.commit()
 
@@ -120,9 +125,12 @@ class JenkinsAgent(agent.Agent):
     def shallow_db_update(self):
         """Insert jobs and nodes with only their names."""
 
-        all_jobs = self.conn.get_all_jobs()
-        all_nodes = self.conn.get_nodes()
-        all_plugins = self.conn.get_plugins()
+        try:
+            all_jobs = self.conn.get_all_jobs()
+            all_nodes = self.conn.get_nodes()
+            all_plugins = self.conn.get_plugins()
+        except Exception as e:
+            LOG.error("Failed to connect Jenkins: %s", e)
 
         self.update_number_of_jobs_plugins_nodes(len(all_jobs), len(all_nodes),
                                                  len(all_plugins))

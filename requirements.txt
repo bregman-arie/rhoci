@@ -1,6 +1,7 @@
 configparser
 flask
 Flask-SQLAlchemy
+futures
 gevent
 python-jenkins
 sqlalchemy-migrate

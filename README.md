@@ -55,3 +55,4 @@ You can find sample in samples/rhoci.conf
 * Add a new entry in rhoci/rhoci/views/__init__.py
 * Add a new view in rhoci/rhoci/views/<new_page_name>.html
 * Add a new item to 'views' variable in rhoci/rhoci/web.py
+* Add it to the navigation bar in rhoci/rhoci/templates/navbar.html

@@ -69,6 +69,7 @@
               <tr>
                 <th>Job Name</th>
                 <th>Last build result</th>
+                <th>Last build number</th>
               </tr>
             </thead>
           </table>
@@ -90,6 +91,7 @@
               <tr>
                 <th>Job Name</th>
                 <th>Last build result</th>
+                <th>Last build number</th>
               </tr>
             </thead>
           </table>
@@ -112,6 +114,7 @@
               <tr>
                 <th>Job Name</th>
                 <th>Last build result</th>
+                <th>Last build number</th>
               </tr>
             </thead>
           </table>
@@ -144,7 +147,18 @@
             {
             $('td', nRow).css('background-color', '#d9edf7');
             }
-        }
+        },
+        columnDefs: [
+            {
+                targets:0,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                        data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            }
+        ]
     });
     $("#phase2_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
@@ -167,7 +181,18 @@
             {
             $('td', nRow).css('background-color', '#d9edf7');
             }
-        }
+        },
+        columnDefs: [
+            {
+                targets:0,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                        data = '<a href="{{ agent.url }}/job/' + data + '">' + data + row[1] + '</a>';
+                    }
+                    return data;
+                }
+            }
+        ]
     });
     $("#dfg_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
@@ -190,7 +215,18 @@
             {
             $('td', nRow).css('background-color', '#d9edf7');
             }
-        }
+        },
+        columnDefs: [
+            {
+                targets:0,
+                render: function ( data, type, row) {
+                    if(type === 'display'){
+                        data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            }
+        ]
     });
 </script>
 <!-- End data table javascript -->

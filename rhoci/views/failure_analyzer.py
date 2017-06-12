@@ -18,10 +18,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-add_job = Blueprint('failure_analyzer', __name__)
+failure_analyzer = Blueprint('failure_analyzer', __name__)
 
 
-@add_job.route('/')
+@failure_analyzer.route('/')
 def index():
     """Failure Analyzer page."""
     return render_template('failure_analyzer.html')
