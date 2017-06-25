@@ -124,7 +124,7 @@
 
 </div>
 
-<!-- Begin data table javascript -->
+<!-- Begin Phase 1 data table javascript -->
 <script>
     $("#phase1_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
@@ -157,9 +157,21 @@
                     }
                     return data;
                 }
+            },
+            {
+                targets:[1,2],
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[2] != 0){
+                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
+                    }
+                    return data;
+                }
             }
         ]
     });
+<!-- End Phase 1 data table javascript -->
+
+
     $("#phase2_{{ release.number }}").on( 'error.dt', function ( e, settings, techNote, message ) {
         console.log( 'An error has been reported by DataTables: ', message );
     }).DataTable({
@@ -187,7 +199,16 @@
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                        data = '<a href="{{ agent.url }}/job/' + data + '">' + data + row[1] + '</a>';
+                        data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:[1,2],
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[2] != 0 ){
+                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
                     }
                     return data;
                 }
@@ -219,9 +240,18 @@
         columnDefs: [
             {
                 targets:0,
-                render: function ( data, type, row) {
+                render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                         data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:[1,2],
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[2] != 0){
+                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
                     }
                     return data;
                 }

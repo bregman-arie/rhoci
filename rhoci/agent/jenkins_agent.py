@@ -16,6 +16,7 @@ import logging
 from multiprocessing import Process
 from concurrent.futures import ThreadPoolExecutor
 import re
+import sys
 import time
 
 from rhoci.agent import agent
@@ -41,8 +42,9 @@ class JenkinsAgent(agent.Agent):
         self.pre_run_process = Process(target=self.pre_start)
         try:
             self.conn = jenkins.Jenkins(self.url, self.user, self.password)
-        except Exception as e:
-            LOG.error("Failed to retrieve data from Jenkins: %s", e)
+            self.active = True
+        except Exception:
+            self.active = False
         self.add_agent_to_db()
 
     def start(self):
@@ -130,7 +132,9 @@ class JenkinsAgent(agent.Agent):
             all_nodes = self.conn.get_nodes()
             all_plugins = self.conn.get_plugins()
         except Exception as e:
-            LOG.error("Failed to connect Jenkins: %s", e)
+            LOG.error("Failed to retrieve data from Jenkins: %s", e)
+            self.active = False
+            sys.exit(2)
 
         self.update_number_of_jobs_plugins_nodes(len(all_jobs), len(all_nodes),
                                                  len(all_plugins))

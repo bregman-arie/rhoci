@@ -1,0 +1,13 @@
+*.sw?
+*.egg
+*.egg-info
+*.pyc
+.test
+.testrepository
+.tox
+.venv
+AUTHORS
+build/*
+ChangeLog
+doc/build/*
+dist/

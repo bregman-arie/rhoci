@@ -15,6 +15,7 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
+import rhoci.models.agent as agent_model
 import rhoci.models.job as job_model
 
 
@@ -27,4 +28,6 @@ jobs = Blueprint('jobs', __name__)
 def index():
     """Jenkins Jobs page."""
     jobs = job_model.Job.query.all()
-    return render_template('jobs.html', jobs=jobs)
+    agent = agent_model.Agent.query.one()
+
+    return render_template('jobs.html', agent=agent, jobs=jobs)
