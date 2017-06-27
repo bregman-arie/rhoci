@@ -59,7 +59,7 @@ class JenkinsAgent(agent.Agent):
 
             all_jobs = self.shallow_db_update()
 
-            with ThreadPoolExecutor(50) as executor:
+            with ThreadPoolExecutor(100) as executor:
                 for job in all_jobs:
                     executor.submit(self.update_job_in_db, job)
 
@@ -90,7 +90,8 @@ class JenkinsAgent(agent.Agent):
         """Adds the agent to the database."""
         with self.app.app_context():
             db_agent = agent_model.Agent(name=self.name,
-                                         url=self.url)
+                                         url=self.url,
+                                         password=self.password)
             db.session.add(db_agent)
             db.session.commit()
 

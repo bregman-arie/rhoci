@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+<div class="container">
+
+<form class="form-horizontal" id="jjb_data">
+  <!-- form start-->
+
+  <!-- Job input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Job</label>
+    <div class="col-sm-4">
+      <input type="text" id="job_input" class="form-control">
+    </div>
+  </div>
+  <!-- Job input end -->
+
+  <!-- buttons start -->
+  <div class="form-group">
+    <div class="col-sm-offset-4 col-sm-4">
+       <button type="button" class="btn btn-primary btn-lg" id="load" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Analyzing...">Analyze!</button>
+    </div>
+  </div>
+  <!-- buttons end -->
+
+  <!-- form end-->
+</form>
+
+  <!-- Alert for missing input -->
+  <div style="display:none;" id="no_job_div" class="container">
+    <div class="alert alert-danger">
+      No such job!
+    </div>
+  </div>
+
+<!-- Begin Console Output -->
+{% include "console_output.html" -%}
+<!-- End Console Output -->
+
+
+<script>
+
+$("#console_output").hide();
+
+$('.btn').on('click', function() {
+  var $this = $(this);
+  var job_name = $('#job_input').val();
+  $this.button('loading');
+  // Hide everything in case this is the second run
+  $("#console_output").hide();
+  $("#no_job_div").hide();
+
+  $.ajax({
+    type:"GET",
+    dataType: "json",
+    data: job_name,
+    url: "{{ url_for('job_analyzer.job_exists') }}",
+    success: function(response){
+      if (response.exists) {
+       $("#console_output").show();
+                          }
+      else {
+        $("#no_job_div").show();
+        $this.button('reset');
+           }
+                               }
+        });
+
+
+});
+
+</script>
+
+{% endblock %}

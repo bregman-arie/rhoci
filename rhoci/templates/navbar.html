@@ -7,7 +7,7 @@
             <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="{{ url_for('home.index') }}">
-          Red Hat OpenStack CI Portal
+           <img src="{{ url_for('static', filename='images/rhoci-logo.png') }}" alt="RHOCI"/>
         </a>
     </div>
     <div class="collapse navbar-collapse navbar-collapse-1">
@@ -31,7 +31,7 @@
                 <a href="{{ url_for('add_job.index') }}">Add Job</a>
             </li>
             <li>
-                <a href="{{ url_for('failure_analyzer.index') }}">Analyze Failure</a>
+                <a href="{{ url_for('job_analyzer.index') }}">Analyze Job</a>
             </li>
         </ul>
     </div>

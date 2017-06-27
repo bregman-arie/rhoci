@@ -22,6 +22,8 @@ class Agent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     url = db.Column(db.String(64), unique=True)
+    password = db.Column(db.String(64))
+    user = db.Column(db.String(64))
     number_of_jobs = db.Column(db.Integer)
     number_of_nodes = db.Column(db.Integer)
     number_of_plugins = db.Column(db.Integer)
