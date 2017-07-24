@@ -50,8 +50,15 @@ class JenkinsAgent(agent.Agent):
     def start(self):
         """Start running the jenkins agent."""
         while True:
-            time.sleep(10)
-            db.session.remove()
+            time.sleep(3600)
+            LOG.info("Checking for new jobs")
+            # with self.app.app_context():
+            #    jenkins_jobs = self.conn.get_all_jobs()
+            #    for job in job_model.Job.query.all():
+            #        print job
+            #        print dir(job)
+            # self.remove_jobs_from_db(all_jobs)
+            # self.add_jobs_to_db(all_jobs)
 
     def pre_start(self):
         """Populate the database with all the information from Jenkins."""
@@ -62,6 +69,13 @@ class JenkinsAgent(agent.Agent):
             with ThreadPoolExecutor(100) as executor:
                 for job in all_jobs:
                     executor.submit(self.update_job_in_db, job)
+
+    def remove_jobs_from_db(self, jobs):
+        """Removes jobs from DB that no longer exist on Jenkins."""
+        with self.app.app_context():
+            for job in jobs:
+                if not job_model.Job.query.filter_by(name=job):
+                    LOG.debug("Removing job: %s from DB" % job)
 
     def update_job_in_db(self, job):
         with self.app.app_context():

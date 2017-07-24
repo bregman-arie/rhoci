@@ -14,6 +14,7 @@
 from flask import jsonify
 from flask import Blueprint
 from flask import render_template
+from flask import request
 import jenkins
 import logging
 
@@ -35,8 +36,7 @@ def index():
 @job_analyzer.route('/job_exists/<job_name>', methods=['GET'])
 def job_exists(job_name=None):
     # all_args = request.args.lists()
-    print job_name
     agent = agent_model.Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-    job_exists = conn.job_exists("asasdsd")
+    job_exists = conn.job_exists(job_name or request.args.get('job_name'))
     return jsonify(exists=job_exists)

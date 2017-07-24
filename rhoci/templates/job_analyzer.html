@@ -55,7 +55,7 @@ $('.btn').on('click', function() {
   $.ajax({
     type:"GET",
     dataType: "json",
-    data: job_name,
+    data: {'job_name': job_name},
     url: "{{ url_for('job_analyzer.job_exists') }}",
     success: function(response){
       if (response.exists) {

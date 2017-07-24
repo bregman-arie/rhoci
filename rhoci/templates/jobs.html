@@ -22,7 +22,8 @@
             <ul class="dropdown-menu">
               <li><a href="#" id="filter1">Job Name</a></li>
               <li><a href="#" id="filter3">Last build result</a></li>
-              <li><a href="#" id="filter2">Last build number</a></li>
+              <li><a href="#" id="filter3">Last build number</a></li>
+              <li><a href="#" id="filter4">Test results</a></li>
             </ul>
           </div>
           <input type="text" class="form-control" placeholder="Filter By Job Name..." autocomplete="off" id="filterInput">
@@ -92,6 +93,7 @@
       <th>Job Name</th>
       <th>Last build number</th>
       <th>Last build result</th>
+      <th>Test results</th>
       <th colspan="2">Actions</th>
     </tr>
   </thead>
@@ -156,6 +158,7 @@ var dataSet = [
   job_name: "{{ job.name }}",
   last_build_result: "{{ job.last_build_result }}",
   last_build_number: "{{ job.last_build_number }}",
+  test_results: "Tests",
 },
 {% endfor %}
 ];
@@ -176,6 +179,7 @@ $("#table1").DataTable({
     { data: "job_name" },
     { data: "last_build_result" },
     { data: "last_build_number" },
+    { data: "test_results" },
     { data: null,
       className: "table-view-pf-actions",
       render: function (data, type, full, meta) {
@@ -232,7 +236,16 @@ $("#table1").DataTable({
                     }
                     return data;
                 }
-            }
+            },
+            {
+                targets:4,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[2] != 0 ){
+                        data = '<a href="{{ agent.url }}/job/' + row['job_name'] + '/' + row['last_build_number'] + '/testReport'+ '">Tests</a>';
+                    }
+                    return data;
+                }
+            },
         ],
   dom: "t",
   language: {
@@ -254,6 +267,9 @@ $("#table1").DataTable({
       }, {
         optionSelector: "#filter3",
         placeholder: "Filter By Last Build Result"
+      }, {
+        optionSelector: "#filter4",
+        placeholder: "Filter By Test Results"
       }
     ],
     paginationSelector: "#pagination1",
