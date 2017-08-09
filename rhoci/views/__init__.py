@@ -17,3 +17,4 @@ from .plugins import plugins  # noqa
 from .jobs import jobs  # noqa
 from .add_job import add_job  # noqa
 from .job_analyzer import job_analyzer  # noqa
+from .review_statistics import review_statistics  # noqa

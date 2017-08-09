@@ -40,6 +40,7 @@ views = (
     (rhoci.views.plugins, '/plugins'),
     (rhoci.views.add_job, '/add_job'),
     (rhoci.views.job_analyzer, '/failure_job'),
+    (rhoci.views.review_statistics, '/review_statistics'),
 )
 
 
@@ -89,7 +90,7 @@ class WebApp(object):
 
         all the tables.
         """
-        setup_versioning(app.config)
+        # setup_versioning(app.config)
         with app.app_context():
             db.create_all()
 
@@ -148,11 +149,12 @@ class WebApp(object):
         """Create DB entry for each release."""
         for release in app.config['releases'].split(','):
             with app.app_context():
-                release_db = release_model.Release(number=release,
-                                                   name=RELEASE_MAP[release])
-                db.session.add(release_db)
-                db.session.commit()
-                logging.info("Added release %s to the DB" % release)
+                if not release_model.Release.query.filter_by(number=release):
+                    release_db = release_model.Release(number=release,
+                                                       name=RELEASE_MAP[release])
+                    db.session.add(release_db)
+                    db.session.commit()
+                    logging.info("Added release %s to the DB" % release)
 
     def _setup_jenkins(self):
         """Create Jenkins agent to pull information from RHOSP Jenkins."""

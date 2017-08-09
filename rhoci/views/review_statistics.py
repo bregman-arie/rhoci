@@ -11,3 +11,17 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from flask import Blueprint
+from flask import render_template
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+review_statistics = Blueprint('review_statistics', __name__)
+
+
+@review_statistics.route('/review_statistics', methods=['GET', 'POST'])
+def index():
+    """Code Review Statistics page."""
+    return render_template('review_statistics.html')

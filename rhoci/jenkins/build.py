@@ -14,16 +14,24 @@
 
 
 def get_last_build_number(job_info):
-        """Given a job info dict, returns the last build number."""
-        if job_info['lastCompletedBuild']:
-            return job_info['lastCompletedBuild']['number']
-        else:
-            return 0
+    """Given a job info dict, returns the last build number."""
+    if job_info['lastCompletedBuild']:
+        return job_info['lastCompletedBuild']['number']
+    else:
+        return 0
 
 
 def get_build_result(conn, job_name, build_number):
-        """Given a Jenkins connection and job name, it returns string of
+    """Given a Jenkins connection and job name, it returns string of
 
-        the last completed build result.
-        """
-        return str(conn.get_build_info(job_name, build_number)['result'])
+    the last completed build result.
+    """
+    return str(conn.get_build_info(job_name, build_number)['result'])
+
+
+def get_console_output(conn, job_name, build_number=None):
+    """Return console output of a given build."""
+    build = build_number or get_last_build_number(
+        conn.get_job_info(job_name))
+    print conn.get_job_info(job_name)
+    # return (conn.get_build_console_output(job_name, build)).encode('utf-8')

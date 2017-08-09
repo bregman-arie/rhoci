@@ -18,7 +18,7 @@ from flask import request
 import logging
 import re
 
-from rhoci.lib.jenkins.jjb import generate_job_definition
+from rhoci.jenkins.jjb import generate_job_definition
 import rhoci.models.job as job_model
 
 

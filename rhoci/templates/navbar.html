@@ -15,24 +15,54 @@
             <li><a href="https://github.com/bregman-arie/RHOCI" target="_blank"><strong>RHOCI source</strong></a></li>
         </ul>
         <ul class="nav navbar-nav navbar-primary">
+          
+          <!-- Home page button -->
             <li>
                 <a href="{{ url_for('home.index') }}">Home</a>
             </li>
-            <li>
-                <a href="{{ url_for('jobs.index') }}">Jobs</a>
+
+
+          <!-- Jobs dropdown-->
+            <li class="dropdown">
+                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Jobs<b class="caret"></b></a>
+               <ul class="dropdown-menu">
+
+               <li>
+                 <a href="{{ url_for('jobs.index') }}">All jobs</a>
+               </li>
+
+               <li class="divider"></li>
+
+               <li>
+                 <a href="{{ url_for('add_job.index') }}">Add job</a>
+               </li>
+
+               <li>
+                 <a href="{{ url_for('job_analyzer.index') }}">Analyze job</a>
+               </li>
+
+               <li>
+                 <a href="{{ url_for('job_analyzer.index') }}">Trigger jobs</a>
+               </li>
+
+               </ul>
             </li>
+
+          <!-- Nodes page button -->
             <li>
                 <a href="{{ url_for('nodes.index') }}">Nodes</a>
             </li>
+
+          <!-- Plugins page button -->
             <li>
                 <a href="{{ url_for('plugins.index') }}">Plugins</a>
             </li>
+
+          <!-- Review Statistics button -->
             <li>
-                <a href="{{ url_for('add_job.index') }}">Add Job</a>
+                <a href="{{ url_for('review_statistics.index') }}">Review Statistics</a>
             </li>
-            <li>
-                <a href="{{ url_for('job_analyzer.index') }}">Analyze Job</a>
-            </li>
+
         </ul>
     </div>
 </nav>

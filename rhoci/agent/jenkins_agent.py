@@ -20,7 +20,7 @@ import sys
 import time
 
 from rhoci.agent import agent
-import rhoci.lib.jenkins.build as jenkins_lib
+import rhoci.jenkins.build as jenkins_lib
 import rhoci.models.job as job_model
 import rhoci.models.agent as agent_model
 import rhoci.models.node as node_model
@@ -103,11 +103,12 @@ class JenkinsAgent(agent.Agent):
     def add_agent_to_db(self):
         """Adds the agent to the database."""
         with self.app.app_context():
-            db_agent = agent_model.Agent(name=self.name,
-                                         url=self.url,
-                                         password=self.password)
-            db.session.add(db_agent)
-            db.session.commit()
+            if not agent_model.Agent.query.filter_by(name=self.name):
+                db_agent = agent_model.Agent(name=self.name,
+                                             url=self.url,
+                                             password=self.password)
+                db.session.add(db_agent)
+                db.session.commit()
 
     def update_number_of_jobs_plugins_nodes(self, jobs_num, nodes_num,
                                             plugins_num):
@@ -155,25 +156,29 @@ class JenkinsAgent(agent.Agent):
                                                  len(all_plugins))
 
         for job in all_jobs:
-            job_t = self.get_job_type(job['name'].lower())
-            rel = self.get_job_release(job['name'])
-            db_job = job_model.Job(name=job['name'],
-                                   job_type=job_t,
-                                   release_number=int(rel))
-            db.session.add(db_job)
-            db.session.commit()
-            LOG.debug("Added job: %s to the DB" % (job['name']))
+            if not job_model.Job.query.filter_by(name=job['name']):
+                job_t = self.get_job_type(job['name'].lower())
+                rel = self.get_job_release(job['name'])
+                db_job = job_model.Job(name=job['name'],
+                                       job_type=job_t,
+                                       release_number=int(rel))
+                db.session.add(db_job)
+                db.session.commit()
+                LOG.debug("Added job: %s to the DB" % (job['name']))
 
         for node in all_nodes:
-            db_node = node_model.Node(name=node['name'])
-            db.session.add(db_node)
-            db.session.commit()
-            LOG.debug("Added node: %s to the DB" % (node['name']))
+            if not node_model.Node.query.filter_by(name=node['name']):
+                db_node = node_model.Node(name=node['name'])
+                db.session.add(db_node)
+                db.session.commit()
+                LOG.debug("Added node: %s to the DB" % (node['name']))
 
         for plugin in all_plugins.iteritems():
-            db_plugin = plugin_model.Plugin(name=plugin[1]['longName'])
-            db.session.add(db_plugin)
-            db.session.commit()
-            LOG.debug("Added plugin: %s to the DB" % (plugin[1]['longName']))
+            plugin_name = plugin[1]['longName']
+            if not plugin_model.Plugin.query.filter_by(name=plugin_name):
+                db_plugin = plugin_model.Plugin(name=plugin_name)
+                db.session.add(db_plugin)
+                db.session.commit()
+                LOG.debug("Added plugin: %s to the DB" % (plugin_name))
 
         return all_jobs

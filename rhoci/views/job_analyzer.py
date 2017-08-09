@@ -35,8 +35,9 @@ def index():
 @job_analyzer.route('/job_exists/', methods=['GET'])
 @job_analyzer.route('/job_exists/<job_name>', methods=['GET'])
 def job_exists(job_name=None):
-    # all_args = request.args.lists()
+    job = job_name or request.args.get('job_name')
     agent = agent_model.Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-    job_exists = conn.job_exists(job_name or request.args.get('job_name'))
+    job_exists = conn.job_exists(job)
+
     return jsonify(exists=job_exists)
