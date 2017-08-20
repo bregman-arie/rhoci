@@ -52,11 +52,12 @@ class JenkinsAgent(agent.Agent):
         while True:
             time.sleep(3600)
             LOG.info("Checking for new jobs")
-            # with self.app.app_context():
-            #    jenkins_jobs = self.conn.get_all_jobs()
-            #    for job in job_model.Job.query.all():
-            #        print job
-            #        print dir(job)
+            with self.app.app_context():
+                jenkins_jobs = self.conn.get_all_jobs()
+                for job in job_model.Job.query.all():
+                    if job not in jenkins_jobs:
+                        LOG.debug("Removing job: %s from DB. It no longer",
+                                  " exists in Jenkins" % job)
             # self.remove_jobs_from_db(all_jobs)
             # self.add_jobs_to_db(all_jobs)
 
@@ -103,7 +104,7 @@ class JenkinsAgent(agent.Agent):
     def add_agent_to_db(self):
         """Adds the agent to the database."""
         with self.app.app_context():
-            if not agent_model.Agent.query.filter_by(name=self.name):
+            if not agent_model.Agent.query.filter_by(name=self.name).count():
                 db_agent = agent_model.Agent(name=self.name,
                                              url=self.url,
                                              password=self.password)
@@ -156,7 +157,7 @@ class JenkinsAgent(agent.Agent):
                                                  len(all_plugins))
 
         for job in all_jobs:
-            if not job_model.Job.query.filter_by(name=job['name']):
+            if not job_model.Job.query.filter_by(name=job['name']).count():
                 job_t = self.get_job_type(job['name'].lower())
                 rel = self.get_job_release(job['name'])
                 db_job = job_model.Job(name=job['name'],
@@ -167,7 +168,7 @@ class JenkinsAgent(agent.Agent):
                 LOG.debug("Added job: %s to the DB" % (job['name']))
 
         for node in all_nodes:
-            if not node_model.Node.query.filter_by(name=node['name']):
+            if not node_model.Node.query.filter_by(name=node['name']).count():
                 db_node = node_model.Node(name=node['name'])
                 db.session.add(db_node)
                 db.session.commit()
@@ -175,7 +176,7 @@ class JenkinsAgent(agent.Agent):
 
         for plugin in all_plugins.iteritems():
             plugin_name = plugin[1]['longName']
-            if not plugin_model.Plugin.query.filter_by(name=plugin_name):
+            if not plugin_model.Plugin.query.filter_by(name=plugin_name).count():
                 db_plugin = plugin_model.Plugin(name=plugin_name)
                 db.session.add(db_plugin)
                 db.session.commit()

@@ -18,7 +18,6 @@ import logging
 import os
 
 from rhoci.db.base import db
-from rhoci.db.versioning import setup_versioning
 from rhoci.filters import configure_template_filters
 import rhoci.models.release as release_model
 import rhoci.views
@@ -36,6 +35,7 @@ import rhoci.agent.jenkins_agent as j_agent  # noqa
 views = (
     (rhoci.views.home, ''),
     (rhoci.views.jobs, '/jobs'),
+    (rhoci.views.builds, '/builds'),
     (rhoci.views.nodes, '/nodes'),
     (rhoci.views.plugins, '/plugins'),
     (rhoci.views.add_job, '/add_job'),
@@ -149,7 +149,8 @@ class WebApp(object):
         """Create DB entry for each release."""
         for release in app.config['releases'].split(','):
             with app.app_context():
-                if not release_model.Release.query.filter_by(number=release):
+                if not release_model.Release.query.filter_by(
+                    number=release).count():
                     release_db = release_model.Release(number=release,
                                                        name=RELEASE_MAP[release])
                     db.session.add(release_db)

@@ -11,11 +11,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .builds import builds  # noqa
-from .add_job import add_job  # noqa
-from .job_analyzer import job_analyzer  # noqa
-from .review_statistics import review_statistics  # noqa
+from flask import render_template
+from flask import Blueprint
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+builds = Blueprint('builds', __name__)
+
+
+@builds.route('/tests_compare')
+def tests_compare():
+    """Comparing tests of two different builds."""
+
+    return render_template('tests_compare.html')
