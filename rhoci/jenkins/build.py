@@ -31,7 +31,7 @@ def get_build_result(conn, job_name, build_number):
 
 def get_console_output(conn, job_name, build_number=None):
     """Return console output of a given build."""
-    build = build_number or get_last_build_number(
-        conn.get_job_info(job_name))
-    print conn.get_job_info(job_name)
+    # build = build_number or get_last_build_number(
+    #    conn.get_job_info(job_name))
+    # print conn.get_job_info(job_name)
     # return (conn.get_build_console_output(job_name, build)).encode('utf-8')

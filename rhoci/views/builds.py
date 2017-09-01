@@ -13,6 +13,7 @@
 #    under the License.
 from flask import render_template
 from flask import Blueprint
+from flask import jsonify
 import logging
 
 
@@ -26,3 +27,10 @@ def tests_compare():
     """Comparing tests of two different builds."""
 
     return render_template('tests_compare.html')
+
+
+@builds.route('/job_exists/', methods=['GET'])
+@builds.route('/job_exists/<job_name>', methods=['GET'])
+def job_exists(job_name=None):
+
+    return jsonify(exists=job_exists)

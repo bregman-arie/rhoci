@@ -44,7 +44,22 @@ class Job(db.Model):
             self.sub_jobs.append(job)
             return self
 
+    @property
+    def serialize(self):
+        """Return job object data in serializeable format"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'last_build_number': self.last_build_number,
+            'last_build_result': self.last_build_result,
+            'job_type': self.job_type,
+        }
+
     def __repr__(self):
-        return "<Job %r\nJob Type: %s\nJob release: %s" % (self.name,
-                                                           self.job_type,
-                                                           self.release_number)
+        return {
+            'id': self.id,
+            'name': self.name,
+            'last_build_number': self.last_build_number,
+            'last_build_result': self.last_build_result,
+            'job_type': self.job_type,
+        }

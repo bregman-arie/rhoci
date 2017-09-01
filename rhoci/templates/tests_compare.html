@@ -10,9 +10,9 @@
 
   <!-- Job input start -->
   <div class="form-group center-block">
-    <label class="col-sm-3 col-md-4 control-label" for="exampleInput">Job</label>
+    <label class="col-sm-3 col-md-4 control-label" for="exampleInput">Job Name</label>
     <div class="col-sm-3">
-      <input type="text" id="job_input" class="form-control">
+      <input type="text" id="job_name_input" class="form-control">
     </div>
   </div>
   <!-- Job input end -->
@@ -38,7 +38,7 @@
   <!-- buttons start -->
   <div class="form-group">
     <div class="col-sm-offset-5 col-sm-4">
-       <button type="button" class="btn btn-primary btn-lg" id="load" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Comparing...">Compare!</button>
+       <button type="button" class="btn btn-primary btn-lg" id="compare" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Comparing...">Compare!</button>
     </div>
   </div>
   <!-- buttons end -->
@@ -46,13 +46,8 @@
   <!-- form end-->
 </form>
 
-  <!-- Alert for missing input -->
-  <div style="display:none;" id="no_job_div" class="container">
-    <div class="alert alert-danger">
-      No such job!
-    </div>
-  </div>
-
+<!-- Alert for missing input -->
+{% include "missing_input.html" -%}
 
 <!-- Progress Bar -->
 <div id="progress-bar" class="progress" style="display:none;">
@@ -68,40 +63,33 @@
 
 <script>
 
-$("#console_output_div").hide();
-$("#console_output_content").hide();
+$('button#compare').click(function(){
+  
+  var job_name = $('#job_name_input').val();
+  var first_build = $('#first_build_input').val();
+  var second_build = $('#second_build_input').val();
 
-$('.btn').on('click', function() {
-  var $this = $(this);
-  var job_name = $('#job_input').val();
-  $this.button('loading');
-  $("#progress-bar").show();
-  // Hide everything in case this is the second run
-  $("#console_output_div").hide();
-  $("#console_output_content").hide();
-  $("#no_job_div").hide();
+  if (job_name && first_build && second_build) {
+    $("#missing_input_div").hide();
 
-  $.ajax({
-    type:"GET",
-    dataType: "json",
-    data: {'job_name': job_name},
-    url: "{{ url_for('job_analyzer.job_exists') }}",
-    success: function(response){
-      if (response.exists) {
-        // Console output of the last build
-       $("#console_output_div").show();
-       $("#console_output_content").show();
-       $("#console_output_content").text(response.console_output);
-                          }
-      else {
-        $("#no_job_div").show();
-        $this.button('reset');
-           }
-                               }
-      $("#progress-bar").hide();
-      $this.button('reset');
-        });
+    $.ajax({
+        url: "{{ url_for('job_analyzer.job_exists') }}",
+        data: {"job_name":job_name
+        },
+        type: 'POST',
+        success: function(response){
+          console.log("job exists");
+        },
+        error: function(error){
+          console.log(error);
+        }
+          });
 
+  }
+
+  else {
+    $("#missing_input_div").show();
+  }
 
 });
 

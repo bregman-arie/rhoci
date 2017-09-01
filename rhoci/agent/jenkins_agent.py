@@ -56,8 +56,9 @@ class JenkinsAgent(agent.Agent):
                 jenkins_jobs = self.conn.get_all_jobs()
                 for job in job_model.Job.query.all():
                     if job not in jenkins_jobs:
+                        print job
                         LOG.debug("Removing job: %s from DB. It no longer",
-                                  " exists in Jenkins" % job)
+                                  " exists in Jenkins" % job.name)
             # self.remove_jobs_from_db(all_jobs)
             # self.add_jobs_to_db(all_jobs)
 
@@ -176,7 +177,8 @@ class JenkinsAgent(agent.Agent):
 
         for plugin in all_plugins.iteritems():
             plugin_name = plugin[1]['longName']
-            if not plugin_model.Plugin.query.filter_by(name=plugin_name).count():
+            if not plugin_model.Plugin.query.filter_by(
+                    name=plugin_name).count():
                 db_plugin = plugin_model.Plugin(name=plugin_name)
                 db.session.add(db_plugin)
                 db.session.commit()

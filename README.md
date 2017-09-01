@@ -4,10 +4,21 @@
 
 RHOCI (Red Hat OpenStack CI)
 
+A web service based on Jenkins to enhance user experience for Red Hat OpenStack CI users.
+This project allows you to:
+
+    * Display information on all jobs without loading additional pages
+    * Compare test results of two different builds of the same job
+    * Generate job definitions based on given input
+    * Trigger jobs based on component name and release
+
+And more :)
+
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [Configuration](#configuration)
+* [API](#api)
 
 ## Requirements
 
@@ -32,6 +43,10 @@ The default location for RHOCI configuration is '/etc/rhoci/rhoci.conf'.
 You can specify it by using the CLI: --conf <conf_file_path>
 
 You can find sample in samples/rhoci.conf
+
+## API
+
+API is documented in /doc view and generated automatically
 
 ## The technologies behind RHOCI
 

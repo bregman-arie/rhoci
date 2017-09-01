@@ -1,5 +1,6 @@
 configparser
 flask
+flask-autodoc
 Flask-SQLAlchemy
 futures
 gevent

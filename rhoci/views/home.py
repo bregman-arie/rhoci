@@ -17,6 +17,7 @@ from flask import jsonify
 import logging
 
 import rhoci.models.agent as agent_model
+from rhoci.views.doc import auto
 import rhoci.models.release as release_model
 import rhoci.models.job as job_model
 
@@ -57,3 +58,23 @@ def ajax_jobs(job_type, release):
                                 job.last_build_number])
 
     return jsonify(results)
+
+
+@auto.doc(groups=['jobs', 'public'])
+@home.route('/v2.0/jobs', methods=['GET'])
+def list_jobs():
+    """Returns all jobs in the DB."""
+    jobs = [i.serialize for i in job_model.Job.query.all()]
+
+    return jsonify(jobs)
+
+
+@auto.doc(groups=['jobs', 'public'])
+@home.route('/v2.0/jobs/<string:job_name>', methods=['GET'])
+def get_job(job_name):
+    """Returns data on a specific job."""
+    job = job_model.Job.query.filter_by(name=job_name).all()
+    if job:
+        return jsonify(job[0].serialize)
+    else:
+        return jsonify({'exist': False})

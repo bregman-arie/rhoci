@@ -17,6 +17,7 @@ from gevent.pywsgi import WSGIServer
 import logging
 import os
 
+from rhoci.views.doc import auto
 from rhoci.db.base import db
 from rhoci.filters import configure_template_filters
 import rhoci.models.release as release_model
@@ -35,11 +36,13 @@ import rhoci.agent.jenkins_agent as j_agent  # noqa
 views = (
     (rhoci.views.home, ''),
     (rhoci.views.jobs, '/jobs'),
+    (rhoci.views.doc, '/doc'),
     (rhoci.views.builds, '/builds'),
     (rhoci.views.nodes, '/nodes'),
+    (rhoci.views.jenkins_notifications, '/jenkins_notifications'),
     (rhoci.views.plugins, '/plugins'),
     (rhoci.views.add_job, '/add_job'),
-    (rhoci.views.job_analyzer, '/failure_job'),
+    (rhoci.views.job_analyzer, '/job_analyzer'),
     (rhoci.views.review_statistics, '/review_statistics'),
 )
 
@@ -59,6 +62,9 @@ class WebApp(object):
         # If user turned on debug, update logging level
         if self.config['DEBUG']:
             self._update_logging_level(logging.DEBUG)
+
+        # Initialize API documentation
+        auto.init_app(app)
 
         self._register_blueprints()
         self._setup_database()
@@ -150,9 +156,9 @@ class WebApp(object):
         for release in app.config['releases'].split(','):
             with app.app_context():
                 if not release_model.Release.query.filter_by(
-                    number=release).count():
-                    release_db = release_model.Release(number=release,
-                                                       name=RELEASE_MAP[release])
+                        number=release).count():
+                    release_db = release_model.Release(
+                        number=release, name=RELEASE_MAP[release])
                     db.session.add(release_db)
                     db.session.commit()
                     logging.info("Added release %s to the DB" % release)

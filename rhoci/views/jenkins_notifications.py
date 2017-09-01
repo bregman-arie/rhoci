@@ -11,32 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from flask import jsonify
 from flask import Blueprint
-from flask import render_template
-from flask import request
-import jenkins
 import logging
-
-import rhoci.models.agent as agent_model
-
 
 logger = logging.getLogger(__name__)
 
-job_analyzer = Blueprint('job_analyzer', __name__)
+jenkins_notifications = Blueprint('jenkins_notifications', __name__)
 
 
-@job_analyzer.route('/job_analyzer', methods=['GET', 'POST'])
+@jenkins_notifications.route('/')
 def index():
-    """Job Analyzer page."""
-    return render_template('job_analyzer.html')
-
-
-@job_analyzer.route('/job_exists/')
-def job_exists():
-    job = request.args.get('job_name')
-    agent = agent_model.Agent.query.one()
-    conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-    job_exists = conn.job_exists(job)
-
-    return jsonify(exists=job_exists)
+    """Home page."""
+    x = 2
+    print(x)

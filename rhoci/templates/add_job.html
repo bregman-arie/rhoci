@@ -59,11 +59,7 @@
   </div>
 
   <!-- Alert for missing input -->
-  <div style="display:none;" id="missing_input_div" class="container">
-    <div class="alert alert-danger">
-      <strong>Missing input!</strong> Please fill in all the details
-    </div>
-  </div>
+  {% include "missing_input.html" -%}
 
   <!-- Alert for couldn't find any job -->
   <div style="display:none;" id="no_job_div" class="container">
