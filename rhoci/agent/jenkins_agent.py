@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import datetime
 import jenkins
 import logging
 from multiprocessing import Process
@@ -21,10 +22,7 @@ import time
 
 from rhoci.agent import agent
 import rhoci.jenkins.build as jenkins_lib
-import rhoci.models.job as job_model
-import rhoci.models.agent as agent_model
-import rhoci.models.node as node_model
-import rhoci.models.plugin as plugin_model
+import rhoci.models as models
 from rhoci.db.base import db
 
 LOG = logging.getLogger(__name__)
@@ -54,7 +52,7 @@ class JenkinsAgent(agent.Agent):
             LOG.info("Checking for new jobs")
             with self.app.app_context():
                 jenkins_jobs = self.conn.get_all_jobs()
-                for job in job_model.Job.query.all():
+                for job in models.Job.query.all():
                     if job not in jenkins_jobs:
                         print job
                         LOG.debug("Removing job: %s from DB. It no longer",
@@ -66,17 +64,29 @@ class JenkinsAgent(agent.Agent):
         """Populate the database with all the information from Jenkins."""
         with self.app.app_context():
 
-            all_jobs = self.shallow_db_update()
+            agent = models.Agent.query.filter_by(name=self.name).first()
+            if not agent.update_time:
+                print datetime.datetime.utcnow()
+                models.Agent.query.filter_by(
+                    name=self.name).update(dict(
+                        update_time=datetime.datetime.utcnow()))
+                all_jobs = self.shallow_db_update()
+                with ThreadPoolExecutor(100) as executor:
+                    for job in all_jobs:
+                        executor.submit(self.update_job_in_db, job)
 
-            with ThreadPoolExecutor(100) as executor:
-                for job in all_jobs:
-                    executor.submit(self.update_job_in_db, job)
+            elif (agent.update_time - datetime.datetime.utcnow() >
+                  datetime.timedelta(minutes=59)):
+                all_jobs = self.shallow_db_update()
+                with ThreadPoolExecutor(100) as executor:
+                    for job in all_jobs:
+                        executor.submit(self.update_job_in_db, job)
 
     def remove_jobs_from_db(self, jobs):
         """Removes jobs from DB that no longer exist on Jenkins."""
         with self.app.app_context():
             for job in jobs:
-                if not job_model.Job.query.filter_by(name=job):
+                if not models.Job.query.filter_by(name=job):
                     LOG.debug("Removing job: %s from DB" % job)
 
     def update_job_in_db(self, job):
@@ -95,7 +105,7 @@ class JenkinsAgent(agent.Agent):
                 last_build_result = "None"
 
             # Update entry in database
-            job_model.Job.query.filter_by(
+            models.Job.query.filter_by(
                 name=job['name']).update(
                     dict(last_build_number=last_build_number,
                          last_build_result=last_build_result))
@@ -105,10 +115,10 @@ class JenkinsAgent(agent.Agent):
     def add_agent_to_db(self):
         """Adds the agent to the database."""
         with self.app.app_context():
-            if not agent_model.Agent.query.filter_by(name=self.name).count():
-                db_agent = agent_model.Agent(name=self.name,
-                                             url=self.url,
-                                             password=self.password)
+            if not models.Agent.query.filter_by(name=self.name).count():
+                db_agent = models.Agent(name=self.name,
+                                        url=self.url,
+                                        password=self.password)
                 db.session.add(db_agent)
                 db.session.commit()
 
@@ -119,7 +129,7 @@ class JenkinsAgent(agent.Agent):
         plugins.
         """
         with self.app.app_context():
-            agent_model.Agent.query.filter_by(name=self.name).update(
+            models.Agent.query.filter_by(name=self.name).update(
                 dict(number_of_jobs=jobs_num,
                      number_of_nodes=nodes_num,
                      number_of_plugins=plugins_num,
@@ -158,28 +168,28 @@ class JenkinsAgent(agent.Agent):
                                                  len(all_plugins))
 
         for job in all_jobs:
-            if not job_model.Job.query.filter_by(name=job['name']).count():
+            if not models.Job.query.filter_by(name=job['name']).count():
                 job_t = self.get_job_type(job['name'].lower())
                 rel = self.get_job_release(job['name'])
-                db_job = job_model.Job(name=job['name'],
-                                       job_type=job_t,
-                                       release_number=int(rel))
+                db_job = models.Job(name=job['name'],
+                                    job_type=job_t,
+                                    release_number=int(rel))
                 db.session.add(db_job)
                 db.session.commit()
                 LOG.debug("Added job: %s to the DB" % (job['name']))
 
         for node in all_nodes:
-            if not node_model.Node.query.filter_by(name=node['name']).count():
-                db_node = node_model.Node(name=node['name'])
+            if not models.Node.query.filter_by(name=node['name']).count():
+                db_node = models.Node(name=node['name'])
                 db.session.add(db_node)
                 db.session.commit()
                 LOG.debug("Added node: %s to the DB" % (node['name']))
 
         for plugin in all_plugins.iteritems():
             plugin_name = plugin[1]['longName']
-            if not plugin_model.Plugin.query.filter_by(
+            if not models.Plugin.query.filter_by(
                     name=plugin_name).count():
-                db_plugin = plugin_model.Plugin(name=plugin_name)
+                db_plugin = models.Plugin(name=plugin_name)
                 db.session.add(db_plugin)
                 db.session.commit()
                 LOG.debug("Added plugin: %s to the DB" % (plugin_name))

@@ -14,12 +14,14 @@
 from flask import render_template
 from flask import Blueprint
 from flask import jsonify
+from flask import request
 import logging
 
-import rhoci.models.agent as agent_model
+from rhoci.models import Agent
 from rhoci.views.doc import auto
-import rhoci.models.release as release_model
-import rhoci.models.job as job_model
+from rhoci.models import Job
+from rhoci.models import Release
+from rhoci.models import Test
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +31,12 @@ home = Blueprint('home', __name__)
 @home.route('/')
 def index():
     """Home page."""
-    releases = release_model.Release.query.all()
+    releases = Release.query.all()
     jobs = {}
-    jobs['phase1'] = job_model.Job.query.filter_by(job_type='phase1')
-    jobs['phase2'] = job_model.Job.query.filter_by(job_type='phase2')
-    jobs['dfg'] = job_model.Job.query.filter_by(job_type='dfg')
-    agent = agent_model.Agent.query.one()
+    jobs['phase1'] = Job.query.filter_by(job_type='phase1')
+    jobs['phase2'] = Job.query.filter_by(job_type='phase2')
+    jobs['dfg'] = Job.query.filter_by(job_type='dfg')
+    agent = Agent.query.one()
 
     return render_template('home.html',
                            releases=releases,
@@ -50,8 +52,7 @@ def ajax_jobs(job_type, release):
     results = dict()
     results['data'] = list()
 
-    jobs = job_model.Job.query.filter_by(job_type=job_type,
-                                         release_number=int(release))
+    jobs = Job.query.filter_by(job_type=job_type, release_number=int(release))
 
     for job in jobs:
         results['data'].append([job.name, job.last_build_result,
@@ -61,20 +62,40 @@ def ajax_jobs(job_type, release):
 
 
 @auto.doc(groups=['jobs', 'public'])
-@home.route('/v2.0/jobs', methods=['GET'])
+@home.route('/v2.0/jobs', methods=['GET', 'POST'])
 def list_jobs():
     """Returns all jobs in the DB."""
-    jobs = [i.serialize for i in job_model.Job.query.all()]
+    if request.method == 'POST':
+        job = Job.query.filter_by(
+            name=request.form['job_name']).first()
+        jobs = job.serialize if job else {}
+    else:
+        jobs = [i.serialize for i in Job.query.all()]
 
-    return jsonify(jobs)
+    return jsonify(output=jobs)
 
 
 @auto.doc(groups=['jobs', 'public'])
 @home.route('/v2.0/jobs/<string:job_name>', methods=['GET'])
 def get_job(job_name):
     """Returns data on a specific job."""
-    job = job_model.Job.query.filter_by(name=job_name).all()
+    job = Job.query.filter_by(name=job_name).all()
     if job:
         return jsonify(job[0].serialize)
     else:
         return jsonify({'exist': False})
+
+
+@auto.doc(groups=['tests', 'public'])
+@home.route('/v2.0/tests', methods=['GET', 'POST'])
+def list_tests():
+    """Returns all tests in the DB."""
+    if request.method == 'POST':
+        tests = Test.query.filter_by(job_name=request.form['job_name'],
+                                     build_number=request.form[
+                                         'build_number']).all()
+    else:
+        tests = [i.serialize for i in Test.query.all()]
+    print tests
+
+    return jsonify(tests=tests)

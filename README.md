@@ -54,6 +54,10 @@ API is documented in /doc view and generated automatically
 * SQLite
 * Patternfly
 
+## Overview
+
+<div align="center"><img src="./doc/rhoci_overview.png" alt="RHOCI Overview"></div><hr />
+
 ## Screenshots
 
 ### Home page

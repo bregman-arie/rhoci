@@ -15,13 +15,20 @@ import rhoci.parser.web as web_parser
 import rhoci.web
 
 
+def create_parser():
+    """Returns parsed arguments from parser."""
+    parser = web_parser.create()
+    return parser.parse_args()
+
+
+def launch_app(args=None):
+    """Runs Web application."""
+    web_server = rhoci.web.WebApp(args)
+    web_server.run()
+
+
 def main():
     """Main entry for running the web server."""
 
-    # Create parser
-    parser = web_parser.create()
-    args = parser.parse_args()
-
-    # Run Webserver
-    web_server = rhoci.web.WebApp(args)
-    web_server.run()
+    args = create_parser()
+    launch_app(args)

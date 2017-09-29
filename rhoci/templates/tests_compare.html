@@ -5,6 +5,7 @@
 
 <div class="container">
 
+
 <form class="form-horizontal" id="jjb_data">
   <!-- form start-->
 
@@ -46,20 +47,15 @@
   <!-- form end-->
 </form>
 
+
 <!-- Alert for missing input -->
 {% include "missing_input.html" -%}
 
+<!-- Alert for missing job -->
+{% include "missing_job.html" -%}
+
 <!-- Progress Bar -->
-<div id="progress-bar" class="progress" style="display:none;">
-  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
-    <span class="sr-only">45% Complete</span>
-  </div>
-</div>
-
-<!-- Begin tests comparison -->
-{% include "tests_comparison_results.html" -%}
-<!-- End tests comparison -->
-
+{% include "progress_bar.html" -%}
 
 <script>
 
@@ -71,26 +67,46 @@ $('button#compare').click(function(){
 
   if (job_name && first_build && second_build) {
     $("#missing_input_div").hide();
+    $("#missing_job_div").hide();
+    $("#progress_bar").show();
+
 
     $.ajax({
-        url: "{{ url_for('job_analyzer.job_exists') }}",
-        data: {"job_name":job_name
-        },
+        url: "{{ url_for('home.list_jobs') }}",
+        data: {"job_name":job_name},
         type: 'POST',
         success: function(response){
-          console.log("job exists");
-        },
-        error: function(error){
-          console.log(error);
-        }
-          });
+          if (response['output']['id']) {
 
-  }
 
+            $.ajax({
+                url: "{{ url_for('home.list_tests') }}",
+                data: {"job_name":job_name, "build_number":first_build},
+                type: 'POST',
+              success: function(response){ 
+                
+                console.log(response);
+              
+              },
+              error: function(error){ console.log(error); }
+            });
+          }
   else {
+    $("#progress_bar").show();
+    $("#missing_job_div").show();
+    $("#missing_input_div").hide();
+    $("#progress_bar_inner").attr('class', 'progress-bar progress-bar-danger progress-bar-striped');
+    $("#progress_bar_inner").text("10% - missing job");
+       }
+}
+});
+}
+else {
+    $("#missing_job_div").hide();
     $("#missing_input_div").show();
-  }
-
+    $("#progress_bar_inner").attr('class', 'progress-bar progress-bar-danger progress-bar-striped');
+    $("#progress_bar_inner").text("10% - missing input");
+     }
 });
 
 </script>

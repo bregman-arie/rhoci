@@ -20,7 +20,7 @@ import os
 from rhoci.views.doc import auto
 from rhoci.db.base import db
 from rhoci.filters import configure_template_filters
-import rhoci.models.release as release_model
+import rhoci.models as models
 import rhoci.views
 from rhoci.rhosp.release import RELEASE_MAP
 
@@ -155,9 +155,10 @@ class WebApp(object):
         """Create DB entry for each release."""
         for release in app.config['releases'].split(','):
             with app.app_context():
-                if not release_model.Release.query.filter_by(
+                print models
+                if not models.Release.query.filter_by(
                         number=release).count():
-                    release_db = release_model.Release(
+                    release_db = models.Release(
                         number=release, name=RELEASE_MAP[release])
                     db.session.add(release_db)
                     db.session.commit()

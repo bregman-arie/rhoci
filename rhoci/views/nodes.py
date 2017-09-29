@@ -15,7 +15,7 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
-import rhoci.models.node as node_model
+from rhoci.models import Node
 
 
 logger = logging.getLogger(__name__)
@@ -26,5 +26,5 @@ nodes = Blueprint('nodes', __name__)
 @nodes.route('/')
 def index():
     """RHOSP Jenkins Nodes page."""
-    nodes = node_model.Node.query.all()
+    nodes = Node.query.all()
     return render_template('nodes.html', nodes=nodes)

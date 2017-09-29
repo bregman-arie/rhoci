@@ -15,7 +15,7 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
-import rhoci.models.plugin as plugin_model
+from rhoci.models import Plugin
 
 
 logger = logging.getLogger(__name__)
@@ -26,5 +26,5 @@ plugins = Blueprint('plugins', __name__)
 @plugins.route('/')
 def index():
     """RHOSP Jenkins Plugins page."""
-    plugins = plugin_model.Plugin.query.all()
+    plugins = Plugin.query.all()
     return render_template('plugins.html', plugins=plugins)

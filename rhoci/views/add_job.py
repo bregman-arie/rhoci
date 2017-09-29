@@ -19,7 +19,7 @@ import logging
 import re
 
 from rhoci.jenkins.jjb import generate_job_definition
-import rhoci.models.job as job_model
+from rhoci.models import Job
 
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ def job_exists():
                                                    request.form['component'],
                                                    request.form['tester']))
 
-    jobs = job_model.Job.query.all()
+    jobs = Job.query.all()
     for job in jobs:
         if pattern.match(job.name):
             jobs_match.append(job.name)

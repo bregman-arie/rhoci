@@ -18,7 +18,7 @@ from flask import request
 import jenkins
 import logging
 
-import rhoci.models.agent as agent_model
+from rhoci.models import Agent
 
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def index():
 @job_analyzer.route('/job_exists/')
 def job_exists():
     job = request.args.get('job_name')
-    agent = agent_model.Agent.query.one()
+    agent = Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
     job_exists = conn.job_exists(job)
 

@@ -6,3 +6,4 @@ futures
 gevent
 python-jenkins
 sqlalchemy-migrate
+Flask-PyMongo
