@@ -51,7 +51,7 @@ class WebApp(object):
     """rhoci Web Application."""
 
     DEFAULT_BIND_HOST = '0.0.0.0'
-    DEFAULT_PORT = 5000
+    DEFAULT_PORT = 80
     DEFAULT_CONFIG_FILE = '/etc/rhoci/rhoci.conf'
 
     def __init__(self, args_ns):
@@ -155,7 +155,6 @@ class WebApp(object):
         """Create DB entry for each release."""
         for release in app.config['releases'].split(','):
             with app.app_context():
-                print models
                 if not models.Release.query.filter_by(
                         number=release).count():
                     release_db = models.Release(

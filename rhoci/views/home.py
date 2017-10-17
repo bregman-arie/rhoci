@@ -17,13 +17,15 @@ from flask import jsonify
 from flask import request
 import logging
 
+import rhoci.agent.update as agent_update
+from rhoci.models import Build
 from rhoci.models import Agent
 from rhoci.views.doc import auto
 from rhoci.models import Job
 from rhoci.models import Release
 from rhoci.models import Test
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 home = Blueprint('home', __name__)
 
@@ -76,12 +78,17 @@ def list_jobs():
 
 
 @auto.doc(groups=['jobs', 'public'])
-@home.route('/v2.0/jobs/<string:job_name>', methods=['GET'])
+@home.route('/v2.0/jobs/<string:job_name>', methods=['GET', 'DELETE'])
 def get_job(job_name):
     """Returns data on a specific job."""
     job = Job.query.filter_by(name=job_name).all()
     if job:
-        return jsonify(job[0].serialize)
+        if request.method == 'DELETE':
+            agent_update.job_db_delete(job_name)
+            return jsonify({'job name:': job_name,
+                            'status': 'removed'})
+        else:
+            return jsonify(job[0].serialize)
     else:
         return jsonify({'exist': False})
 
@@ -99,3 +106,28 @@ def list_tests():
     print tests
 
     return jsonify(tests=tests)
+
+
+@auto.doc(groups=['update', 'public'])
+@home.route('/v2.0/update_jobs', methods=['GET', 'POST'])
+def update_jobs():
+    """Shallow update of all jobs."""
+    LOG.info("Jobs update requested.")
+    agent_update.shallow_jobs_update()
+    return jsonify({'status': 'OK'})
+
+
+@home.route('/v2.0/jenkins_notifications', methods=['POST'])
+def jenkins_notifications():
+    """Recieving notifications from Jenkins."""
+    LOG.info("Recieved update from Jenkins.")
+    LOG.info(request.data)
+    return jsonify({'notification': 'recieved'})
+
+
+@auto.doc(groups=['builds', 'public'])
+@home.route('/v2.0/builds', methods=['GET', 'POST'])
+def builds():
+    """Returns information on Jenkins builds."""
+    builds = [i.serialize for i in Build.query.all()]
+    return jsonify(output=builds)

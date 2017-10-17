@@ -32,9 +32,11 @@ class Agent(db.Model):
 
     def __repr__(self):
         return "<Agent %r\nNumber of jobs: %s\nNumber of \
-nodes: %s\nNumber of plugins: %s" % (self.name, self.number_of_jobs,
-                                     self.number_of_nodes,
-                                     self.number_of_plugins)
+nodes: %s\nNumber of plugins: %s\nLast update: %s" % (self.name,
+                                                      self.number_of_jobs,
+                                                      self.number_of_nodes,
+                                                      self.number_of_plugins,
+                                                      self.update_time)
 
 
 class Build(db.Model):
@@ -43,15 +45,20 @@ class Build(db.Model):
     __tablename__ = 'build'
 
     id = db.Column(db.Integer)
-    job = db.Column(db.String(64), db.ForeignKey('job.name'),
-                    primary_key=True)
+    job = db.Column(db.String(64), primary_key=True)
     number = db.Column(db.Integer, primary_key=True)
-    skips = db.Column(db.Integer)
-    fails = db.Column(db.Integer)
-    passes = db.Column(db.Integer)
+
+    @property
+    def serialize(self):
+        """Return build object data in serializeable format"""
+        return {
+            'id': self.id,
+            'job': self.job,
+            'number': self.number,
+        }
 
     def __repr__(self):
-        return "<Build number %r\n" % (self.id)
+        return self.serialize()
 
 
 class Job(db.Model):
@@ -80,13 +87,7 @@ class Job(db.Model):
         }
 
     def __repr__(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'last_build_number': self.last_build_number,
-            'last_build_result': self.last_build_result,
-            'job_type': self.job_type,
-        }
+        return self.serialize()
 
 
 class Test(db.Model):

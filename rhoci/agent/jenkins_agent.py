@@ -21,6 +21,7 @@ import sys
 import time
 
 from rhoci.agent import agent
+from rhoci.agent import update
 import rhoci.jenkins.build as jenkins_lib
 import rhoci.models as models
 from rhoci.db.base import db
@@ -49,16 +50,8 @@ class JenkinsAgent(agent.Agent):
         """Start running the jenkins agent."""
         while True:
             time.sleep(3600)
-            LOG.info("Checking for new jobs")
-            with self.app.app_context():
-                jenkins_jobs = self.conn.get_all_jobs()
-                for job in models.Job.query.all():
-                    if job not in jenkins_jobs:
-                        print job
-                        LOG.debug("Removing job: %s from DB. It no longer",
-                                  " exists in Jenkins" % job.name)
-            # self.remove_jobs_from_db(all_jobs)
-            # self.add_jobs_to_db(all_jobs)
+            LOG.info("Updating jobs")
+            update.shallow_jobs_update()
 
     def pre_start(self):
         """Populate the database with all the information from Jenkins."""
@@ -66,7 +59,6 @@ class JenkinsAgent(agent.Agent):
 
             agent = models.Agent.query.filter_by(name=self.name).first()
             if not agent.update_time:
-                print datetime.datetime.utcnow()
                 models.Agent.query.filter_by(
                     name=self.name).update(dict(
                         update_time=datetime.datetime.utcnow()))
@@ -95,9 +87,9 @@ class JenkinsAgent(agent.Agent):
                 job_info = self.conn.get_job_info(job['name'])
                 last_build_number = jenkins_lib.get_last_build_number(
                     job_info)
-            except Exception:
-                LOG.info(
-                    "Unable to fetch informatino for %s" % job['name'])
+            except Exception as e:
+                LOG.info("Unable to fetch information for %s: %s" % (job['name'],
+                                                                     e.message))
             if last_build_number:
                 last_build_result = jenkins_lib.get_build_result(
                     self.conn, job['name'], last_build_number)
