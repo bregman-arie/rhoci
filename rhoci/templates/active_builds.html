@@ -1,0 +1,153 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<br>
+{% if not agent.active %}
+  <div class="container">
+    <div class="alert alert-danger">
+  <span class="pficon pficon-error-circle-o"></span>
+  <strong>Couldn't reach RHOSP Jenkins.</strong> Make sure you have connectivity and credentials to reach and use RHOSP Jenkins.
+    </div>
+  </div>
+{% endif %}
+<!-- Main container -->
+
+<div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
+
+   <body class="cards-pf">
+      <div class="container-fluid container-cards-pf col-md-offset-0">
+        <div class="row row-cards-pf">
+
+     <div class="col-xs-6 col-sm-4 col-md-4">
+            <div class="card-pf card-pf-accented card-pf-aggregate-status card-pf-aggregate-status-mini">
+  <h2 class="card-pf-title">
+    <a href="#">
+      <span class="pficon pficon-registry"></span>
+      <a href="{{ url_for('jobs.index') }}">
+          <span class="card-pf-aggregate-status-count">{{ agent.number_of_jobs }} Jobs</span>
+      </a>
+    </a>
+  </h2>
+  <div class="card-pf-body">
+    <p class="card-pf-aggregate-status-notifications">
+    </p>
+  </div>
+  </div>
+  </div>
+
+
+     <div class="col-xs-6 col-sm-4 col-md-4">
+            <div class="card-pf card-pf-accented card-pf-aggregate-status card-pf-aggregate-status-mini">
+  <h2 class="card-pf-title">
+    <a href="#">
+      <span class="pficon pficon-cluster"></span>
+      <a href="{{ url_for('nodes.index') }}">
+          <span class="card-pf-aggregate-status-count">{{ agent.number_of_nodes }} Nodes</span>
+      </a>
+    </a>
+  </h2>
+  <div class="card-pf-body">
+    <p class="card-pf-aggregate-status-notifications">
+    </p>
+  </div>
+  </div>
+  </div>
+
+     <div class="col-xs-6 col-sm-4 col-md-4">
+            <div class="card-pf card-pf-accented card-pf-aggregate-status card-pf-aggregate-status-mini">
+  <h2 class="card-pf-title">
+    <a href="#">
+      <span class="pficon pficon-bundle"></span>
+      <a href="{{ url_for('plugins.index') }}">
+          <span class="card-pf-aggregate-status-count">{{ agent.number_of_plugins }} Plugins</span>
+      </a>
+    </a>
+  </h2>
+  <div class="card-pf-body">
+    <p class="card-pf-aggregate-status-notifications">
+    </p>
+  </div>
+  </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- Begin builds iteration -->
+<div class="list-group list-view-pf list-view-pf-view">
+{% for build in builds -%}
+{% include "build.html" -%}
+<!-- End builds iteration -->
+{% endfor -%}
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Row Checkbox Selection
+    $("input[type='checkbox']").change(function (e) {
+      if ($(this).is(":checked")) {
+        $(this).closest('.list-group-item').addClass("active");
+      } else {
+        $(this).closest('.list-group-item').removeClass("active");
+      }
+    });
+    // toggle dropdown menu
+    $(".list-view-pf-actions").on("show.bs.dropdown", function () {
+      var $this = $(this);
+      var $dropdown = $this.find(".dropdown");
+      var space = $(window).height() - $dropdown[0].getBoundingClientRect().top - $this.find(".dropdown-menu").outerHeight(true);
+      $dropdown.toggleClass("dropup", space < 10);
+    });
+    // compound expansion
+    $(".list-view-pf-expand").on("click", function () {
+      var $this = $(this);
+      var $heading = $(this).parents(".list-group-item");
+      //var $row = $heading.parent();
+      var $subPanels = $heading.find(".list-group-item-container");
+      var index = $heading.find(".list-view-pf-expand").index(this);
+
+      //Remove all active status
+      $heading.find(".list-view-pf-expand.active").find(".fa-angle-right").removeClass("fa-angle-down")
+        .end().removeClass("active")
+          .end().removeClass("list-view-pf-expand-active");
+      // Add active to the clicked item
+      $(this).addClass("active")
+        .parents(".list-group-item").addClass("list-view-pf-expand-active")
+          .end().find(".fa-angle-right").addClass("fa-angle-down");
+      // check if it needs to hide
+      if($subPanels.eq(index).hasClass("hidden")){
+        $heading.find(".list-group-item-container:visible").addClass("hidden");
+        $subPanels.eq(index).removeClass("hidden");
+      } else {
+        $subPanels.eq(index).addClass("hidden");
+        $heading.find(".list-view-pf-expand.active").find(".fa-angle-right").removeClass("fa-angle-down")
+         .end().removeClass("active")
+          .end().removeClass("list-view-pf-expand-active");
+      }
+    });
+
+    // click close button to close the panel
+    $(".list-group-item-container .close").on("click", function (){
+      var $this = $(this);
+      var $panel = $this.parent();
+
+      // close the container and remove the active status
+      $panel.addClass("hidden")
+        .parent().removeClass("list-view-pf-expand-active")
+          .find(".list-view-pf-expand.active").removeClass("active")
+            .find(".fa-angle-right").removeClass("fa-angle-down")
+    });
+  });
+</script>
+
+
+
+    </div>
+</div>
+
+<!-- -->
+{% endblock %}

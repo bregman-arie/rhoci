@@ -54,10 +54,10 @@ def shallow_jobs_update():
 
 def job_db_delete(job):
     """Delete job entry from DB."""
-    db_job = Job.query.all()[0]
+    db_job = Job.query.filter_by(name=job).first()
     db.session.delete(db_job)
     db.session.commit()
-    LOG.info("Removed the job %s from the DB" % job)
+    LOG.info("Removed job %s from the DB" % job)
 
 
 def job_db_update(job, conn):

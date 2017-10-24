@@ -54,7 +54,13 @@
                <ul class="dropdown-menu">
 
                <li>
-                 <a href="{{ url_for('builds.tests_compare') }}">compare test results</a>
+                 <a href="{{ url_for('builds.active') }}">Active builds</a>
+               </li>
+
+               <li class="divider"></li>
+
+               <li>
+                 <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
                </li>
 
                </ul>

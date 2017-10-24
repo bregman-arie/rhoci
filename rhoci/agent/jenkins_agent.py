@@ -51,7 +51,8 @@ class JenkinsAgent(agent.Agent):
         while True:
             time.sleep(3600)
             LOG.info("Updating jobs")
-            update.shallow_jobs_update()
+            with self.app.app_context():
+                update.shallow_jobs_update()
 
     def pre_start(self):
         """Populate the database with all the information from Jenkins."""
@@ -88,8 +89,8 @@ class JenkinsAgent(agent.Agent):
                 last_build_number = jenkins_lib.get_last_build_number(
                     job_info)
             except Exception as e:
-                LOG.info("Unable to fetch information for %s: %s" % (job['name'],
-                                                                     e.message))
+                LOG.info("Unable to fetch information for %s: %s" % (
+                    job['name'], e.message))
             if last_build_number:
                 last_build_result = jenkins_lib.get_build_result(
                     self.conn, job['name'], last_build_number)

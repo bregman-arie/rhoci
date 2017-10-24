@@ -18,6 +18,7 @@ from flask import request
 import logging
 
 import rhoci.agent.update as agent_update
+from rhoci.jenkins import manager
 from rhoci.models import Build
 from rhoci.models import Agent
 from rhoci.views.doc import auto
@@ -120,9 +121,10 @@ def update_jobs():
 @home.route('/v2.0/jenkins_notifications', methods=['POST'])
 def jenkins_notifications():
     """Recieving notifications from Jenkins."""
-    LOG.info("Recieved update from Jenkins.")
-    LOG.info(request.data)
-    return jsonify({'notification': 'recieved'})
+    LOG.info("Recieved notification from Jenkins.")
+    LOG.debug("Data: %s" % request.data)
+    status = manager.update_db(request.get_json(silent=True))
+    return jsonify({'notification': status})
 
 
 @auto.doc(groups=['builds', 'public'])
@@ -130,4 +132,4 @@ def jenkins_notifications():
 def builds():
     """Returns information on Jenkins builds."""
     builds = [i.serialize for i in Build.query.all()]
-    return jsonify(output=builds)
+    return jsonify(builds=builds)

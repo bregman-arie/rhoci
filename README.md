@@ -75,3 +75,7 @@ API is documented in /doc view and generated automatically
 * Add a new view in rhoci/rhoci/views/<new_page_name>.html
 * Add a new item to 'views' variable in rhoci/rhoci/web.py
 * Add it to the navigation bar in rhoci/rhoci/templates/navbar.html
+
+## How to change API
+
+API is defined in rhoci.views.home

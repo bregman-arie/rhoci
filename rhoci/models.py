@@ -47,6 +47,8 @@ class Build(db.Model):
     id = db.Column(db.Integer)
     job = db.Column(db.String(64), primary_key=True)
     number = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean)
+    status = db.Column(db.String(64))
 
     @property
     def serialize(self):
@@ -55,6 +57,8 @@ class Build(db.Model):
             'id': self.id,
             'job': self.job,
             'number': self.number,
+            'active': self.active,
+            'status': self.status,
         }
 
     def __repr__(self):

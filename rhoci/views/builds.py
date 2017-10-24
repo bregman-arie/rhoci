@@ -16,6 +16,9 @@ from flask import Blueprint
 from flask import jsonify
 import logging
 
+from rhoci.models import Agent
+from rhoci.models import Build
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,3 +37,12 @@ def tests_compare():
 def job_exists(job_name=None):
 
     return jsonify(exists=job_exists)
+
+
+@builds.route('/active_builds', methods=['GET'])
+def active():
+
+    builds = Build.query.all()
+    agent = Agent.query.one()
+
+    return render_template('active_builds.html', agent=agent, builds=builds)

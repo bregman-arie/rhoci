@@ -11,6 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from rhoci.models import Build
+from rhoci.db.base import db
 
 
 def get_last_build_number(job_info):
@@ -27,3 +29,20 @@ def get_build_result(conn, job_name, build_number):
     the last completed build result.
     """
     return str(conn.get_build_info(job_name, build_number)['result'])
+
+
+def update_in_db(data):
+    """Update builds table with given data."""
+    active = True if data['build']['phase'] != 'COMPLETED' else False
+    name = data['name']
+    number = data['build']['number']
+    phase = (data['build']['phase']).lower()
+
+    if not Build.query.filter_by(job=name, number=number).count():
+        build = Build(job=name, number=number, active=active)
+        db.session.add(build)
+        db.session.commit()
+
+    if phase == 'completed':
+        Build.query.filter_by(job=name, number=number).update(dict(
+            active=False, status=data['build']['status']))

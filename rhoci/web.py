@@ -51,7 +51,7 @@ class WebApp(object):
     """rhoci Web Application."""
 
     DEFAULT_BIND_HOST = '0.0.0.0'
-    DEFAULT_PORT = 80
+    DEFAULT_PORT = 5000
     DEFAULT_CONFIG_FILE = '/etc/rhoci/rhoci.conf'
 
     def __init__(self, args_ns):
