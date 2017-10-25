@@ -15,6 +15,7 @@ from configparser import ConfigParser
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 
 from rhoci.views.doc import auto
@@ -128,9 +129,12 @@ class WebApp(object):
     def _setup_logging(self):
         """Setup logging level."""
 
-        format = '%(levelname)s: %(name)s | %(message)s'
+        format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
         level = logging.INFO
         logging.basicConfig(level=level, format=format)
+        handler = RotatingFileHandler('rhoci.log', maxBytes=20000,
+                                      backupCount=10)
+        logging.getLogger().addHandler(handler)
 
     def _update_logging_level(self, logging_level):
         """Update logging based on passed level."""

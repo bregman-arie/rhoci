@@ -156,9 +156,9 @@ var dataSet = [
 {% for job in jobs %}
 {
   job_name: "{{ job.name }}",
-  last_build_result: "{{ job.last_build_result }}",
+  last_build_status: "{{ job.last_build_status }}",
   last_build_number: "{{ job.last_build_number }}",
-  test_results: "Tests",
+  test_statuss: "Tests",
 },
 {% endfor %}
 ];
@@ -177,9 +177,9 @@ $("#table1").DataTable({
       sortable: false
     },
     { data: "job_name" },
-    { data: "last_build_result" },
+    { data: "last_build_status" },
     { data: "last_build_number" },
-    { data: "test_results" },
+    { data: "test_statuss" },
     { data: null,
       className: "table-view-pf-actions",
       render: function (data, type, full, meta) {
@@ -205,15 +205,15 @@ $("#table1").DataTable({
   ],
   data: dataSet,
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData['last_build_result'] == "FAILURE" )
+            if ( aData['last_build_status'] == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData['last_build_result'] == "SUCCESS" )
+            else if ( aData['last_build_status'] == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData['last_build_result'] == "UNSTABLE" )
+            else if ( aData['last_build_status'] == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }

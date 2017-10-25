@@ -42,7 +42,8 @@ def job_exists(job_name=None):
 @builds.route('/active_builds', methods=['GET'])
 def active():
 
-    builds = Build.query.all()
+    db_builds = Build.query.filter_by(active=False)
+    builds = [build.serialize for build in db_builds]
     agent = Agent.query.one()
 
     return render_template('active_builds.html', agent=agent, builds=builds)

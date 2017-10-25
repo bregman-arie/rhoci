@@ -11,8 +11,14 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from jenkins import NotFoundException
+import logging
+
 from rhoci.models import Build
+from rhoci.models import Job
 from rhoci.db.base import db
+
+LOG = logging.getLogger(__name__)
 
 
 def get_last_build_number(job_info):
@@ -33,16 +39,46 @@ def get_build_result(conn, job_name, build_number):
 
 def update_in_db(data):
     """Update builds table with given data."""
-    active = True if data['build']['phase'] != 'COMPLETED' else False
+    active = True if data['build']['phase'] == 'STARTED' else False
+    if 'artifcats' in data:
+        artifacts = [i['archive'] for i in (
+            [j for i, j in data['artifacts'].iteritems()])]
+    else:
+        artifacts = ''
+    phase = (data['build']['phase']).lower()
+    parameters = str(data['build']['parameters'])
+    full_url = data['build']['full_url']
     name = data['name']
     number = data['build']['number']
-    phase = (data['build']['phase']).lower()
+    print parameters
 
     if not Build.query.filter_by(job=name, number=number).count():
-        build = Build(job=name, number=number, active=active)
+        build = Build(job=name, number=number, active=active,
+                      parameters=parameters, url=full_url)
         db.session.add(build)
         db.session.commit()
 
-    if phase == 'completed':
+    if phase == 'finalized':
+        status = data['build']['status']
         Build.query.filter_by(job=name, number=number).update(dict(
-            active=False, status=data['build']['status']))
+            active=False, status=status, artifacts=str(artifacts)))
+        Job.query.filter_by(name=name).update(dict(last_build_number=number,
+                                                   last_build_status=status))
+
+        db.session.commit()
+
+
+def check_active_builds(conn):
+    """Checks if active builds in DB are indeed still active."""
+    active_builds_db = Build.query.filter_by(active=True).all()
+    for build in active_builds_db:
+        try:
+            build_info = conn.get_build_info(build.job, build.number)
+            print build_info
+        except NotFoundException:
+            LOG.info("Couldn't find build. Job is removed from Jenkins.")
+            job = Job.query.filter_by(name=build.job).first()
+            db.session.delete(job)
+            db.session.delete(build)
+            db.session.commit()
+            LOG.info("Removed job and build.")

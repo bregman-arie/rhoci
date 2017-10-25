@@ -58,7 +58,7 @@ def ajax_jobs(job_type, release):
     jobs = Job.query.filter_by(job_type=job_type, release_number=int(release))
 
     for job in jobs:
-        results['data'].append([job.name, job.last_build_result,
+        results['data'].append([job.name, job.last_build_status,
                                 job.last_build_number])
 
     return jsonify(results)

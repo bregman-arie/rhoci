@@ -49,6 +49,9 @@ class Build(db.Model):
     number = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean)
     status = db.Column(db.String(64))
+    url = db.Column(db.String(128))
+    parameters = db.Column(db.Text)
+    artifacts = db.Column(db.Text)
 
     @property
     def serialize(self):
@@ -59,10 +62,13 @@ class Build(db.Model):
             'number': self.number,
             'active': self.active,
             'status': self.status,
+            'url': self.url,
+            'parameters': eval(self.parameters) if self.parameters else {},
+            'artifacts': eval(self.artifacts) if self.artifacts else {}
         }
 
-    def __repr__(self):
-        return self.serialize()
+#    def __repr__(self):
+#        return str(self.serialize)
 
 
 class Job(db.Model):
@@ -74,7 +80,7 @@ class Job(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     jenkins_server = db.Column(db.String(64))
     last_build_number = db.Column(db.Integer)
-    last_build_result = db.Column(db.String(64))
+    last_build_status = db.Column(db.String(64))
     job_type = db.Column(db.String(64))
     release_number = db.Column(db.Integer, db.ForeignKey('release.number'))
     release = db.relationship("Release", uselist=False, backref="release")
@@ -86,7 +92,7 @@ class Job(db.Model):
             'id': self.id,
             'name': self.name,
             'last_build_number': self.last_build_number,
-            'last_build_result': self.last_build_result,
+            'last_build_status': self.last_build_status,
             'job_type': self.job_type,
         }
 

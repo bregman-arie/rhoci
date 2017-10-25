@@ -78,16 +78,16 @@ def job_db_update(job, conn):
             db.session.commit()
 
     if last_build_number:
-        last_build_result = jenkins_lib.get_build_result(
+        last_build_status = jenkins_lib.get_build_status(
             conn, job['name'], last_build_number)
     else:
-        last_build_result = "None"
+        last_build_status = "None"
 
     # Update entry in database
     Job.query.filter_by(
         name=job['name']).update(
             dict(last_build_number=last_build_number,
-                 last_build_result=last_build_result))
+                 last_build_status=last_build_status))
 
 
 def build_db_update(build_data):

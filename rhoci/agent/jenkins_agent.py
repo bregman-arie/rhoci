@@ -22,7 +22,7 @@ import time
 
 from rhoci.agent import agent
 from rhoci.agent import update
-import rhoci.jenkins.build as jenkins_lib
+import rhoci.jenkins.build as build
 import rhoci.models as models
 from rhoci.db.base import db
 
@@ -53,6 +53,7 @@ class JenkinsAgent(agent.Agent):
             LOG.info("Updating jobs")
             with self.app.app_context():
                 update.shallow_jobs_update()
+            LOG.info("Update complete")
 
     def pre_start(self):
         """Populate the database with all the information from Jenkins."""
@@ -75,6 +76,8 @@ class JenkinsAgent(agent.Agent):
                     for job in all_jobs:
                         executor.submit(self.update_job_in_db, job)
 
+            build.check_active_builds(self.conn)
+
     def remove_jobs_from_db(self, jobs):
         """Removes jobs from DB that no longer exist on Jenkins."""
         with self.app.app_context():
@@ -86,22 +89,22 @@ class JenkinsAgent(agent.Agent):
         with self.app.app_context():
             try:
                 job_info = self.conn.get_job_info(job['name'])
-                last_build_number = jenkins_lib.get_last_build_number(
+                last_build_number = build.get_last_build_number(
                     job_info)
             except Exception as e:
                 LOG.info("Unable to fetch information for %s: %s" % (
                     job['name'], e.message))
             if last_build_number:
-                last_build_result = jenkins_lib.get_build_result(
+                last_build_status = build.get_build_status(
                     self.conn, job['name'], last_build_number)
             else:
-                last_build_result = "None"
+                last_build_status = "None"
 
             # Update entry in database
             models.Job.query.filter_by(
                 name=job['name']).update(
                     dict(last_build_number=last_build_number,
-                         last_build_result=last_build_result))
+                         last_build_status=last_build_status))
             db.session.commit()
             LOG.debug("Updated job from %s: %s" % (self.name, job['name']))
 
