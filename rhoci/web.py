@@ -132,7 +132,7 @@ class WebApp(object):
         format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
         level = logging.INFO
         logging.basicConfig(level=level, format=format)
-        handler = RotatingFileHandler('rhoci.log', maxBytes=20000,
+        handler = RotatingFileHandler('rhoci.log', maxBytes=200000,
                                       backupCount=10)
         logging.getLogger().addHandler(handler)
 

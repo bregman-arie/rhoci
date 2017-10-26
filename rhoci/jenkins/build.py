@@ -29,7 +29,7 @@ def get_last_build_number(job_info):
         return 0
 
 
-def get_build_result(conn, job_name, build_number):
+def get_build_status(conn, job_name, build_number):
     """Given a Jenkins connection and job name, it returns string of
 
     the last completed build result.
@@ -64,7 +64,6 @@ def update_in_db(data):
             active=False, status=status, artifacts=str(artifacts)))
         Job.query.filter_by(name=name).update(dict(last_build_number=number,
                                                    last_build_status=status))
-
         db.session.commit()
 
 

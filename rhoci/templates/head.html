@@ -22,6 +22,8 @@
   {% endblock %}
 
   {% block stylesheets %}
+  <link href="{{ url_for('static', filename='css/bootstrap-theme.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/patternfly.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/patternfly-additions.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}"></script>

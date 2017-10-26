@@ -158,7 +158,7 @@ var dataSet = [
   job_name: "{{ job.name }}",
   last_build_status: "{{ job.last_build_status }}",
   last_build_number: "{{ job.last_build_number }}",
-  test_statuss: "Tests",
+  test_results: "Tests",
 },
 {% endfor %}
 ];
@@ -179,7 +179,7 @@ $("#table1").DataTable({
     { data: "job_name" },
     { data: "last_build_status" },
     { data: "last_build_number" },
-    { data: "test_statuss" },
+    { data: "test_results" },
     { data: null,
       className: "table-view-pf-actions",
       render: function (data, type, full, meta) {
