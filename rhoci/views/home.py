@@ -104,7 +104,6 @@ def list_tests():
                                          'build_number']).all()
     else:
         tests = [i.serialize for i in Test.query.all()]
-    print tests
 
     return jsonify(tests=tests)
 

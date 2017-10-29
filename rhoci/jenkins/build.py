@@ -39,29 +39,36 @@ def get_build_status(conn, job_name, build_number):
 
 def update_in_db(data):
     """Update builds table with given data."""
-    active = True if data['build']['phase'] == 'STARTED' else False
-    if 'artifcats' in data:
-        artifacts = [i['archive'] for i in (
-            [j for i, j in data['artifacts'].iteritems()])]
-    else:
-        artifacts = ''
+    active = False
+    trigger = "Unknown"
     phase = (data['build']['phase']).lower()
     parameters = str(data['build']['parameters'])
     full_url = data['build']['full_url']
     name = data['name']
     number = data['build']['number']
-    print parameters
+
+    if data['build']['phase'] == 'STARTED':
+        active = True
+        status = 'IN_PROGRESS'
+    if 'artifcats' in data:
+        artifacts = [i['archive'] for i in (
+            [j for i, j in data['artifacts'].iteritems()])]
+    else:
+        artifacts = ''
+    if 'GERRIT_EVENT_ACCOUNT_NAME' in data['build']['parameters']:
+        trigger = "Gerrit (%s)" % data[
+            'build']['parameters']['GERRIT_EVENT_ACCOUNT_NAME']
 
     if not Build.query.filter_by(job=name, number=number).count():
-        build = Build(job=name, number=number, active=active,
-                      parameters=parameters, url=full_url)
+        build = Build(job=name, number=number, status=status, active=active,
+                      parameters=parameters, url=full_url, trigger=trigger)
         db.session.add(build)
         db.session.commit()
 
     if phase == 'finalized':
         status = data['build']['status']
         Build.query.filter_by(job=name, number=number).update(dict(
-            active=False, status=status, artifacts=str(artifacts)))
+            active=active, status=status, artifacts=str(artifacts)))
         Job.query.filter_by(name=name).update(dict(last_build_number=number,
                                                    last_build_status=status))
         db.session.commit()

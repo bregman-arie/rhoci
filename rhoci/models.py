@@ -50,6 +50,7 @@ class Build(db.Model):
     active = db.Column(db.Boolean)
     status = db.Column(db.String(64))
     url = db.Column(db.String(128))
+    trigger = db.Column(db.String(128))
     parameters = db.Column(db.Text)
     artifacts = db.Column(db.Text)
 
@@ -63,6 +64,7 @@ class Build(db.Model):
             'active': self.active,
             'status': self.status,
             'url': self.url,
+            'trigger': self.trigger,
             'parameters': eval(self.parameters) if self.parameters else {},
             'artifacts': eval(self.artifacts) if self.artifacts else {}
         }

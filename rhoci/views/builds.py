@@ -47,3 +47,12 @@ def active():
     agent = Agent.query.one()
 
     return render_template('active_builds.html', agent=agent, builds=builds)
+
+
+@builds.route('/builds', methods=['GET'])
+def all_builds():
+
+    db_builds = Build.query.all()
+    all_builds = [build.serialize for build in db_builds]
+
+    return render_template('builds.html', all_builds=all_builds)
