@@ -132,3 +132,11 @@ def builds():
     """Returns information on Jenkins builds."""
     builds = [i.serialize for i in Build.query.all()]
     return jsonify(builds=builds)
+
+
+@auto.doc(groups=['tests', 'public'])
+@home.route('/v2.0/tests', methods=['GET', 'POST'])
+def tests():
+    """Returns information on Jenkins builds tests."""
+    tests = [i.serialize for i in Test.query.all()]
+    return jsonify(tests=tests)

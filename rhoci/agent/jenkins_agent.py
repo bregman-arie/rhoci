@@ -42,7 +42,9 @@ class JenkinsAgent(agent.Agent):
         try:
             self.conn = jenkins.Jenkins(self.url, self.user, self.password)
             self.active = True
-        except Exception:
+        except Exception as e:
+            LOG.info("Something went terribly wrong starting Jenkins agent: %s"
+                     % e.message)
             self.active = False
         self.add_agent_to_db()
 

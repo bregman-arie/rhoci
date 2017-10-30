@@ -69,9 +69,6 @@ class Build(db.Model):
             'artifacts': eval(self.artifacts) if self.artifacts else {}
         }
 
-#    def __repr__(self):
-#        return str(self.serialize)
-
 
 class Job(db.Model):
     """Represents Jenkins job."""
@@ -103,20 +100,30 @@ class Job(db.Model):
 
 
 class Test(db.Model):
-    """Represents Test."""
+    """Represents a single unique test."""
 
     __tablename__ = 'test'
 
     id = db.Column(db.Integer)
     class_name = db.Column(db.String(128), primary_key=True)
-    job_name = db.Column(db.String(64), db.ForeignKey('job.name'),
-                         primary_key=True)
-    build_number = db.Column(db.String(64), db.ForeignKey('build.number'),
-                             primary_key=True)
+    failure = db.Column(db.Integer)
+    success = db.Column(db.Integer)
 
-    def __repr__(self):
-        return "<Test %s\ncount: %s" % (self.class_name,
-                                        self.count)
+
+class TestBuild(db.Model):
+    """Represents a test in a context of build."""
+
+    __tablename__ = 'test_build'
+
+    id = db.Column(db.Integer)
+    class_name = db.Column(db.String(128), primary_key=True)
+    job = db.Column(db.String(64), primary_key=True)
+    build = db.Column(db.String(64), primary_key=True)
+    status = db.Column(db.String(64))
+    skipped = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    duration = db.Column(db.String(64))
+    errorStackTrace = db.Column(db.Text)
 
 
 class Node(db.Model):
@@ -154,3 +161,15 @@ class Plugin(db.Model):
 
     def __repr__(self):
         return "<Plugin %r" % (self.name)
+
+
+class DFG(db.Model):
+    """Represents DFG."""
+
+    __tablename__ = 'DFG'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), primary_key=True, unique=True)
+
+    def __repr__(self):
+        return "<DFG %r" % (self.name)

@@ -22,7 +22,10 @@
             Job {{ build.job }}
           </div>
           <div class="list-group-item-text" style="font-size:20px">
-            Build #{{ build.number }}<br>
+            Build #{{ build.number }}
+          </div>
+          <div class="list-group-item-text" style="font-size:20px">
+            {{ build.trigger }}
           </div>
         </div>
         <div class="list-view-pf-additional-info">
