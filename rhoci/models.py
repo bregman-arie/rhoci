@@ -109,6 +109,15 @@ class Test(db.Model):
     failure = db.Column(db.Integer)
     success = db.Column(db.Integer)
 
+    @property
+    def serialize(self):
+        """Return test object data in serializeable format"""
+        return {
+            'class_name': self.class_name,
+            'failure': self.failure,
+            'success': self.success
+        }
+
 
 class TestBuild(db.Model):
     """Represents a test in a context of build."""
@@ -124,6 +133,20 @@ class TestBuild(db.Model):
     name = db.Column(db.String(64))
     duration = db.Column(db.String(64))
     errorStackTrace = db.Column(db.Text)
+
+    @property
+    def serialize(self):
+        """Return test build object data in serializeable format"""
+        return {
+            'class_name': self.class_name,
+            'job': self.job,
+            'build': self.build,
+            'status': self.status,
+            'skipped': self.skipped,
+            'name': self.name,
+            'duration': self.duration,
+            'errorStackTrace': self.errorStackTrace
+        }
 
 
 class Node(db.Model):

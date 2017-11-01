@@ -13,7 +13,6 @@
 #    under the License.
 from configparser import ConfigParser
 from flask import Flask
-from gevent.pywsgi import WSGIServer
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -39,6 +38,7 @@ views = (
     (rhoci.views.jobs, '/jobs'),
     (rhoci.views.doc, '/doc'),
     (rhoci.views.builds, '/builds'),
+    (rhoci.views.tests, '/tests'),
     (rhoci.views.nodes, '/nodes'),
     (rhoci.views.jenkins_notifications, '/jenkins_notifications'),
     (rhoci.views.plugins, '/plugins'),
@@ -145,15 +145,7 @@ class WebApp(object):
         """Runs the web server."""
         logger.info("Running rhoci web server")
 
-        listen_socket = (
-            app.config.get('BIND_HOST', self.DEFAULT_BIND_HOST),
-            app.config.get('PORT', self.DEFAULT_PORT)
-        )
-
-        self.server = WSGIServer(listen_socket,
-                                 application=app,
-                                 log='default')
-        self.server.serve_forever()
+        app.run(threaded=True)
 
     def _setup_releases(self):
         """Create DB entry for each release."""

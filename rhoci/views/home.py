@@ -24,7 +24,7 @@ from rhoci.models import Agent
 from rhoci.views.doc import auto
 from rhoci.models import Job
 from rhoci.models import Release
-from rhoci.models import Test
+from rhoci.models import TestBuild
 
 LOG = logging.getLogger(__name__)
 
@@ -99,11 +99,11 @@ def get_job(job_name):
 def list_tests():
     """Returns all tests in the DB."""
     if request.method == 'POST':
-        tests = Test.query.filter_by(job_name=request.form['job_name'],
-                                     build_number=request.form[
-                                         'build_number']).all()
+        tests = TestBuild.query.filter_by(job_name=request.form['job_name'],
+                                          build_number=request.form[
+                                              'build_number']).all()
     else:
-        tests = [i.serialize for i in Test.query.all()]
+        tests = [i.serialize for i in TestBuild.query.all()]
 
     return jsonify(tests=tests)
 
@@ -132,11 +132,3 @@ def builds():
     """Returns information on Jenkins builds."""
     builds = [i.serialize for i in Build.query.all()]
     return jsonify(builds=builds)
-
-
-@auto.doc(groups=['tests', 'public'])
-@home.route('/v2.0/tests', methods=['GET', 'POST'])
-def tests():
-    """Returns information on Jenkins builds tests."""
-    tests = [i.serialize for i in Test.query.all()]
-    return jsonify(tests=tests)

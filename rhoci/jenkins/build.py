@@ -51,28 +51,34 @@ def update_tests(tests_data, job, build_number):
                            failure=0,
                            success=0)
             db.session.add(test_db)
-            db.commit()
-        test_build_db = TestBuild(job=job, build=build_number,
-                                  status=test['status'],
-                                  skipped=test['skipped'],
-                                  class_name=test['className'],
-                                  name=test['name'],
-                                  duration=test['duration'],
-                                  errorStackTrace=test['errorStackTrace'])
-        db.session.add(test_build_db)
+            db.session.commit()
+            LOG.debug("Added test %s" % test['className'])
+        if not TestBuild.query.filter_by(class_name=test['className'],
+                                         job=job, build=build_number).count():
+            test_build_db = TestBuild(job=job, build=build_number,
+                                      status=test['status'],
+                                      skipped=test['skipped'],
+                                      class_name=test['className'],
+                                      name=test['name'],
+                                      duration=test['duration'],
+                                      errorStackTrace=test['errorStackTrace'])
+            db.session.add(test_build_db)
+            db.session.commit()
+            LOG.debug("Added test build %s %s %s" % (test['className'], job,
+                                                     build_number))
         if test['status'] == 'PASSED':
             Test.query.filter_by(class_name=test['className']).update(dict(
                 success=+1))
         else:
             Test.query.filter_by(class_name=test['className']).update(dict(
                 failure=+1))
-        db.commit()
+        db.session.commit()
 
 
 def update_in_db(data):
     """Update builds table with given data."""
     active = False
-    trigger = "Unknown"
+    status = trigger = "Unknown"
     phase = (data['build']['phase']).lower()
     parameters = str(data['build']['parameters'])
     full_url = data['build']['full_url']
@@ -118,7 +124,8 @@ def update_in_db(data):
         db.session.commit()
         url = current_app.config.get("url")
         tests_raw_data = urlopen(
-            url + "/job/" + name + "/" + number + "/testReport/api/json").read(
+            url + "/job/" + name + "/" +
+            str(number) + "/testReport/api/json").read(
         )
         if 'Not found' not in tests_raw_data:
             LOG.debug("Found tests. Adding them to DB.")

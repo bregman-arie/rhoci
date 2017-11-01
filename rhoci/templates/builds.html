@@ -24,6 +24,7 @@
               <li><a href="#" id="filter3">Build number</a></li>
               <li><a href="#" id="filter3">Status</a></li>
               <li><a href="#" id="filter4">Trigger</a></li>
+              <li><a href="#" id="filter5">Parameters</a></li>
             </ul>
           </div>
           <input type="text" class="form-control" placeholder="Filter By Job Name..." autocomplete="off" id="filterInput">
@@ -94,6 +95,7 @@
       <th>Build Number</th>
       <th>Build status</th>
       <th>Trigger</th>
+      <th>Parameters</th>
       <th colspan="2">Actions</th>
     </tr>
   </thead>
@@ -159,6 +161,7 @@ var dataSet = [
   number: "{{ build.number }}",
   build_status: "{{ build.status }}",
   trigger: "{{ build.trigger }}",
+  parameters: "{{ build.parameters }}",
 },
 {% endfor %}
 ];
@@ -180,6 +183,7 @@ $("#table1").DataTable({
     { data: "number" },
     { data: "build_status" },
     { data: "trigger" },
+    { data: "parameters" },
     { data: null,
       className: "table-view-pf-actions",
       render: function (data, type, full, meta) {
@@ -227,6 +231,9 @@ $("#table1").DataTable({
       }, {
         optionSelector: "#filter4",
         placeholder: "Filter By Build Trigger"
+      }, {
+        optionSelector: "#filter5",
+        placeholder: "Filter By Parameters",
       }
     ],
     paginationSelector: "#pagination1",

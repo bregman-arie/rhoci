@@ -70,6 +70,28 @@
                </ul>
             </li>
 
+          <!-- Tests page button -->
+            <li class="dropdown">
+                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tests<b class="caret"></b></a>
+               <ul class="dropdown-menu">
+
+               <li>
+                 <a href="{{ url_for('tests.test_runs') }}">All test runs</a>
+               </li>
+
+               <li>
+                 <a href="{{ url_for('tests.unique_tests') }}">Unique tests</a>
+               </li>
+
+               <li class="divider"></li>
+
+               <li>
+                 <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
+               </li>
+
+               </ul>
+            </li>
+
           <!-- Nodes page button -->
             <li>
                 <a href="{{ url_for('nodes.index') }}">Nodes</a>

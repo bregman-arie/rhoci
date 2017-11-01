@@ -11,14 +11,24 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .builds import builds  # noqa
-from .add_job import add_job  # noqa
-from .job_analyzer import job_analyzer  # noqa
-from .doc import doc  # noqa
-from .review_statistics import review_statistics  # noqa
-from .jenkins_notifications import jenkins_notifications  # noqa
-from .tests import tests  # noqa
+
+""" RHOCI base exception handling. """
+
+
+class RHOCIException(Exception):
+    """Base RHOCI Exception.
+
+    To use this class, inherit from it and define a 'message' property.
+    """
+    message = "An unknown exception occurred."
+
+    def __init__(self, *args, **kwargs):
+        if len(args) > 0:
+            self.message = args[0]
+        super(RHOCIException, self).__init__(self.message % kwargs)
+        self.msg = self.message % kwargs
+
+
+class APIException(RHOCIException):
+    msg = "Something, somewhere went terribly wrong"
+    code = 500
