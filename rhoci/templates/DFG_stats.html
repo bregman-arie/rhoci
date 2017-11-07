@@ -2,15 +2,19 @@
 
 {% block content %}
 
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+
 <!-- Main container -->
 <br>
 <div class="container-fluid col-md-custom col-md-offset-custom">
   <div class="row text-center">
   </div>
 
-{% for dfg in all_dfgs %}
+{% for release in releases %}
 
-{% include "DFG.html" -%}
+{% include "DFG_pie_chart.html" -%}
+
 
 {% endfor %}
 

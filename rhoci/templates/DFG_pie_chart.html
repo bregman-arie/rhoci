@@ -1,0 +1,51 @@
+<div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+  <div class="card-pf card-pf-view">                                                                                                                                                          
+    <div class="card-pf-body">
+      <div class="card-pf-top-element">
+      <h2 class="card-pf-title text-center">
+        RHOSP {{ release['number'] }}
+      </h2>
+      </div>
+            <div id="pie-chart-{{ release['number'] }}" class="example-pie-chart-right-legend" style="display:inline-block"></div>
+      <div class="card-pf-items text-center">
+        <div class="card-pf-item">
+        </div>
+      </div>
+    </div>
+    <div class="card-pf-view-checkbox">
+      <input type="checkbox">
+    </div>
+  </div>
+  </div>
+
+<script>
+  var c3ChartDefaults = $().c3ChartDefaults();
+
+  var pieData = {
+    type : 'pie',
+    colors: {
+      Failed: $.pfPaletteColors.red,
+      Unstable: $.pfPaletteColors.gold,
+      Success: $.pfPaletteColors.green
+    },
+    columns: [
+      ['Failed', {{ release['FAILED'] }}],
+      ['Unstable', {{ release['UNSTABLE'] }}],
+      ['Success', {{ release['SUCCESS'] }}]
+    ],
+    onclick: function (d, i) { console.log("onclick", d, i); },
+    onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+    onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+  };
+
+  // Pie Chart without Legend
+  var pieChartConfig = c3ChartDefaults.getDefaultPieConfig();
+  pieChartConfig.bindto = '#pie-chart-{{ release['number'] }}';
+  pieChartConfig.data = pieData;
+  pieChartConfig.size = {
+    width: 200,
+    height: 171
+  };
+  var pieChartNoLegend = c3.generate(pieChartConfig);
+
+</script>
