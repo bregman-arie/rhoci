@@ -25,6 +25,7 @@ from rhoci.views.doc import auto
 from rhoci.models import Job
 from rhoci.models import Release
 from rhoci.models import TestBuild
+from rhoci.models import DFG
 
 LOG = logging.getLogger(__name__)
 
@@ -132,3 +133,11 @@ def builds():
     """Returns information on Jenkins builds."""
     builds = [i.serialize for i in Build.query.all()]
     return jsonify(builds=builds)
+
+
+@auto.doc(groups=['rhosp', 'public'])
+@home.route('/v2.0/dfg', methods=['GET', 'POST'])
+def dfgs():
+    """Returns all DFGs"""
+    dfg = [i.serialize for i in DFG.query.all()]
+    return jsonify(dfgs=dfg)

@@ -20,7 +20,7 @@
           <div class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Job Name <span class="caret"></span></button>
             <ul class="dropdown-menu">
-              <li><a href="#" id="filter1">Job Name</a></li>
+              <li><a href="#" id="filter1">Test Class Name</a></li>
               <li><a href="#" id="filter3">Build number</a></li>
               <li><a href="#" id="filter3">Status</a></li>
               <li><a href="#" id="filter4">Trigger</a></li>
@@ -208,15 +208,6 @@ $("#table1").DataTable({
     }
   ],
   data: dataSet,
-    columnDefs: [
-        {
-            targets:3,
-            render: function ( data, type, row, meta ) {
-              return data.length > 2 ?
-        data.substr( 0, 2 ) +'…' :
-        data;
-                }
-         },
   dom: "t",
   language: {
     zeroRecords: "No records found"

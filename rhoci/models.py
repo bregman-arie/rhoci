@@ -192,7 +192,11 @@ class DFG(db.Model):
     __tablename__ = 'DFG'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), primary_key=True, unique=True)
+    name = db.Column(db.String(64), unique=True)
 
-    def __repr__(self):
-        return "<DFG %r" % (self.name)
+    @property
+    def serialize(self):
+        """Return DFG object data in serializeable format"""
+        return {
+            'name': self.name,
+        }

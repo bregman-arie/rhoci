@@ -150,6 +150,7 @@
   </div>
 </div>
 
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/plug-ins/1.10.11/dataRender/ellipsis.js"></script>
 <script>
 $(document).ready(function() {
 
@@ -209,6 +210,9 @@ $("#table1").DataTable({
   ],
   data: dataSet,
   dom: "t",
+  columnDefs: [
+						{ targets: 5, render: $.fn.dataTable.render.ellipsis( 20, true ) },
+					],
   language: {
     zeroRecords: "No records found"
   },

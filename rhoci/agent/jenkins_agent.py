@@ -25,6 +25,7 @@ from rhoci.agent import update
 import rhoci.jenkins.build as build
 import rhoci.models as models
 from rhoci.db.base import db
+from rhoci.rhosp.dfg import get_dfg_name
 
 LOG = logging.getLogger(__name__)
 
@@ -142,6 +143,12 @@ class JenkinsAgent(agent.Agent):
         elif 'phase2' in name:
             return 'phase2'
         elif 'dfg' in name:
+            dfg = get_dfg_name(name)
+            print dfg
+            if not models.DFG.query.filter_by(name=dfg).count():
+                db_dfg = models.DFG(name=dfg)
+                db.session.add(db_dfg)
+                db.session.commit()
             return 'dfg'
         else:
             return 'other'

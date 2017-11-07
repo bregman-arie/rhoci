@@ -11,15 +11,29 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from .home import home  # noqa
-from .nodes import nodes  # noqa
-from .plugins import plugins  # noqa
-from .jobs import jobs  # noqa
-from .builds import builds  # noqa
-from .add_job import add_job  # noqa
-from .job_analyzer import job_analyzer  # noqa
-from .doc import doc  # noqa
-from .review_statistics import review_statistics  # noqa
-from .jenkins_notifications import jenkins_notifications  # noqa
-from .tests import tests  # noqa
-from .dfg import dfg  # noqa
+from flask import render_template
+from flask import Blueprint
+import logging
+
+from rhoci.models import DFG
+
+
+logger = logging.getLogger(__name__)
+
+dfg = Blueprint('dfg', __name__)
+
+
+@dfg.route('/', methods=['GET'])
+def index():
+
+    db_dfg = DFG.query.all()
+    all_dfgs = [dfg.serialize for dfg in db_dfg]
+
+    return render_template('DFGs.html', all_dfgs=all_dfgs)
+
+
+@dfg.route('/dfg/<dfg_name>', methods=['GET'])
+def stats(dfg_name):
+
+    print dfg_name
+    return render_template('DFG_stats.html')
