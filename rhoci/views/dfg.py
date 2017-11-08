@@ -15,6 +15,7 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
+from rhoci.models import Agent
 from rhoci.models import DFG
 from rhoci.models import Job
 from rhoci.models import Release
@@ -34,18 +35,18 @@ def index():
     return render_template('DFGs.html', all_dfgs=all_dfgs)
 
 
-@dfg.route('/dfg/<dfg_name>', methods=['GET'])
+@dfg.route('/<dfg_name>', methods=['GET'])
 def stats(dfg_name):
 
+    agent = Agent.query.one()
     rls = Release.query.all()
     data = []
     for item in rls:
-        print "RELEASE %s !" % item.number
-        for i in Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('FAILURE'), Job.release == item):
-            print i.name
-        data.append({'FAILED': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('FAILURE'), Job.release == item).count(),
+        data.append({'FAILURE': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('FAILURE'), Job.release == item).count(),
                      'SUCCESS': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('SUCCESS'), Job.release == item).count(),
                      'UNSTABLE': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('UNSTABLE'), Job.release == item).count(),
-                     'number': item.number})
+                     'None': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('None'), Job.release == item).count(),
+                     'number': item.number,
+                     'dfg': dfg_name})
 
-    return render_template('DFG_stats.html', releases=data)
+    return render_template('DFG_stats.html', releases=data, agent=agent)

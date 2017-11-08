@@ -24,16 +24,64 @@
   var pieData = {
     type : 'pie',
     colors: {
-      Failed: $.pfPaletteColors.red,
+      Failure: $.pfPaletteColors.red,
       Unstable: $.pfPaletteColors.gold,
+      None: $.pfPaletteColors.blue,
       Success: $.pfPaletteColors.green
     },
     columns: [
-      ['Failed', {{ release['FAILED'] }}],
+      ['Failure', {{ release['FAILURE'] }}],
       ['Unstable', {{ release['UNSTABLE'] }}],
+      ['None', {{ release['None'] }}],
       ['Success', {{ release['SUCCESS'] }}]
     ],
-    onclick: function (d, i) { console.log("onclick", d, i); },
+    onclick: function (d, i) { 
+    
+    
+    $('#dfg_jobs_table').DataTable( {
+      "ajax": "{{ url_for('jobs.jobs_status', status='FAILURE', dfg=release.dfg, release=release.number) }}".replace("FAILURE", d.id),
+      "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+          if ( aData[1] == "FAILURE" )
+          {
+          $('td', nRow).css('background-color', '#f2dede' );
+          }
+          else if ( aData[1] == "SUCCESS" )
+          {
+          $('td', nRow).css('background-color', '#dff0d8');
+          }
+          else if ( aData[1] == "UNSTABLE" )
+          {
+          $('td', nRow).css('background-color', '#fcf8e3');
+          }
+          else
+          {
+          $('td', nRow).css('background-color', '#d9edf7');
+          }
+        },
+        columnDefs: [
+            {
+                targets:0,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                        data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:[1,2],
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[2] != 0){
+                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            }
+        ]
+    } );
+    
+    
+    },
     onmouseover: function (d, i) { console.log("onmouseover", d, i); },
     onmouseout: function (d, i) { console.log("onmouseout", d, i); }
   };

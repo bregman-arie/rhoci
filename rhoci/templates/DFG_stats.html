@@ -5,18 +5,28 @@
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
 
-<!-- Main container -->
 <br>
 <div class="container-fluid col-md-custom col-md-offset-custom">
   <div class="row text-center">
   </div>
 
+<table id="dfg_jobs_table" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Job Name</th>
+                <th>Last Build Status</th>
+                <th>Last Build Number</th>
+            </tr>
+        </thead>
+</table>
+
+<!-- Pie chart for each release -->
 {% for release in releases %}
 
 {% include "DFG_pie_chart.html" -%}
 
-
 {% endfor %}
-
 <!-- -->
+
+
 {% endblock %}

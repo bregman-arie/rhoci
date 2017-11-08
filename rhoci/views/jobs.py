@@ -13,6 +13,7 @@
 #    under the License.
 from flask import render_template
 from flask import Blueprint
+from flask import jsonify
 import logging
 
 from rhoci.models import Agent
@@ -31,3 +32,18 @@ def index():
     agent = Agent.query.one()
 
     return render_template('jobs.html', agent=agent, jobs=jobs)
+
+
+@jobs.route('/jobs_status/<status>_<dfg>_<release>')
+def jobs_status(status, dfg, release):
+    """Get jobs with specific status"""
+    results = dict()
+    results['data'] = list()
+
+    jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
+                            Job.last_build_status.like(status),
+                            Job.release_number.like(release))
+    for job in jobs:
+        results['data'].append([job.name, job.last_build_status,
+                                job.last_build_number])
+    return jsonify(results)
