@@ -23,6 +23,10 @@ def create_runserver_subparser(subparsers, parent_parser):
     runserver_parser.add_argument(
         '--conf', '-c', dest="config_file", help='RHOCI configuration file')
 
+    runserver_parser.add_argument(
+        '--port', '-p', dest="port", default=80,
+        help="Port number to use when running RHOCI Web server")
+
 
 def create():
     """Returns argparse parser."""

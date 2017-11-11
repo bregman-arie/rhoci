@@ -2,4 +2,4 @@
 rm -rf .venv
 virtualenv .venv && source .venv/bin/activate
 pip install .
-rhoci run --debug
+rhoci run --debug -p 5000

@@ -133,7 +133,7 @@ class WebApp(object):
         format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
         level = logging.INFO
         logging.basicConfig(level=level, format=format)
-        handler = RotatingFileHandler('rhoci.log', maxBytes=200000,
+        handler = RotatingFileHandler('rhoci.log', maxBytes=2000000,
                                       backupCount=10)
         logging.getLogger().addHandler(handler)
 
@@ -146,7 +146,7 @@ class WebApp(object):
         """Runs the web server."""
         logger.info("Running rhoci web server")
 
-        app.run(threaded=True)
+        app.run(threaded=True, host='0.0.0.0', port=int(app.config['PORT']))
 
     def _setup_releases(self):
         """Create DB entry for each release."""

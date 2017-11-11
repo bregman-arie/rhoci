@@ -142,7 +142,7 @@ class JenkinsAgent(agent.Agent):
             return 'phase1'
         elif 'phase2' in name:
             return 'phase2'
-        elif 'dfg' in name:
+        elif 'DFG' in name:
             dfg = get_dfg_name(name)
             if not models.DFG.query.filter_by(name=dfg).count():
                 db_dfg = models.DFG(name=dfg)

@@ -15,19 +15,18 @@
   <div class="col-sm-12">
     <form class="toolbar-pf-actions">
       <div class="form-group toolbar-pf-filter">
-        <label class="sr-only" for="filter">Job Name</label>
+        <label class="sr-only" for="filter">Class Name</label>
         <div class="input-group">
           <div class="input-group-btn">
-            <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Job Name <span class="caret"></span></button>
+            <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Class Name <span class="caret"></span></button>
             <ul class="dropdown-menu">
               <li><a href="#" id="filter1">Test Class Name</a></li>
-              <li><a href="#" id="filter3">Build number</a></li>
-              <li><a href="#" id="filter3">Status</a></li>
-              <li><a href="#" id="filter4">Trigger</a></li>
-              <li><a href="#" id="filter5">Parameters</a></li>
+              <li><a href="#" id="filter3">Job Name</a></li>
+              <li><a href="#" id="filter3">Build Number</a></li>
+              <li><a href="#" id="filter4">Status</a></li>
             </ul>
           </div>
-          <input type="text" class="form-control" placeholder="Filter By Job Name..." autocomplete="off" id="filterInput">
+          <input type="text" class="form-control" placeholder="Filter By Class Name..." autocomplete="off" id="filterInput">
         </div>
       </div>
       <div class="form-group">
@@ -91,11 +90,10 @@
   <thead>
     <tr>
       <th><label class="sr-only" for="selectAll">Select all rows</label><input type="checkbox" id="selectAll" name="selectAll"></th>
+      <th>Class Name</th>
       <th>Job Name</th>
       <th>Build Number</th>
-      <th>Build status</th>
-      <th>Trigger</th>
-      <th>Parameters</th>
+      <th>Status</th>
       <th colspan="2">Actions</th>
     </tr>
   </thead>
@@ -155,13 +153,12 @@ $(document).ready(function() {
 
 // JSON data for Table View
 var dataSet = [
-{% for build in all_builds %}
+{% for test in all_tests %}
 {
-  job_name: "{{ build.job }}",
-  number: "{{ build.number }}",
-  build_status: "{{ build.status }}",
-  trigger: "{{ build.trigger }}",
-  parameters: "{{ build.parameters }}",
+  class_name: "{{ test.class_name }}",
+  job: "{{ test.job }}",
+  build: "{{ test.build }}",
+  status: "{{ test.status }}",
 },
 {% endfor %}
 ];
@@ -179,11 +176,10 @@ $("#table1").DataTable({
       },
       sortable: false
     },
-    { data: "job_name" },
-    { data: "number" },
-    { data: "build_status" },
-    { data: "trigger" },
-    { data: "parameters" },
+    { data: "class_name" },
+    { data: "job" },
+    { data: "build" },
+    { data: "status" },
     { data: null,
       className: "table-view-pf-actions",
       render: function (data, type, full, meta) {
@@ -221,7 +217,7 @@ $("#table1").DataTable({
       {
         default: true,
         optionSelector: "#filter1",
-        placeholder: "Filter By Job Name..."
+        placeholder: "Filter By Class Name..."
       }, {
         optionSelector: "#filter2",
         placeholder: "Filter By Build Number..."

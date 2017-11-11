@@ -141,3 +141,21 @@ def dfgs():
     """Returns all DFGs"""
     dfg = [i.serialize for i in DFG.query.all()]
     return jsonify(dfgs=dfg)
+
+
+@home.route('/releases', methods=['GET'])
+def releases():
+
+    releases = Release.query.all()
+    jobs = {}
+    jobs['phase1'] = Job.query.filter_by(job_type='phase1')
+    jobs['phase2'] = Job.query.filter_by(job_type='phase2')
+    jobs['dfg'] = Job.query.filter_by(job_type='dfg')
+    agent = Agent.query.one()
+
+    return render_template('releases.html',
+                           releases=releases,
+                           agent=agent,
+                           phase1=jobs['phase1'],
+                           phase2=jobs['phase2'],
+                           dfg=jobs['dfg'])
