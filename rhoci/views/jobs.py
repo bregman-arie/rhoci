@@ -14,6 +14,8 @@
 from flask import render_template
 from flask import Blueprint
 from flask import jsonify
+from flask import request
+import jenkins
 import logging
 
 from rhoci.models import Agent
@@ -47,3 +49,15 @@ def jobs_status(status, dfg, release):
         results['data'].append([job.name, job.last_build_status,
                                 job.last_build_number])
     return jsonify(results)
+
+
+@jobs.route('/exists/')
+def exists():
+    job = request.args.get('job')
+    exists = True
+    if not Job.query.filter_by(name=job).count():
+        agent = Agent.query.one()
+        conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+        exists = conn.job_exists(job)
+
+    return jsonify(exists=exists)

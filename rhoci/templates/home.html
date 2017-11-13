@@ -73,17 +73,48 @@
   </div>
   </div>
 
-  <br><br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
+</div>
 
+<br><br><br>
+
+      <div class="row">
   <div class="form-group">
     <div class="col-sm-offset-4 col-sm-4">
       <a href="{{ url_for('dfg.index') }}"><button class="btn btn-warning btn-lg" style="height:130px;width:250px"><font size="5">DFG View</font></button></a>
       <a href="{{ url_for('home.releases') }}"><button class="btn btn-primary btn-lg" style="height:130px;width:250px"><font size="5">Release View</font></button></a>
 </div>
   </div>
+      </div>
 
-</div>
-</div>
+  <br><br><br><br>
 
+  <!-- Top Failing Tests Table -->
+    <div class="list-group-item-container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h3>
+              <strong>Top Failing Tests</strong>
+          </h3>
+          <table class="table table-striped table-bordered table-hover" id="failing_tests">
+            <thead>
+              <tr>
+                <th>Class Name</th>
+                <th>Failure Count</th>
+                <th>Success Count</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+
+<script>
+    $('#failing_tests').DataTable( {
+        "ajax": "{{ url_for('tests.top_failing_tests') }}",
+    });
+</script>
 
 {% endblock %}

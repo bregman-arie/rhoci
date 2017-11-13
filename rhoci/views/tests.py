@@ -13,6 +13,7 @@
 #    under the License.
 from flask import render_template
 from flask import Blueprint
+from flask import jsonify
 import logging
 
 from rhoci.models import Test
@@ -39,4 +40,18 @@ def unique_tests():
     db_tests = Test.query.all()
     all_tests = [test.serialize for test in db_tests]
 
-    return render_template('tests.html', all_tests=all_tests)
+    return render_template('unique_tests.html', all_tests=all_tests)
+
+
+@tests.route('/top_failing_tests', methods=['GET'])
+def top_failing_tests():
+
+    results = dict()
+    results['data'] = list()
+
+    db_tests = Test.query.limit(5).all()
+
+    for test in db_tests:
+        results['data'].append([test.class_name, test.failure, test.success])
+
+    return jsonify(results)

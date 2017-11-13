@@ -138,13 +138,16 @@ class JenkinsAgent(agent.Agent):
 
     def get_job_type(self, name):
         """Returns job type based on its name."""
+        print name
         if 'phase1' in name:
             return 'phase1'
         elif 'phase2' in name:
             return 'phase2'
-        elif 'DFG' in name:
+        elif 'dfg' in name:
+            print "yes, DFG!"
             dfg = get_dfg_name(name)
-            if not models.DFG.query.filter_by(name=dfg).count():
+            if (not models.DFG.query.filter_by(name=dfg).count() and
+                    dfg.lower() != 'dfg'):
                 db_dfg = models.DFG(name=dfg)
                 db.session.add(db_dfg)
                 db.session.commit()

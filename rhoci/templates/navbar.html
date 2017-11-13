@@ -82,6 +82,10 @@
                  <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
                </li>
 
+               <li>
+                 <a href="{{ url_for('builds.failure_analyze') }}">Failure Analyzer</a>
+               </li>
+
                </ul>
             </li>
 
@@ -124,11 +128,6 @@
               </li>
 
                </ul>
-            </li>
-
-          <!-- Review Statistics button -->
-            <li>
-                <a href="{{ url_for('review_statistics.index') }}">Review Statistics</a>
             </li>
 
         </ul>

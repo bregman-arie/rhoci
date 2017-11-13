@@ -56,3 +56,9 @@ def all_builds():
     all_builds = [build.serialize for build in db_builds]
 
     return render_template('builds.html', all_builds=all_builds)
+
+
+@builds.route('/failure_anaylze', methods=['GET'])
+def failure_analyze():
+
+    return render_template('failure_analyzer.html')

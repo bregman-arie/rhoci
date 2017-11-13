@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+<div class="container">
+
+<form class="form-horizontal" id="jjb_data">
+  <!-- form start-->
+
+  <!-- Job input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Job</label>
+    <div class="col-sm-4">
+      <input type="text" id="job_input" class="form-control">
+    </div>
+  </div>
+  <!-- Job input end -->
+
+  <!-- Build input start -->
+  <div class="form-group center-block">
+    <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Build</label>
+    <div class="col-sm-2">
+      <input type="text" id="build_input" class="form-control">
+    </div>
+  </div>
+  <!--- Build input end -->
+
+  <!-- buttons start -->
+  <div class="form-group">
+    <div class="col-sm-offset-4 col-sm-4">
+       <button type="button" class="btn btn-primary btn-lg" id="load" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Analyzing...">Analyze!</button>
+    </div>
+  </div>
+  <!-- buttons end -->
+
+  <!-- form end-->
+</form>
+
+<!-- Begin Console Output -->
+{% include "logs.html" -%}
+<!-- End Console Output -->
+
+
+<script>
+
+$('.btn').on('click', function() {
+  var $this = $(this);
+
+  // Assign variables from forms
+  var job = $('#job_input').val();
+  var build = $('#build_input').val();
+
+  $.ajax({
+    type:"GET",
+    dataType: "json",
+    data: {'job': job},
+    url: "{{ url_for('builds.exists') }}",
+    success: function(response){
+      if (response.exists) {
+        console.log(response.message);
+      }
+      else {
+        console.log(reponse.message);
+      }
+                               }
+        });
+
+
+});
+
+</script>
+
+{% endblock %}

@@ -14,4 +14,8 @@
 
 
 def get_dfg_name(string):
-    return string.split('-')[1]
+    name = string.split('-')[1]
+    if len(name) < 4:
+        return name.upper()
+    else:
+        return name.capitalize()
