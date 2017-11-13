@@ -13,11 +13,14 @@
 #    under the License.
 from flask import render_template
 from flask import Blueprint
+import jenkins
 from flask import jsonify
+from flask import request
 import logging
 
 from rhoci.models import Agent
 from rhoci.models import Build
+from rhoci.models import Job
 
 
 logger = logging.getLogger(__name__)
@@ -62,3 +65,30 @@ def all_builds():
 def failure_analyze():
 
     return render_template('failure_analyzer.html')
+
+
+@builds.route('/exists/')
+def exists():
+    job = request.args.get('job')
+    build = int(request.args.get('build'))
+    exists = True
+    message = ''
+
+    if not job or not build:
+        exists = False
+        message = "Invalid input"
+    elif not Job.query.filter_by(name=job).count():
+        agent = Agent.query.one()
+        conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+        exists = conn.job_exists(job)
+        message = "Couldn't find any job called %s " % job
+    elif not Build.query.filter_by(number=build).count():
+        agent = Agent.query.one()
+        conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+        try:
+            conn.get_build_info(job, build)
+        except jenkins.NotFoundException:
+            message = "Build not found"
+            exists = False
+
+    return jsonify(exists=exists, message=message)

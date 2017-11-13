@@ -54,14 +54,14 @@ $('.btn').on('click', function() {
   $.ajax({
     type:"GET",
     dataType: "json",
-    data: {'job': job},
+    data: {'job': job, 'build': build},
     url: "{{ url_for('builds.exists') }}",
     success: function(response){
       if (response.exists) {
         console.log(response.message);
       }
       else {
-        console.log(reponse.message);
+        console.log(response.message);
       }
                                }
         });
