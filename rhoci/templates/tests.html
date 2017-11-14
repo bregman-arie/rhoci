@@ -204,6 +204,20 @@ $("#table1").DataTable({
     }
   ],
   data: dataSet,
+  "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+      if ( aData['status'] == "FAILED" )
+      {
+      $('td', nRow).css('background-color', '#f2dede' );
+      }
+      else if ( aData['status'] == "PASSED" )
+      {
+      $('td', nRow).css('background-color', '#dff0d8');
+      }
+      else if ( aData['status'] == "SKIPPED" )
+      {
+      $('td', nRow).css('background-color', '#fcf8e3');
+      }
+  },
   dom: "t",
   language: {
     zeroRecords: "No records found"
