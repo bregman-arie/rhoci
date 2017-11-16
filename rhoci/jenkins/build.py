@@ -42,6 +42,11 @@ def get_build_status(conn, job_name, build_number):
     return str(conn.get_build_info(job_name, build_number)['result'])
 
 
+def get_artifacts(conn, job, build):
+    build_db = Build.query.filter_by(job=job, number=build)
+    print build_db.artifacts
+
+
 def update_tests(tests_data, job, build_number):
     """Checks if build ran tests. If yes, updates DB with the tests."""
     #  TODO(abregman): move this code to python-jenkins

@@ -18,6 +18,7 @@ from flask import jsonify
 from flask import request
 import logging
 
+import rhoci.jenkins.build as jenkins_build
 from rhoci.models import Agent
 from rhoci.models import Build
 from rhoci.models import Job
@@ -69,10 +70,10 @@ def failure_analyze():
 
 @builds.route('/exists/')
 def exists():
-    job = request.args.get('job')
-    build = int(request.args.get('build'))
     exists = True
     message = ''
+    job = request.args.get('job')
+    build = request.args.get('build')
 
     if not job or not build:
         exists = False
@@ -80,15 +81,46 @@ def exists():
     elif not Job.query.filter_by(name=job).count():
         agent = Agent.query.one()
         conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-        exists = conn.job_exists(job)
-        message = "Couldn't find any job called %s " % job
-    elif not Build.query.filter_by(number=build).count():
+        try:
+            exists = conn.job_exists(job)
+            message = "Couldn't find any job called %s " % job
+        except jenkins.JenkinsException:
+            exists = False
+            message = "Unable to reach Jenkins for some reason..."
+    elif not Build.query.filter_by(job=job, number=int(build)).count():
         agent = Agent.query.one()
         conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
         try:
-            conn.get_build_info(job, build)
+            conn.get_build_info(job, int(build))
         except jenkins.NotFoundException:
             message = "Build not found"
             exists = False
 
+    if exists:
+        if Build.query.filter_by(job=job, number=int(build)).count():
+            build_db = Build.query.filter_by(job=job, number=int(build))
+            build_status = build_db.status
+        else:
+            build_status = jenkins_build.get_build_status(conn, job, int(build))
+
+        if build_status != "FAILURE":
+            print build_status
+            exists = False
+            message = "The build didn't fail..."
+
     return jsonify(exists=exists, message=message)
+
+
+@builds.route('/obtain_logs')
+def obtain_logs():
+    found = False
+    message = "Couldn't find logs :("
+
+    job = request.args.get('job')
+    build = request.args.get('build')
+
+    agent = Agent.query.one()
+    conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+    print conn.get_build_info(job, int(build))
+
+    return jsonify(found=found, message=message)
