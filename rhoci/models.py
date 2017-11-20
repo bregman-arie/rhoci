@@ -200,3 +200,14 @@ class DFG(db.Model):
         return {
             'name': self.name,
         }
+
+
+class Artifact(db.Model):
+    """Represents an artifact"""
+
+    __tablename__ = 'artifact'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    build = db.Column(db.Integer)
+    job = db.Column(db.String(64))

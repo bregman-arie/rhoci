@@ -121,6 +121,8 @@ def obtain_logs():
 
     agent = Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+    if Build.query.filter_by(job=job, number=int(build)).count():
+        build_db = Build.query.filter_by(job=job, number=int(build))
     print conn.get_build_info(job, int(build))
 
     return jsonify(found=found, message=message)
