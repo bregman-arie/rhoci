@@ -52,7 +52,6 @@ class Build(db.Model):
     url = db.Column(db.String(128))
     trigger = db.Column(db.String(128))
     parameters = db.Column(db.Text)
-    artifacts = db.Column(db.Text)
 
     @property
     def serialize(self):
@@ -66,7 +65,6 @@ class Build(db.Model):
             'url': self.url,
             'trigger': self.trigger,
             'parameters': eval(self.parameters) if self.parameters else {},
-            'artifacts': eval(self.artifacts) if self.artifacts else {}
         }
 
 
@@ -208,6 +206,7 @@ class Artifact(db.Model):
     __tablename__ = 'artifact'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
+    name = db.Column(db.String(64))
+    relativePath = db.Column(db.String(128))
     build = db.Column(db.Integer)
     job = db.Column(db.String(64))

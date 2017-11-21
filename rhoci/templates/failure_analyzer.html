@@ -95,8 +95,9 @@ function obtain_logs() {
     data: {'job': job, 'build': build},
     url: "{{ url_for('builds.obtain_logs') }}",
     success: function(response){
-      if (response.exists) {
+      if (response.found) {
         console.log(response.message);
+        $("#logs_div").removeClass('hidden');
       }
       else {
         $("#alert_div").removeClass('hidden');

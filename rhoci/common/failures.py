@@ -25,6 +25,6 @@ FAILURES = [
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': None,
      'action': 'Add write permissions to the path you are trying to use',
-     'cause': 'Looks like the path you are trying to use is missing permissions',
+     'cause': 'The path you are trying to use is missing permissions',
      },
 ]

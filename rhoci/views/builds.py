@@ -20,6 +20,7 @@ import logging
 
 import rhoci.jenkins.build as jenkins_build
 from rhoci.models import Agent
+from rhoci.models import Artifact
 from rhoci.models import Build
 from rhoci.models import Job
 
@@ -101,7 +102,8 @@ def exists():
             build_db = Build.query.filter_by(job=job, number=int(build))
             build_status = build_db.status
         else:
-            build_status = jenkins_build.get_build_status(conn, job, int(build))
+            build_status = jenkins_build.get_build_status(conn,
+                                                          job, int(build))
 
         if build_status != "FAILURE":
             print build_status
@@ -121,8 +123,12 @@ def obtain_logs():
 
     agent = Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-    if Build.query.filter_by(job=job, number=int(build)).count():
-        build_db = Build.query.filter_by(job=job, number=int(build))
-    print conn.get_build_info(job, int(build))
+    if Artifact.query.filter_by(job=job, build=int(build)).count():
+        print Artifact.query.filter_by(job=job, build=int(build))
+        found = True
+    else:
+        arts = conn.get_build_info(job, int(build))['artifacts']
+        jenkins_build.update_artifacts_db(arts, job, build)
+        found = True
 
     return jsonify(found=found, message=message)

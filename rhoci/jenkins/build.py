@@ -17,6 +17,7 @@ import jenkins
 import logging
 from urllib import urlopen
 
+from rhoci.models import Artifact
 from rhoci.models import Build
 from rhoci.models import Job
 from rhoci.models import Test
@@ -150,3 +151,14 @@ def check_active_builds(conn):
             db.session.delete(build)
             db.session.commit()
             LOG.info("Removed job and build.")
+
+
+def update_artifacts_db(artifacts, job, build):
+    for art in artifacts:
+        db_artifact = Artifact(name=art['fileName'],
+                               build=int(build),
+                               job=job,
+                               relativePath=art['relativePath'])
+        db.session.add(db_artifact)
+        db.session.commit()
+        LOG.info("Added artifact in DB: %s" % art['fileName'])

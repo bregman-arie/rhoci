@@ -42,11 +42,23 @@ def stats(dfg_name):
     rls = Release.query.all()
     data = []
     for item in rls:
-        data.append({'FAILURE': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('FAILURE'), Job.release == item).count(),
-                     'SUCCESS': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('SUCCESS'), Job.release == item).count(),
-                     'UNSTABLE': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('UNSTABLE'), Job.release == item).count(),
-                     'None': Job.query.filter(Job.name.contains('DFG-%s' % dfg_name), Job.last_build_status.like('None'), Job.release == item).count(),
-                     'number': item.number,
-                     'dfg': dfg_name})
+        data.append({'FAILURE': Job.query.filter(
+            Job.name.contains(
+                'DFG-%s' % dfg_name), Job.last_build_status.like(
+                    'FAILURE'), Job.release == item).count(),
+            'SUCCESS': Job.query.filter(
+                Job.name.contains(
+                    'DFG-%s' % dfg_name), Job.last_build_status.like(
+                        'SUCCESS'), Job.release == item).count(),
+            'UNSTABLE': Job.query.filter(
+                Job.name.contains(
+                    'DFG-%s' % dfg_name), Job.last_build_status.like(
+                        'UNSTABLE'), Job.release == item).count(),
+            'None': Job.query.filter(
+                Job.name.contains(
+                    'DFG-%s' % dfg_name), Job.last_build_status.like(
+                        'None'), Job.release == item).count(),
+            'number': item.number,
+            'dfg': dfg_name})
 
     return render_template('DFG_stats.html', releases=data, agent=agent)
