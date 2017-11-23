@@ -17,11 +17,13 @@ import jenkins
 from flask import jsonify
 from flask import request
 import logging
+import urllib2
 
 import rhoci.jenkins.build as jenkins_build
 from rhoci.models import Agent
 from rhoci.models import Artifact
 from rhoci.models import Build
+from rhoci.models import Failure
 from rhoci.models import Job
 
 
@@ -124,12 +126,39 @@ def obtain_logs():
     agent = Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
     if Artifact.query.filter_by(job=job, build=int(build)).count():
-        logs = [i.name for i in Artifact.query.filter_by(
+        logs = [str(i.name) for i in Artifact.query.filter_by(
             job=job, build=int(build)) if i.name.endswith(".log")]
         found = True
+        message = "Found logs in DB"
     else:
         logs = conn.get_build_info(job, int(build))['artifacts']
-        jenkins_build.update_artifacts_db(logs, job, build)
-        found = True
+        if logs:
+            jenkins_build.update_artifacts_db(logs, job, build)
+            found = True
+            message = "Found logs in Jenkins"
 
     return jsonify(found=found, message=message, logs=logs)
+
+
+@builds.route('/find_failure')
+def find_failure():
+    found = False
+    failure_name = ''
+
+    job = request.args.get('job')
+    build = request.args.get('build')
+    log = request.args.get('log')
+
+    agent = Agent.query.one()
+    artifact = Artifact.query.filter_by(job=job, build=int(build), name=log).first()
+    relativePath = artifact.relativePath
+
+    log_url = agent.url + "/job/" + job + "/" + build + "/artifact/" + relativePath
+    log_data = urllib2.urlopen(log_url)
+    for line in log_data:
+        for failure in Failure.query.all():
+            if failure.pattern in line:
+                found = True
+                failure_name = failure.name
+
+    return jsonify(found=found, failure_name=failure_name)

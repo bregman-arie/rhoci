@@ -29,4 +29,13 @@ FAILURES = [
      'action': 'Add write permissions to the path you are trying to use',
      'cause': 'The path you are trying to use is missing permissions',
      },
+
+    {'category': 'Wrong Usage',
+     'name': 'Missing Templates',
+     'pattern': 'missing templates',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Specify the right template name/path',
+     'cause': 'You specified non-existing template',
+     }
 ]

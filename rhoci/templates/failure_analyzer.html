@@ -41,11 +41,15 @@
 <img src="{{ url_for('static', filename='images/pacman.gif') }}" style="display:block;margin:auto;" />
 </div>
 
+
+<div class="container hidden" id="info_div">
+</div>
+
 {% include "alert.html" -%}
 
-<!-- Begin Console Output -->
 {% include "logs.html" -%}
-<!-- End Console Output -->
+
+{% include "failure.html" -%}
 
 </div>
 
@@ -59,6 +63,10 @@ $('.btn').on('click', function() {
   var build = $('#build_input').val();
   $("#alert_div").addClass('hidden');
   $("#loading_div").removeClass('hidden');
+  $("#logs_table tr").remove(); 
+  $("#logs_div").addClass('hidden');
+  $("#failure_div").addClass('hidden');
+  $("#info_div").addClass('hidden');
 
   input_validation();
 
@@ -104,20 +112,66 @@ function obtain_logs() {
         var cell = row.insertCell(0);
         cell.innerHTML = response.logs[i];
         }
+        
+        find_error(response.logs);
+
       }
       else {
         $("#alert_div").removeClass('hidden');
         $("#alert_div").text(response.message);
-
+        $("#loading_div").addClass('hidden');
       }
-    $("#loading_div").addClass('hidden');
     }
   });
 
 }
 
 
+function find_error(logs) {
+
+  var found = false;
+  var failure_name = '';
+
+  for(var i =0; i<(logs).length; i++) {
+
+  $.ajax({
+    type:"GET",
+    dataType: "json",
+    data: {'log': logs[i], 'job': job, 'build': build},
+    url: "{{ url_for('builds.find_failure') }}",
+    success: function(response){
+    
+      if (response.found) {
+      console.log("Yay found the failure!!!")
+      console.log(logs[i])
+      found = true;
+      failure_name = response.failure_name;
+      }
+    
+    }
+  });
+
+
+  }
+
+  if (found == false){
+    $("#alert_div").removeClass('hidden');
+    $("#alert_div").text("Couldn't find any error :( Teach me!");
+  }
+  else {
+    $("#failure_div").removeClass('hidden');
+    $("#failure_div").text(failure_name);
+  }
+
+  $("#loading_div").addClass('hidden');
+}
+
+
+
 });
+
+
+
 
 
 </script>
