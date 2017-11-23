@@ -13,17 +13,19 @@
 #    under the License.
 FAILURES = [
     {'category': 'Packages',
+     'name': 'Missing module',
      'pattern': 'ImportError: No module named',
      'upper_bound_pattern': 'Traceback',
-     'lower_bound_pattern': None,
+     'lower_bound_pattern': '',
      'action': 'Install the missing package on the slave or the remote host',
      'cause': 'The node you invoked the command on is missing a package'
      },
 
     {'category': 'Permissions',
+     'name': 'Missing permissions',
      'pattern': 'not writable',
      'upper_bound_pattern': 'TASK [',
-     'lower_bound_pattern': None,
+     'lower_bound_pattern': '',
      'action': 'Add write permissions to the path you are trying to use',
      'cause': 'The path you are trying to use is missing permissions',
      },

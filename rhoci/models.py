@@ -210,3 +210,31 @@ class Artifact(db.Model):
     relativePath = db.Column(db.String(128))
     build = db.Column(db.Integer)
     job = db.Column(db.String(64))
+
+
+class Failure(db.Model):
+    """Represents a failure of build"""
+
+    __tablename__ = 'failure'
+
+    id = db.Column(db.Integer)
+    name = db.Column(db.String(128), primary_key=True)
+    pattern = db.Column(db.String(128))
+    upper_bound_pattern = db.Column(db.String(128))
+    lower_bound_pattern = db.Column(db.String(128))
+    category = db.Column(db.String(128))
+    action = db.Column(db.String(128))
+    cause = db.Column(db.String(128))
+
+    @property
+    def serialize(self):
+        """Return test object data in serializeable format"""
+        return {
+            'name': self.name,
+            'pattern': self.pattern,
+            'upper_bound_pattern': self.upper_bound_pattern,
+            'lower_bound_pattern': self.lower_bound_pattern,
+            'category': self.category,
+            'action': self.action,
+            'cause': self.cause,
+        }

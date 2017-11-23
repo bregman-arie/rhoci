@@ -124,11 +124,12 @@ def obtain_logs():
     agent = Agent.query.one()
     conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
     if Artifact.query.filter_by(job=job, build=int(build)).count():
-        print Artifact.query.filter_by(job=job, build=int(build))
+        logs = [i.name for i in Artifact.query.filter_by(
+            job=job, build=int(build)) if i.name.endswith(".log")]
         found = True
     else:
-        arts = conn.get_build_info(job, int(build))['artifacts']
-        jenkins_build.update_artifacts_db(arts, job, build)
+        logs = conn.get_build_info(job, int(build))['artifacts']
+        jenkins_build.update_artifacts_db(logs, job, build)
         found = True
 
-    return jsonify(found=found, message=message)
+    return jsonify(found=found, message=message, logs=logs)

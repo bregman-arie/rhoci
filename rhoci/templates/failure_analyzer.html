@@ -98,6 +98,12 @@ function obtain_logs() {
       if (response.found) {
         console.log(response.message);
         $("#logs_div").removeClass('hidden');
+        var table = document.getElementById("logs_table");
+        for(var i =0; i<(response.logs).length; i++) {
+        var row = table.insertRow(0);
+        var cell = row.insertCell(0);
+        cell.innerHTML = response.logs[i];
+        }
       }
       else {
         $("#alert_div").removeClass('hidden');

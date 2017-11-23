@@ -19,6 +19,7 @@ import os
 
 from rhoci.views.doc import auto
 from rhoci.db.base import db
+from rhoci.common.failures import FAILURES
 from rhoci.filters import configure_template_filters
 import rhoci.models as models
 import rhoci.views
@@ -71,6 +72,7 @@ class WebApp(object):
         self._register_blueprints()
         self._setup_database()
         self._setup_releases()
+        self._load_failures()
         self._setup_jenkins()
 
     def _register_blueprints(self):
@@ -147,6 +149,24 @@ class WebApp(object):
         logger.info("Running rhoci web server")
 
         app.run(threaded=True, host='0.0.0.0', port=int(app.config['PORT']))
+
+    def _load_failures(self):
+        """Loads RHOCI built-in failure to DB."""
+        for f in FAILURES:
+            with app.app_context():
+                if not models.Failure.query.filter_by(name=f['name']).count():
+                    failure_db = models.Failure(category=f['category'],
+                                                pattern=f['pattern'],
+                                                name=f['name'],
+                                                upper_bound_pattern=f[
+                                                    'upper_bound_pattern'],
+                                                lower_bound_pattern=f[
+                                                    'lower_bound_pattern'],
+                                                action=f['action'],
+                                                cause=f['cause'])
+                    db.session.add(failure_db)
+                    db.session.commit()
+                    logging.info("Loaded a new failure: %s" % f['name'])
 
     def _setup_releases(self):
         """Create DB entry for each release."""

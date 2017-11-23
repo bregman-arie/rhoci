@@ -22,6 +22,7 @@ from rhoci.jenkins import manager
 from rhoci.models import Build
 from rhoci.models import Agent
 from rhoci.views.doc import auto
+from rhoci.models import Failure
 from rhoci.models import Job
 from rhoci.models import Release
 from rhoci.models import TestBuild
@@ -141,6 +142,14 @@ def dfgs():
     """Returns all DFGs"""
     dfg = [i.serialize for i in DFG.query.all()]
     return jsonify(dfgs=dfg)
+
+
+@auto.doc(groups=['failures', 'public'])
+@home.route('/v2.0/failures', methods=['GET', 'POST'])
+def failures():
+    """Returns all failures"""
+    failures = [i.serialize for i in Failure.query.all()]
+    return jsonify(failures=failures)
 
 
 @home.route('/releases', methods=['GET'])

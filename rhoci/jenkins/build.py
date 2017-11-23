@@ -154,7 +154,10 @@ def check_active_builds(conn):
 
 
 def update_artifacts_db(artifacts, job, build):
+    logs = []
     for art in artifacts:
+        if art['fileName'].endswith(".log"):
+            logs.append(art['fileName'])
         db_artifact = Artifact(name=art['fileName'],
                                build=int(build),
                                job=job,
@@ -162,3 +165,4 @@ def update_artifacts_db(artifacts, job, build):
         db.session.add(db_artifact)
         db.session.commit()
         LOG.info("Added artifact in DB: %s" % art['fileName'])
+    return logs

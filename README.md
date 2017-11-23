@@ -7,10 +7,10 @@ RHOCI (Red Hat OpenStack CI)
 A web service based on Jenkins to enhance user experience for Red Hat OpenStack CI users.
 This project allows you to:
 
-    * Display information on all jobs without loading additional pages
-    * Compare test results of two different builds of the same job
+    * See all the jobs, builds and tests in one page, without loading additional pages
+    * Filter jobs, builds and tests based on different parameters (status, params, substring)
     * Generate job definitions based on given input
-    * Trigger jobs based on component name and release
+    * Analyze build failures
 
 And more :)
 
@@ -75,7 +75,3 @@ API is documented in /doc view and generated automatically
 * Add a new view in rhoci/rhoci/views/<new_page_name>.html
 * Add a new item to 'views' variable in rhoci/rhoci/web.py
 * Add it to the navigation bar in rhoci/rhoci/templates/navbar.html
-
-## How to change API
-
-API is defined in rhoci.views.home
