@@ -14,10 +14,10 @@
 FAILURES = [
     {'category': 'Packages',
      'name': 'Missing module',
-     'pattern': 'ImportError: No module named',
+     'pattern': 'No module',
      'upper_bound_pattern': 'Traceback',
      'lower_bound_pattern': '',
-     'action': 'Install the missing package on the slave or the remote host',
+     'action': 'Install the missing package on the host where you recieved the error',
      'cause': 'The node you invoked the command on is missing a package'
      },
 

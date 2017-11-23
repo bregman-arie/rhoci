@@ -143,22 +143,30 @@ def obtain_logs():
 @builds.route('/find_failure')
 def find_failure():
     found = False
-    failure_name = ''
+    cause = ''
+    action = ''
+    failure_line = ''
 
     job = request.args.get('job')
     build = request.args.get('build')
-    log = request.args.get('log')
 
     agent = Agent.query.one()
-    artifact = Artifact.query.filter_by(job=job, build=int(build), name=log).first()
-    relativePath = artifact.relativePath
+    logs = [i for i in Artifact.query.filter_by(
+        job=job, build=int(build)) if i.name.endswith(".log")]
 
-    log_url = agent.url + "/job/" + job + "/" + build + "/artifact/" + relativePath
-    log_data = urllib2.urlopen(log_url)
-    for line in log_data:
-        for failure in Failure.query.all():
-            if failure.pattern in line:
-                found = True
-                failure_name = failure.name
+    for log in logs:
+        if found:
+            break
+        log_url = agent.url + "/job/" + job + "/" + build + "/artifact/" + log.relativePath
+        log_data = urllib2.urlopen(log_url)
+        for line in log_data:
+            for failure in Failure.query.all():
+                if failure.pattern in line:
+                    found = True
+                    failure_line = line
+                    cause = failure.cause
+                    action = failure.action
+                    break
 
-    return jsonify(found=found, failure_name=failure_name)
+    return jsonify(found=found, failure_line=failure_line,
+                   cause=cause, action=action)
