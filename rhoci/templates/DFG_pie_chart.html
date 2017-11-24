@@ -37,7 +37,8 @@
     ],
     onclick: function (d, i) { 
     
-    
+    $("#dfg_jobs_table").removeClass('hidden');
+
     $('#dfg_jobs_table').DataTable( {
       "ajax": "{{ url_for('jobs.jobs_status', status='FAILURE', dfg=release.dfg, release=release.number) }}".replace("FAILURE", d.id),
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -69,7 +70,16 @@
                 }
             },
             {
-                targets:[1,2],
+                targets:1,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[1] != 'FAILURE'){
+                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:2,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[2] != 0){
                         data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';

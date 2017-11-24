@@ -66,9 +66,12 @@ def all_builds():
 
 
 @builds.route('/failure_anaylze', methods=['GET'])
-def failure_analyze():
+@builds.route('/failure_anaylze/<job>_<build>', methods=['GET'])
+def failure_analyze(job=None, build=None):
 
-    return render_template('failure_analyzer.html')
+    start = True if job else False
+
+    return render_template('failure_analyzer.html', start=start)
 
 
 @builds.route('/exists/')
