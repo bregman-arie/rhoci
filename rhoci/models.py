@@ -52,6 +52,8 @@ class Build(db.Model):
     url = db.Column(db.String(128))
     trigger = db.Column(db.String(128))
     parameters = db.Column(db.Text)
+    failure_text = db.Column(db.Text)
+    failure_name = db.Column(db.String(128))
 
     @property
     def serialize(self):
@@ -65,6 +67,8 @@ class Build(db.Model):
             'url': self.url,
             'trigger': self.trigger,
             'parameters': eval(self.parameters) if self.parameters else {},
+            'failure_text': self.failure_text,
+            'failure_name': self.failure_name,
         }
 
 
@@ -225,6 +229,7 @@ class Failure(db.Model):
     category = db.Column(db.String(128))
     action = db.Column(db.String(128))
     cause = db.Column(db.String(128))
+    count = db.Column(db.Integer)
 
     @property
     def serialize(self):

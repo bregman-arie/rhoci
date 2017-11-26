@@ -44,8 +44,7 @@ def get_build_status(conn, job_name, build_number):
 
 
 def get_artifacts(conn, job, build):
-    build_db = Build.query.filter_by(job=job, number=build)
-    print build_db.artifacts
+    pass
 
 
 def update_tests(tests_data, job, build_number):

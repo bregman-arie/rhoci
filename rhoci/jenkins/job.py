@@ -14,6 +14,7 @@
 import logging
 
 from rhoci.db.base import db
+from rhoci.models import Agent
 from rhoci.models import Job
 from rhoci.rhosp import jenkins
 
@@ -36,3 +37,17 @@ def update_in_db(data):
         db.session.add(db_job)
         db.session.commit()
         LOG.debug("Added job: %s to the DB" % (data['name']))
+
+
+def job_exists(job):
+    """Returns true if job exists"""
+    agent = Agent.query.one()
+    conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+    try:
+        exists = conn.job_exists(job)
+        message = "Couldn't find any job called %s " % job
+    except jenkins.JenkinsException:
+        exists = False
+        message = "Unable to reach Jenkins for some reason..."
+
+    return exists, message

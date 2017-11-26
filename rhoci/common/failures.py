@@ -12,16 +12,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 FAILURES = [
-    {'category': 'Packages',
+    {'category': 'CI framework',
      'name': 'Missing module',
      'pattern': 'No module',
      'upper_bound_pattern': 'Traceback',
      'lower_bound_pattern': '',
-     'action': 'Install the missing package on the host where you recieved the error',
+     'action': 'Install the missing package on the " \
+"host where you recieved the error',
      'cause': 'The node you invoked the command on is missing a package'
      },
 
-    {'category': 'Permissions',
+    {'category': 'CI framework',
      'name': 'Missing permissions',
      'pattern': 'not writable',
      'upper_bound_pattern': 'TASK [',
@@ -30,12 +31,33 @@ FAILURES = [
      'cause': 'The path you are trying to use is missing permissions',
      },
 
-    {'category': 'Wrong Usage',
+    {'category': 'CI framework',
      'name': 'Missing Templates',
-     'pattern': 'missing templates',
+     'pattern': 'missing_templates',
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
      'action': 'Specify the right template name/path',
      'cause': 'You specified non-existing template',
-     }
+     },
+
+    {'category': 'Product',
+     'name': 'Deployment Failure',
+     'pattern': 'deployment failed',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Read /home/stack/overcloud_failure_long.log to find " \
+"out why the deployment failed',
+     'cause': 'The failure message is to generic to point " \
+"out why exactly the deployment failed',
+     },
+
+    {'category': 'Product',
+     'name': 'Bad URL',
+     'pattern': '404 Client Error',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Change URL to one that actually works',
+     'cause': 'The specified URL was not found (404)',
+     },
+
 ]

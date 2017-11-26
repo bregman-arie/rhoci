@@ -12,7 +12,7 @@
   <div class="form-group center-block">
     <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Job</label>
     <div class="col-sm-4">
-      <input type="text" id="job_input" class="form-control">
+      <input type="text" id="job_input" class="form-control" value="{{ job }}">
     </div>
   </div>
   <!-- Job input end -->
@@ -21,7 +21,7 @@
   <div class="form-group center-block">
     <label class="col-sm-4 col-md-4 control-label" for="exampleInput">Build</label>
     <div class="col-sm-2">
-      <input type="text" id="build_input" class="form-control">
+      <input type="text" id="build_input" class="form-control" value="{{ build }}">
     </div>
   </div>
   <!--- Build input end -->
@@ -57,12 +57,8 @@
 
 <script>
 
-$('.btn').on('click', function() {
-  var $this = $(this);
 
 {% include "failure_analyzer.js" -%}
-
-});
 
 </script>
   <script>

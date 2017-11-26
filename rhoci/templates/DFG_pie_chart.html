@@ -75,7 +75,10 @@
                     if(type === 'display' && row[1] != 'FAILURE'){
                         data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
                     }
-                    return data;
+                    else {
+                      data = "Failure <a href={{ url_for('builds.failure_analyze', job='JOB', build='BUILD') }}>(Why did it fail?)</a>".replace("JOB", row[0]).replace("BUILD", row[2]);
+                  }
+                  return data;
                 }
             },
             {

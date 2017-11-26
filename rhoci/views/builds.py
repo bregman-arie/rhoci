@@ -20,6 +20,7 @@ import logging
 import urllib2
 
 import rhoci.jenkins.build as jenkins_build
+import rhoci.jenkins.job as jenkins_job
 from rhoci.models import Agent
 from rhoci.models import Artifact
 from rhoci.models import Build
@@ -69,9 +70,11 @@ def all_builds():
 @builds.route('/failure_anaylze/<job>_<build>', methods=['GET'])
 def failure_analyze(job=None, build=None):
 
-    start = True if job else False
-
-    return render_template('failure_analyzer.html', start=start)
+    if job:
+        return render_template('start_failure_analyzer.html', job=job,
+                               build=build)
+    else:
+        return render_template('failure_analyzer.html')
 
 
 @builds.route('/exists/')
@@ -85,14 +88,7 @@ def exists():
         exists = False
         message = "Invalid input"
     elif not Job.query.filter_by(name=job).count():
-        agent = Agent.query.one()
-        conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-        try:
-            exists = conn.job_exists(job)
-            message = "Couldn't find any job called %s " % job
-        except jenkins.JenkinsException:
-            exists = False
-            message = "Unable to reach Jenkins for some reason..."
+        exists, message = jenkins_job.exists(job)
     elif not Build.query.filter_by(job=job, number=int(build)).count():
         agent = Agent.query.one()
         conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
@@ -111,7 +107,6 @@ def exists():
                                                           job, int(build))
 
         if build_status != "FAILURE":
-            print build_status
             exists = False
             message = "The build didn't fail..."
 
@@ -160,11 +155,12 @@ def find_failure():
     for log in logs:
         if found:
             break
-        log_url = agent.url + "/job/" + job + "/" + build + "/artifact/" + log.relativePath
+        log_url = "{}/job/{}/{}/artifact/{}" % (agent.url, job, build,
+                                                log.relativePath)
         log_data = urllib2.urlopen(log_url)
         for line in log_data:
             for failure in Failure.query.all():
-                if failure.pattern in line:
+                if failure.pattern in line.decode('utf-8').strip():
                     found = True
                     failure_line = line
                     cause = failure.cause
