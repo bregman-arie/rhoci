@@ -134,6 +134,8 @@ def obtain_logs():
             jenkins_build.update_artifacts_db(logs, job, build)
             found = True
             message = "Found logs in Jenkins"
+        logs = [str(i.name) for i in Artifact.query.filter_by(
+            job=job, build=int(build)) if i.name.endswith(".log")]
 
     return jsonify(found=found, message=message, logs=logs)
 
@@ -152,13 +154,28 @@ def find_failure():
     logs = [i for i in Artifact.query.filter_by(
         job=job, build=int(build)) if i.name.endswith(".log")]
 
-    for log in logs:
-        if found:
-            break
-        log_url = "{}/job/{}/{}/artifact/{}" % (agent.url, job, build,
-                                                log.relativePath)
-        log_data = urllib2.urlopen(log_url)
-        for line in log_data:
+    if logs:
+        for log in logs:
+            if found:
+                break
+            log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
+                                                        str(log.relativePath))
+            log_data = urllib2.urlopen(log_url)
+            for line in log_data:
+                for failure in Failure.query.all():
+                    if failure.pattern in line.decode('utf-8').strip():
+                        found = True
+                        failure_line = line
+                        cause = failure.cause
+                        action = failure.action
+                        break
+    else:
+        console_url = "{}/job/{}/{}/consoleText".format(str(agent.url), str(job),
+                                                        str(build))
+        console_data = urllib2.urlopen(console_url)
+        for line in console_data:
+            if found:
+                break
             for failure in Failure.query.all():
                 if failure.pattern in line.decode('utf-8').strip():
                     found = True

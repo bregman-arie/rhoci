@@ -17,8 +17,8 @@ FAILURES = [
      'pattern': 'No module',
      'upper_bound_pattern': 'Traceback',
      'lower_bound_pattern': '',
-     'action': 'Install the missing package on the " \
-"host where you recieved the error',
+     'action': ('Install the missing package on the ',
+                'host where you recieved the error'),
      'cause': 'The node you invoked the command on is missing a package'
      },
 
@@ -45,10 +45,10 @@ FAILURES = [
      'pattern': 'deployment failed',
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
-     'action': 'Read /home/stack/overcloud_failure_long.log to find " \
-"out why the deployment failed',
-     'cause': 'The failure message is to generic to point " \
-"out why exactly the deployment failed',
+     'action': ('Read /home/stack/overcloud_failure_long.log to find '
+                'out why the deployment failed'),
+     'cause': ('The failure message is to generic to point '
+               'out why exactly the deployment failed'),
      },
 
     {'category': 'Product',
@@ -58,6 +58,15 @@ FAILURES = [
      'lower_bound_pattern': '',
      'action': 'Change URL to one that actually works',
      'cause': 'The specified URL was not found (404)',
+     },
+
+    {'category': 'CI framework',
+     'name': 'Missing file or directory',
+     'pattern': 'No such file or directory',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Fix file or directory name',
+     'cause': 'The file or directory you specified doesnt exists',
      },
 
 ]
