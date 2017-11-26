@@ -80,6 +80,7 @@ def failure_analyze(job=None, build=None):
 @builds.route('/exists/')
 def exists():
     exists = True
+    known_failure = False
     message = ''
     job = request.args.get('job')
     build = request.args.get('build')
@@ -89,6 +90,7 @@ def exists():
         message = "Invalid input"
     elif not Job.query.filter_by(name=job).count():
         exists, message = jenkins_job.exists(job)
+        jenkins_job.add_new_job(job)
     elif not Build.query.filter_by(job=job, number=int(build)).count():
         agent = Agent.query.one()
         conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
@@ -100,17 +102,28 @@ def exists():
 
     if exists:
         if Build.query.filter_by(job=job, number=int(build)).count():
-            build_db = Build.query.filter_by(job=job, number=int(build))
+            build_db = Build.query.filter_by(job=job, number=int(build)).first()
             build_status = build_db.status
+            if build_db.failure_name:
+                known_failure = True
         else:
             build_status = jenkins_build.get_build_status(conn,
                                                           job, int(build))
+            jenkins_build.add_new_build(job, build)
 
         if build_status != "FAILURE":
             exists = False
             message = "The build didn't fail..."
 
-    return jsonify(exists=exists, message=message)
+    if known_failure:
+        failure = Failure.query.filter_by(name=build_db.failure_name).first()
+        return jsonify(exists=exists,
+                       known_failure=known_failure,
+                       cause=failure.cause,
+                       action=failure.action,
+                       failure_line=build_db.failure_text)
+    else:
+        return jsonify(exists=exists, message=message, known_failure=known_failure)
 
 
 @builds.route('/obtain_logs')
@@ -168,10 +181,11 @@ def find_failure():
                         failure_line = line
                         cause = failure.cause
                         action = failure.action
+                        failure_name = failure.name
                         break
     else:
-        console_url = "{}/job/{}/{}/consoleText".format(str(agent.url), str(job),
-                                                        str(build))
+        console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
+                                                        str(job), str(build))
         console_data = urllib2.urlopen(console_url)
         for line in console_data:
             if found:
@@ -182,7 +196,11 @@ def find_failure():
                     failure_line = line
                     cause = failure.cause
                     action = failure.action
+                    failure_name = failure.name
                     break
+
+    if found:
+        jenkins_build.update_failure(job, build, failure_name, failure_line)
 
     return jsonify(found=found, failure_line=failure_line,
                    cause=cause, action=action)

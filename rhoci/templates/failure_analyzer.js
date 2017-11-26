@@ -22,8 +22,22 @@ function input_validation() {
     success: function(response){
       console.log("begin");
       if (response.exists) {
+        if (response.known_failure) {
+          
+          $("#failure_div").removeClass('hidden');
+          var div = document.getElementById('failure_info_div');
+          div.innerHTML += "<div class='alert alert-danger'>Found the failure: " + response.failure_line + "</div>";
+          div.innerHTML += "<br>";
+          div.innerHTML += "<div class='alert alert-info'>Cause: " + response.cause + "</div>";
+          div.innerHTML += "<br>";
+          div.innerHTML += "<div class='alert alert-success'> Suggested action: " + response.action + "</div>";
+          $("#loading_div").addClass('hidden');
+        
+        }
+        else {
         console.log("obtain logs!");
         obtain_logs();
+        }
       }
       else {
         $("#alert_div").removeClass('hidden');

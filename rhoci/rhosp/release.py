@@ -11,6 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import re
+
+
 RELEASE_MAP = {'6': 'juno',
                '7': 'kilo',
                '8': 'liberty',
@@ -18,3 +21,8 @@ RELEASE_MAP = {'6': 'juno',
                '10': 'newton',
                '11': 'ocata',
                '12': 'pike'}
+
+
+def extract_release(string):
+    m = re.search('-\d{1,2}', string)
+    return m.group().split('-')[1] if m else 0

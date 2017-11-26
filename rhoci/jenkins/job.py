@@ -17,6 +17,7 @@ from rhoci.db.base import db
 from rhoci.models import Agent
 from rhoci.models import Job
 from rhoci.rhosp import jenkins
+from rhoci.rhosp import release
 
 LOG = logging.getLogger(__name__)
 
@@ -51,3 +52,14 @@ def job_exists(job):
         message = "Unable to reach Jenkins for some reason..."
 
     return exists, message
+
+
+def add_new_job(name):
+    """Add new job to DB."""
+    job_type = jenkins.get_job_type(name.lower())
+    rel = release.extract_release(name)
+    db_job = Job(name=name, job_type=job_type,
+                 release_number=int(rel))
+    db.session.add(db_job)
+    db.session.commit()
+    LOG.debug("Added job: %s to the DB" % name)

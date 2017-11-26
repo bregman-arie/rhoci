@@ -17,6 +17,7 @@ import jenkins
 import logging
 from urllib import urlopen
 
+from rhoci.models import Agent
 from rhoci.models import Artifact
 from rhoci.models import Build
 from rhoci.models import Job
@@ -40,11 +41,18 @@ def get_build_status(conn, job_name, build_number):
 
     the last completed build result.
     """
-    return str(conn.get_build_info(job_name, build_number)['result'])
+    return str(conn.get_build_info(job_name, int(build_number))['result'])
 
 
 def get_artifacts(conn, job, build):
     pass
+
+
+def update_failure(job, number, failure_name, text):
+    """Update the failure cause of a specific build."""
+    Build.query.filter_by(job=job, number=int(number)).update(
+        dict(failure_text=text, failure_name=failure_name))
+    db.session.commit()
 
 
 def update_tests(tests_data, job, build_number):
@@ -78,6 +86,17 @@ def update_tests(tests_data, job, build_number):
             Test.query.filter_by(class_name=test['className']).update(dict(
                 failure=+1))
         db.session.commit()
+
+
+def add_new_build(job, number):
+    """Add a new build to the DB."""
+
+    agent = Agent.query.one()
+    conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+    status = get_build_status(conn, job, number)
+    build = Build(job=job, number=number, status=status)
+    db.session.add(build)
+    db.session.commit()
 
 
 def update_in_db(data):
