@@ -242,4 +242,5 @@ class Failure(db.Model):
             'category': self.category,
             'action': self.action,
             'cause': self.cause,
+            'count': self.count,
         }

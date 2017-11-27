@@ -17,6 +17,7 @@ from flask import jsonify
 import logging
 
 from rhoci.models import Agent
+from rhoci.models import Build
 from rhoci.models import Job
 
 
@@ -44,6 +45,15 @@ def jobs_status(status, dfg, release):
                             Job.last_build_status.like(status),
                             Job.release_number.like(release))
     for job in jobs:
-        results['data'].append([job.name, job.last_build_status,
-                                job.last_build_number])
+        if Build.query.filter_by(job=job.name,
+                                 number=job.last_build_number).count():
+            build_db = Build.query.filter_by(
+                job=job.name,
+                number=job.last_build_number).first()
+            if build_db.failure_name:
+                results['data'].append([job.name, build_db.failure_name,
+                                        job.last_build_number])
+        else:
+            results['data'].append([job.name, job.last_build_status,
+                                    job.last_build_number])
     return jsonify(results)

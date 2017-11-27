@@ -19,6 +19,7 @@ from flask import request
 import logging
 import urllib2
 
+from rhoci.db.base import db
 import rhoci.jenkins.build as jenkins_build
 import rhoci.jenkins.job as jenkins_job
 from rhoci.models import Agent
@@ -182,6 +183,10 @@ def find_failure():
                         cause = failure.cause
                         action = failure.action
                         failure_name = failure.name
+                        Failure.query.filter_by(
+                            name=failure.name).update(
+                                {'count': Failure.count + 1})
+                        db.session.commit()
                         break
     else:
         console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
@@ -197,6 +202,10 @@ def find_failure():
                     cause = failure.cause
                     action = failure.action
                     failure_name = failure.name
+                    Failure.query.filter_by(
+                        name=failure.name).update(
+                            {'count': Failure.count + 1})
+                    db.session.commit()
                     break
 
     if found:
@@ -204,3 +213,19 @@ def find_failure():
 
     return jsonify(found=found, failure_line=failure_line,
                    cause=cause, action=action)
+
+
+@builds.route('/top_failure_types', methods=['GET'])
+def top_failure_types():
+
+    results = dict()
+    results['data'] = list()
+
+    db_failures = Failure.query.order_by(Failure.count.desc()).limit(5).all()
+
+    for failure in db_failures:
+        if failure.count:
+            results['data'].append(
+                [failure.name, failure.category, failure.count])
+
+    return jsonify(results)

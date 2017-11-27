@@ -51,7 +51,7 @@ def get_artifacts(conn, job, build):
 def update_failure(job, number, failure_name, text):
     """Update the failure cause of a specific build."""
     Build.query.filter_by(job=job, number=int(number)).update(
-        dict(failure_text=text, failure_name=failure_name))
+        dict(failure_text=unicode(text, 'utf-8'), failure_name=failure_name))
     db.session.commit()
 
 
@@ -127,11 +127,8 @@ def update_in_db(data):
                     'actions'][1]['causes'][0]['shortDescription']
             except Exception as e:
                 LOG.info("Was unable to get build info: %s" % e.message)
-    if 'artifcats' in data:
-        artifacts = [i['archive'] for i in (
-            [j for i, j in data['artifacts'].iteritems()])]
-    else:
-        artifacts = ''
+    # todo(abregman): Add artifacts to the DB
+    # if 'artifcats' in data:
 
     if not Build.query.filter_by(job=name, number=number).count():
         build = Build(job=name, number=number, status=status, active=active,
@@ -142,7 +139,7 @@ def update_in_db(data):
     if phase == 'finalized':
         status = data['build']['status']
         Build.query.filter_by(job=name, number=number).update(dict(
-            active=active, status=status, artifacts=str(artifacts)))
+            active=active, status=status))
         Job.query.filter_by(name=name).update(dict(last_build_number=number,
                                                    last_build_status=status))
         db.session.commit()

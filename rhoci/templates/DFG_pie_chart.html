@@ -42,7 +42,7 @@
     $('#dfg_jobs_table').DataTable( {
       "ajax": "{{ url_for('jobs.jobs_status', status='FAILURE', dfg=release.dfg, release=release.number) }}".replace("FAILURE", d.id),
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-          if ( aData[1] == "FAILURE" )
+          if ( aData[1] != "SUCCESS" && aData[1] != 'UNSTABLE' )
           {
           $('td', nRow).css('background-color', '#f2dede' );
           }
