@@ -19,14 +19,8 @@ import logging
 
 import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
-from rhoci.models import Build
-from rhoci.models import Agent
+import rhoci.models as models
 from rhoci.views.doc import auto
-from rhoci.models import Failure
-from rhoci.models import Job
-from rhoci.models import Release
-from rhoci.models import TestBuild
-from rhoci.models import DFG
 
 LOG = logging.getLogger(__name__)
 
@@ -36,19 +30,23 @@ home = Blueprint('home', __name__)
 @home.route('/')
 def index():
     """Home page."""
-    releases = Release.query.all()
+    releases = models.Release.query.all()
     jobs = {}
-    jobs['phase1'] = Job.query.filter_by(job_type='phase1')
-    jobs['phase2'] = Job.query.filter_by(job_type='phase2')
-    jobs['dfg'] = Job.query.filter_by(job_type='dfg')
-    agent = Agent.query.one()
+    jobs['phase1'] = models.Job.query.filter_by(job_type='phase1')
+    jobs['phase2'] = models.Job.query.filter_by(job_type='phase2')
+    jobs['dfg'] = models.Job.query.filter_by(job_type='dfg')
+    jobs_num = models.Job.query.count()
+    nodes_num = models.Node.query.count()
+    plugins_num = models.Plugin.query.count()
 
     return render_template('home.html',
                            releases=releases,
-                           agent=agent,
                            phase1=jobs['phase1'],
                            phase2=jobs['phase2'],
-                           dfg=jobs['dfg'])
+                           dfg=jobs['dfg'],
+                           jobs_num=jobs_num,
+                           nodes_num=nodes_num,
+                           plugins_num=plugins_num)
 
 
 @home.route('/releases/ajax/jobs/<job_type>_<release>')
@@ -57,7 +55,8 @@ def ajax_jobs(job_type, release):
     results = dict()
     results['data'] = list()
 
-    jobs = Job.query.filter_by(job_type=job_type, release_number=int(release))
+    jobs = models.Job.query.filter_by(
+        job_type=job_type, release_number=int(release))
 
     for job in jobs:
         results['data'].append([job.name, job.last_build_status,
@@ -71,11 +70,11 @@ def ajax_jobs(job_type, release):
 def list_jobs():
     """Returns all jobs in the DB."""
     if request.method == 'POST':
-        job = Job.query.filter_by(
+        job = models.Job.query.filter_by(
             name=request.form['job_name']).first()
         jobs = job.serialize if job else {}
     else:
-        jobs = [i.serialize for i in Job.query.all()]
+        jobs = [i.serialize for i in models.Job.query.all()]
 
     return jsonify(output=jobs)
 
@@ -84,7 +83,7 @@ def list_jobs():
 @home.route('/v2.0/jobs/<string:job_name>', methods=['GET', 'DELETE'])
 def get_job(job_name):
     """Returns data on a specific job."""
-    job = Job.query.filter_by(name=job_name).all()
+    job = models.Job.query.filter_by(name=job_name).all()
     if job:
         if request.method == 'DELETE':
             agent_update.job_db_delete(job_name)
@@ -101,11 +100,11 @@ def get_job(job_name):
 def list_tests():
     """Returns all tests in the DB."""
     if request.method == 'POST':
-        tests = TestBuild.query.filter_by(job_name=request.form['job_name'],
-                                          build_number=request.form[
-                                              'build_number']).all()
+        tests = models.TestBuild.query.filter_by(
+            job_name=request.form['job_name'],
+            build_number=request.form['build_number']).all()
     else:
-        tests = [i.serialize for i in TestBuild.query.all()]
+        tests = [i.serialize for i in models.TestBuild.query.all()]
 
     return jsonify(tests=tests)
 
@@ -132,7 +131,7 @@ def jenkins_notifications():
 @home.route('/v2.0/builds', methods=['GET', 'POST'])
 def builds():
     """Returns information on Jenkins builds."""
-    builds = [i.serialize for i in Build.query.all()]
+    builds = [i.serialize for i in models.Build.query.all()]
     return jsonify(builds=builds)
 
 
@@ -140,7 +139,7 @@ def builds():
 @home.route('/v2.0/dfg', methods=['GET', 'POST'])
 def dfgs():
     """Returns all DFGs"""
-    dfg = [i.serialize for i in DFG.query.all()]
+    dfg = [i.serialize for i in models.DFG.query.all()]
     return jsonify(dfgs=dfg)
 
 
@@ -148,23 +147,21 @@ def dfgs():
 @home.route('/v2.0/failures', methods=['GET', 'POST'])
 def failures():
     """Returns all failures"""
-    failures = [i.serialize for i in Failure.query.all()]
+    failures = [i.serialize for i in models.Failure.query.all()]
     return jsonify(failures=failures)
 
 
 @home.route('/releases', methods=['GET'])
 def releases():
 
-    releases = Release.query.all()
+    releases = models.Release.query.all()
     jobs = {}
-    jobs['phase1'] = Job.query.filter_by(job_type='phase1')
-    jobs['phase2'] = Job.query.filter_by(job_type='phase2')
-    jobs['dfg'] = Job.query.filter_by(job_type='dfg')
-    agent = Agent.query.one()
+    jobs['phase1'] = models.Job.query.filter_by(job_type='phase1')
+    jobs['phase2'] = models.Job.query.filter_by(job_type='phase2')
+    jobs['dfg'] = models.Job.query.filter_by(job_type='dfg')
 
     return render_template('releases.html',
                            releases=releases,
-                           agent=agent,
                            phase1=jobs['phase1'],
                            phase2=jobs['phase2'],
                            dfg=jobs['dfg'])

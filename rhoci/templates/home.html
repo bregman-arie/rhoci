@@ -3,14 +3,6 @@
 {% block content %}
 
 <br>
-{% if not agent.active %}
-  <div class="container">
-    <div class="alert alert-danger">
-  <span class="pficon pficon-error-circle-o"></span>
-  <strong>Couldn't reach RHOSP Jenkins.</strong> Make sure you have connectivity and credentials to reach and use RHOSP Jenkins.
-    </div>
-  </div>
-{% endif %}
 <!-- Main container -->
 
 <div class="container-fluid col-md-custom col-md-offset-custom">
@@ -27,7 +19,7 @@
     <a href="#">
       <span class="pficon pficon-registry"></span>
       <a href="{{ url_for('jobs.index') }}">
-          <span class="card-pf-aggregate-status-count">{{ agent.number_of_jobs }} Jobs</span>
+          <span class="card-pf-aggregate-status-count">{{ jobs_num }} Jobs</span>
       </a>
     </a>
   </h2>
@@ -45,7 +37,7 @@
     <a href="#">
       <span class="pficon pficon-cluster"></span>
       <a href="{{ url_for('nodes.index') }}">
-          <span class="card-pf-aggregate-status-count">{{ agent.number_of_nodes }} Nodes</span>
+          <span class="card-pf-aggregate-status-count">{{ nodes_num }} Nodes</span>
       </a>
     </a>
   </h2>
@@ -62,7 +54,7 @@
     <a href="#">
       <span class="pficon pficon-bundle"></span>
       <a href="{{ url_for('plugins.index') }}">
-          <span class="card-pf-aggregate-status-count">{{ agent.number_of_plugins }} Plugins</span>
+          <span class="card-pf-aggregate-status-count">{{ plugins_num }} Plugins</span>
       </a>
     </a>
   </h2>

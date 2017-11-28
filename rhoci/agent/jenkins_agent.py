@@ -22,7 +22,7 @@ import time
 
 from rhoci.agent import agent
 from rhoci.agent import update
-import rhoci.jenkins.build as build
+import rhoci.jenkins.build as build_lib
 import rhoci.models as models
 from rhoci.db.base import db
 from rhoci.rhosp.dfg import get_dfg_name
@@ -59,27 +59,48 @@ class JenkinsAgent(agent.Agent):
             LOG.info("Update complete")
 
     def pre_start(self):
-        """Populate the database with all the information from Jenkins."""
+        """Populate the database with information from Jenkins
+
+        Jobs - name, last build status, last build_number
+        Builds - Job name, Status, Number
+        """
         with self.app.app_context():
 
+            # If there is no update time, it means the application never
+            # contacted Jenkins so run update without additional
+            # If there was an update, check if one hour passed since
+            # last update
             agent = models.Agent.query.filter_by(name=self.name).first()
-            if not agent.update_time:
+            if not agent.update_time or (agent.update_time -
+                                         datetime.datetime.utcnow() >
+                                         datetime.timedelta(minutes=59)):
+
+                # Update timestamp for last Jenkins update
                 models.Agent.query.filter_by(
                     name=self.name).update(dict(
                         update_time=datetime.datetime.utcnow()))
+                LOG.debug("Updated agent timestamp")
+
+                # Do a shallow update (detailed description in docstring)
                 all_jobs = self.shallow_db_update()
+
+                # Update information regarding the job in the DB
                 with ThreadPoolExecutor(100) as executor:
                     for job in all_jobs:
                         executor.submit(self.update_job_in_db, job)
 
-            elif (agent.update_time - datetime.datetime.utcnow() >
-                  datetime.timedelta(minutes=59)):
-                all_jobs = self.shallow_db_update()
-                with ThreadPoolExecutor(100) as executor:
-                    for job in all_jobs:
-                        executor.submit(self.update_job_in_db, job)
+            # In case application was restarted or crushed, check if active
+            # builds in DB are still active
+            build_lib.check_active_builds(self.conn)
 
-            build.check_active_builds(self.conn)
+            # Analyze failed builds
+            failed_builds = models.Build.query.filter_by(
+                status='Failure').all()
+            for build_db in failed_builds:
+                if not build_db.failure_name:
+                    LOG.info("Analyzing job %s build %s" % (build_db.job,
+                                                            build_db.number))
+                    build_lib.anaylze_failure(build_db)
 
     def remove_jobs_from_db(self, jobs):
         """Removes jobs from DB that no longer exist on Jenkins."""
@@ -89,19 +110,25 @@ class JenkinsAgent(agent.Agent):
                     LOG.debug("Removing job: %s from DB" % job)
 
     def update_job_in_db(self, job):
+        last_build_status = "None"
         with self.app.app_context():
             try:
                 job_info = self.conn.get_job_info(job['name'])
-                last_build_number = build.get_last_build_number(
+                last_build_number = build_lib.get_last_build_number(
                     job_info)
             except Exception as e:
                 LOG.info("Unable to fetch information for %s: %s" % (
                     job['name'], e.message))
             if last_build_number:
-                last_build_status = build.get_build_status(
-                    self.conn, job['name'], last_build_number)
-            else:
-                last_build_status = "None"
+                if not models.Build.query.filter_by(
+                   number=last_build_number).count():
+                    last_build_status = build_lib.get_build_status(
+                        self.conn, job['name'], last_build_number)
+                    db_build = models.Build(job=job['name'],
+                                            number=last_build_number,
+                                            status=last_build_status)
+                    db.session.add(db_build)
+                    db.session.commit()
 
             # Update entry in database
             models.Job.query.filter_by(
@@ -120,21 +147,6 @@ class JenkinsAgent(agent.Agent):
                                         password=self.password)
                 db.session.add(db_agent)
                 db.session.commit()
-
-    def update_number_of_jobs_plugins_nodes(self, jobs_num, nodes_num,
-                                            plugins_num):
-        """Updates the Jenkins agent db entry with number of jobs, nodes and
-
-        plugins.
-        """
-        with self.app.app_context():
-            models.Agent.query.filter_by(name=self.name).update(
-                dict(number_of_jobs=jobs_num,
-                     number_of_nodes=nodes_num,
-                     number_of_plugins=plugins_num,
-                     active=self.active))
-            LOG.debug("Updated number of jobs, nodes and plugins")
-            db.session.commit()
 
     def get_job_type(self, name):
         """Returns job type based on its name."""
@@ -158,7 +170,7 @@ class JenkinsAgent(agent.Agent):
         return m.group().split('-')[1] if m else 0
 
     def shallow_db_update(self):
-        """Insert jobs and nodes with only their names."""
+        """Insert jobs, nodes and plugins to DB (names only)."""
 
         try:
             all_jobs = self.conn.get_all_jobs()
@@ -168,9 +180,6 @@ class JenkinsAgent(agent.Agent):
             LOG.error("Failed to retrieve data from Jenkins: %s", e)
             self.active = False
             sys.exit(2)
-
-        self.update_number_of_jobs_plugins_nodes(len(all_jobs), len(all_nodes),
-                                                 len(all_plugins))
 
         for job in all_jobs:
             if not models.Job.query.filter_by(name=job['name']).count():
