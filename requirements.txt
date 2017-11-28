@@ -3,6 +3,5 @@ flask
 flask-autodoc
 Flask-SQLAlchemy
 futures
-gevent
 python-jenkins
 sqlalchemy-migrate

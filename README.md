@@ -7,12 +7,11 @@ RHOCI (Red Hat OpenStack CI)
 A web service based on Jenkins to enhance user experience for Red Hat OpenStack CI users.
 This project allows you to:
 
-    * See all the jobs, builds and tests in one page, without loading additional pages
-    * Filter jobs, builds and tests based on different parameters (status, params, substring)
+    * View all jobs in one datatable where you can filter them based on different parameters
+    * View all builds in one datatable where you can filter them based on different parameters
+    * View all unique tests and how many times they failed or passed
     * Generate job definitions based on given input
     * Analyze build failures
-
-And more :)
 
 * [Requirements](#requirements)
 * [Installation](#installation)
@@ -26,11 +25,15 @@ And more :)
 
 ## Installation
 
+    sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    sudo yum install -y httpd python-pip python-virtualenv gcc
     virtualenv .venv && source .venv/bin/activate
     pip install .
 
-You can also run the quick setup script in this directory:
+Make sure you allow HTTP traffic
+Note that you can instead run the following two scripts
 
+    chmod +x scripts/initial_setup.sh && scripts/initial_setup.sh
     chmod +x scripts/quick_run.sh && scripts/quick_run.sh
 
 ## Run RHOCI

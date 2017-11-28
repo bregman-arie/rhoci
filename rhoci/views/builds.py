@@ -229,3 +229,17 @@ def top_failure_types():
                 [failure.name, failure.category, failure.count])
 
     return jsonify(results)
+
+
+@builds.route('/get_failure')
+def get_failure():
+    job = request.args.get('job')
+    build = request.args.get('build')
+
+    build_db = Build.query.filter_by(job=job, number=build).first()
+    failure = Failure.query.filter_by(name=build_db.failure_name).first()
+
+    return jsonify(failure_name=failure.name,
+                   failure_text=build_db.failure_text,
+                   failure_action=failure.action,
+                   failure_cause=failure.cause)

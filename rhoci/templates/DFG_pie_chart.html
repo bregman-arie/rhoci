@@ -18,6 +18,7 @@
   </div>
   </div>
 
+
 <script>
   var c3ChartDefaults = $().c3ChartDefaults();
 
@@ -72,12 +73,15 @@
             {
                 targets:1,
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row[1] != 'FAILURE'){
+                    if(type === 'display' && (row[1] == 'UNSTABLE' || row[1] == 'SUCCESS')){
                         data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[2] + '">' + data + '</a>';
                     }
+                    else if (type === 'display' && row[1] == 'FAILURE') {
+                    data = "Failure <a href={{ url_for('builds.failure_analyze', job='JOB', build='BUILD') }}>(Why did it fail?)</a>".replace("JOB", row[0]).replace("BUILD", row[2]);
+                    }
                     else {
-                      data = "Failure <a href={{ url_for('builds.failure_analyze', job='JOB', build='BUILD') }}>(Why did it fail?)</a>".replace("JOB", row[0]).replace("BUILD", row[2]);
-                  }
+                    data = '<button type="button" onClick="reply_click(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
+                    }
                   return data;
                 }
             },
