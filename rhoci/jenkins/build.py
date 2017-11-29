@@ -15,11 +15,12 @@ from flask import current_app
 import json
 import jenkins
 import logging
-from urllib import urlopen
+import urllib2
 
 from rhoci.models import Agent
 from rhoci.models import Artifact
 from rhoci.models import Build
+from rhoci.models import Failure
 from rhoci.models import Job
 from rhoci.models import Test
 from rhoci.models import TestBuild
@@ -42,10 +43,6 @@ def get_build_status(conn, job_name, build_number):
     the last completed build result.
     """
     return str(conn.get_build_info(job_name, int(build_number))['result'])
-
-
-def get_artifacts(conn, job, build):
-    pass
 
 
 def update_failure(job, number, failure_name, text):
@@ -144,10 +141,9 @@ def update_in_db(data):
                                                    last_build_status=status))
         db.session.commit()
         url = current_app.config.get("url")
-        tests_raw_data = urlopen(
+        tests_raw_data = urllib2.urlopen(
             url + "/job/" + name + "/" +
-            str(number) + "/testReport/api/json").read(
-        )
+            str(number) + "/testReport/api/json").read()
         if 'Not found' not in tests_raw_data:
             LOG.debug("Found tests. Adding them to DB.")
             update_tests(tests_raw_data, name, number)
@@ -181,3 +177,67 @@ def update_artifacts_db(artifacts, job, build):
         db.session.commit()
         LOG.info("Added artifact in DB: %s" % art['fileName'])
     return logs
+
+
+def get_artifacts(job, build):
+    """Obtain the name the artifacts of a given build and update the DB
+
+    accordingly.
+    """
+    if not Artifact.query.filter_by(job=job, build=int(build)).count():
+        agent = Agent.query.one()
+        conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+        artifacts = conn.get_build_info(job, int(build))['artifacts']
+        update_artifacts_db(artifacts, job, build)
+
+
+def check_match(data):
+    """Simple comparison to find out if there is a match."""
+    print "hi Im here"
+    for line in data:
+        if line:
+            for failure in Failure.query.all():
+                if failure.pattern in line.decode('utf-8').strip():
+                    Failure.query.filter_by(name=failure.name).update(
+                        {'count': Failure.count + 1})
+                    db.session.commit()
+                    return True, line, failure.name
+    return False, '', ''
+
+
+def analyze_failure(job, build):
+    """Tries to figure out why a certain build failed and updates the
+
+    DB accordingly.
+    """
+    found = False
+    get_artifacts(job, build)
+    agent = Agent.query.one()
+
+    # Check if there are artifacts that end with .log
+    logs = [i for i in Artifact.query.filter_by(
+        job=job, build=int(build)) if i.name.endswith(".log")]
+
+    if logs:
+        for log in logs:
+            if found:
+                break
+            log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
+                                                        str(log.relativePath))
+            print log_url
+            log_data = urllib2.urlopen(log_url)
+            print log_data
+            match, failure_text, failure_name = check_match(log_data)
+            if match:
+                update_failure(job, build, failure_name, failure_text)
+                break
+        if not match:
+            console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
+                                                            str(job),
+                                                            str(build))
+            console_data = urllib2.urlopen(console_url)
+            match, failure_text, failure_name = check_match(console_data)
+            if match:
+                update_failure(job, build, failure_name, failure_text)
+        if not match:
+                update_failure(job, build, 'Unknown', '')

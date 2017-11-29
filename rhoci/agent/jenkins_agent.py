@@ -95,12 +95,13 @@ class JenkinsAgent(agent.Agent):
 
             # Analyze failed builds
             failed_builds = models.Build.query.filter_by(
-                status='Failure').all()
+                status='FAILURE').all()
             for build_db in failed_builds:
-                if not build_db.failure_name:
+                if (not build_db.failure_name or
+                        build_db.failure_name != 'Unknown'):
                     LOG.info("Analyzing job %s build %s" % (build_db.job,
                                                             build_db.number))
-                    build_lib.anaylze_failure(build_db)
+                    build_lib.analyze_failure(build_db.job, build_db.number)
 
     def remove_jobs_from_db(self, jobs):
         """Removes jobs from DB that no longer exist on Jenkins."""

@@ -105,6 +105,24 @@ FAILURES = [
      'cause': 'The service you are trying to reach is unavailable',
      },
 
+    {'category': 'Infrastructure',
+     'name': 'Server Unavailable',
+     'pattern': 'Gateway Time-out',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Contact the support team of the service you are trying to use',
+     'cause': 'The server you are trying to reach is unavailable',
+     },
+
+    {'category': 'Infrastructure',
+     'name': 'Server Unavailable',
+     'pattern': 'Timeout waiting for the server',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Contact the support team of the service you are trying to use',
+     'cause': 'The server you are trying to reach is unavailable',
+     },
+
     {'category': 'Product',
      'name': 'Overcloud Upgrade',
      'pattern': 'Overcloud upgrade composable step failed',
@@ -140,6 +158,35 @@ FAILURES = [
      'action': 'Make sure you clone the project the right ' +
      'way or cherry-pick commits',
      'cause': 'Mockbuild failed for unknown reason',
+     },
+
+    {'category': 'CI Workflow',
+     'name': 'Git - Unable to fetch Repo',
+     'pattern': 'Error fetching remote repo',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Make sure the repo name and branch are correct',
+     'cause': 'It looks like you specified a missing repo or barnch',
+     },
+
+    {'category': 'Packages',
+     'name': 'Missing Packages',
+     'pattern': 'Error: Package:',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Make sure package is present in the repository or you have ' +
+     'the right repository that should include the missing package',
+     'cause': 'The package you are trying to install requires another ' +
+     'package that is missing',
+     },
+
+    {'category': 'Jenkins',
+     'name': 'Archive Issue',
+     'pattern': 'We had issue(s) while log archiving',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'User - retrigger job. Admin - investigate Jenkins logs',
+     'cause': 'Couldnt figure out why it happened',
      },
 
     {'category': 'CI framework',
