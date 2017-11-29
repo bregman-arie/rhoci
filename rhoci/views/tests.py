@@ -16,8 +16,10 @@ from flask import Blueprint
 from flask import jsonify
 from flask import redirect
 import logging
+import urllib2
 
 import rhoci.models as models
+import rhoci.jenkins.build as jenkins_build
 
 
 logger = logging.getLogger(__name__)
@@ -60,10 +62,19 @@ def top_failing_tests():
 @tests.route('/get_tests/<job>_<build>', methods=['GET'])
 def get_tests(job=None, build=None):
 
+    agent = models.Agent.query.one()
+
     if models.TestBuild.query.filter_by(job=job, build=build).count():
+
         tests = models.TestBuild.query.filter_by(job=job, build=build).all()
         return render_template('tests.html', all_tests=tests)
+
     else:
-        agent = models.Agent.query.one()
+
+        tests_raw_data = urllib2.urlopen(agent.url + "/job/" + job + "/" +
+                                         build + "/testReport/api/json").read()
+        if 'Not found' not in tests_raw_data:
+            jenkins_build.update_tests(tests_raw_data, job, build)
+
         tests_url = agent.url + '/job/' + job + '/' + build + '/testReport'
         return redirect(tests_url)

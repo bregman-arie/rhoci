@@ -52,37 +52,41 @@ def update_failure(job, number, failure_name, text):
     db.session.commit()
 
 
-def update_tests(tests_data, job, build_number):
+def update_tests(tests_data, job, build):
     """Checks if build ran tests. If yes, updates DB with the tests."""
     #  TODO(abregman): move this code to python-jenkins
+    LOG.info("Adding tests to DB for job %s build %s" % (job, build))
     for test in json.loads(tests_data)['suites'][0]['cases']:
-        if not Test.query.filter_by(class_name=test['className']).count():
-            test_db = Test(class_name=test['className'],
-                           failure=0,
-                           success=0)
-            db.session.add(test_db)
+        # Avoid setUpClass
+        if test['className'] != '':
+            if not Test.query.filter_by(class_name=test['className']).count():
+                test_db = Test(class_name=test['className'],
+                               failure=0,
+                               success=0)
+                db.session.add(test_db)
+                db.session.commit()
+                LOG.debug("Added test %s" % test['className'])
+            if (not TestBuild.query.filter_by(class_name=test['className'],
+                                              job=job, build=build).count()):
+                test_build_db = TestBuild(job=job, build=build,
+                                          status=test['status'],
+                                          skipped=test['skipped'],
+                                          class_name=test['className'],
+                                          name=test['name'],
+                                          duration=test['duration'],
+                                          errorStackTrace=test[
+                                              'errorStackTrace'])
+                db.session.add(test_build_db)
+                db.session.commit()
+                LOG.debug("Added test build %s %s %s" % (test['className'], job,
+                                                         build))
+            if test['status'] == 'PASSED':
+                Test.query.filter_by(class_name=test['className']).update(
+                    {'success': Test.success + 1})
+            else:
+                Test.query.filter_by(class_name=test['className']).update(
+                    {'failure': Test.failure + 1})
             db.session.commit()
-            LOG.debug("Added test %s" % test['className'])
-        if not TestBuild.query.filter_by(class_name=test['className'],
-                                         job=job, build=build_number).count():
-            test_build_db = TestBuild(job=job, build=build_number,
-                                      status=test['status'],
-                                      skipped=test['skipped'],
-                                      class_name=test['className'],
-                                      name=test['name'],
-                                      duration=test['duration'],
-                                      errorStackTrace=test['errorStackTrace'])
-            db.session.add(test_build_db)
-            db.session.commit()
-            LOG.debug("Added test build %s %s %s" % (test['className'], job,
-                                                     build_number))
-        if test['status'] == 'PASSED':
-            Test.query.filter_by(class_name=test['className']).update(dict(
-                success=+1))
-        else:
-            Test.query.filter_by(class_name=test['className']).update(dict(
-                failure=+1))
-        db.session.commit()
 
 
 def add_new_build(job, number):
@@ -145,7 +149,6 @@ def update_in_db(data):
             url + "/job/" + name + "/" +
             str(number) + "/testReport/api/json").read()
         if 'Not found' not in tests_raw_data:
-            LOG.debug("Found tests. Adding them to DB.")
             update_tests(tests_raw_data, name, number)
 
 
@@ -210,6 +213,7 @@ def analyze_failure(job, build):
     DB accordingly.
     """
     found = False
+    match = False
     get_artifacts(job, build)
     agent = Agent.query.one()
 
@@ -223,11 +227,15 @@ def analyze_failure(job, build):
                 break
             log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
                                                         str(log.relativePath))
-            log_data = urllib2.urlopen(log_url)
-            match, failure_text, failure_name = check_match(log_data)
-            if match:
-                update_failure(job, build, failure_name, failure_text)
-                break
+            try:
+                log_data = urllib2.urlopen(log_url)
+                match, failure_text, failure_name = check_match(log_data)
+                if match:
+                    update_failure(job, build, failure_name, failure_text)
+                    break
+            except urllib2.HTTPError:
+                LOG.debug("Couldnt read logs for job %s build %s." % (
+                    job, build))
         if not match:
             console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
                                                             str(job),
@@ -243,3 +251,14 @@ def analyze_failure(job, build):
         else:
             LOG.info("The failure for job %s build %s is %s" % (job, build,
                                                                 failure_name))
+    else:
+        console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
+                                                        str(job),
+                                                        str(build))
+        console_data = urllib2.urlopen(console_url)
+        match, failure_text, failure_name = check_match(console_data)
+        if match:
+            update_failure(job, build, failure_name, failure_text)
+        else:
+            LOG.info("Was unable to figure out " +
+                     "why job %s build %s failed" % (job, build))

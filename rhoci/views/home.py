@@ -154,6 +154,7 @@ def failures():
 @home.route('/releases', methods=['GET'])
 def releases():
 
+    agent = models.Agent.query.one()
     releases = models.Release.query.all()
     jobs = {}
     jobs['phase1'] = models.Job.query.filter_by(job_type='phase1')
@@ -164,4 +165,5 @@ def releases():
                            releases=releases,
                            phase1=jobs['phase1'],
                            phase2=jobs['phase2'],
-                           dfg=jobs['dfg'])
+                           dfg=jobs['dfg'],
+                           agent=agent)
