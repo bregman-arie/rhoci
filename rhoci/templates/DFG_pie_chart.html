@@ -27,7 +27,7 @@
     colors: {
       Failure: $.pfPaletteColors.red,
       Unstable: $.pfPaletteColors.gold,
-      None: $.pfPaletteColors.blue,
+      None: '#E8E8E8',
       Success: $.pfPaletteColors.green
     },
     columns: [
@@ -43,9 +43,9 @@
     $('#dfg_jobs_table').DataTable( {
       "ajax": "{{ url_for('jobs.jobs_status', status='FAILURE', dfg=release.dfg, release=release.number) }}".replace("FAILURE", d.id),
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-          if ( aData[1] != "SUCCESS" && aData[1] != 'UNSTABLE' )
+          if ( aData[1] == 'None' )
           {
-          $('td', nRow).css('background-color', '#f2dede' );
+          $('td', nRow).css('background-color', '#E8E8E8');
           }
           else if ( aData[1] == "SUCCESS" )
           {
@@ -57,7 +57,7 @@
           }
           else
           {
-          $('td', nRow).css('background-color', '#d9edf7');
+          $('td', nRow).css('background-color', '#f2dede' );
           }
         },
         columnDefs: [
@@ -79,7 +79,7 @@
                     else if (type === 'display' && row[1] == 'FAILURE') {
                     data = "Failure <a href={{ url_for('builds.failure_analyze', job='JOB', build='BUILD') }}>(Why did it fail?)</a>".replace("JOB", row[0]).replace("BUILD", row[2]);
                     }
-                    else {
+                    else if (type === 'display' && row[1] != 'None' ){
                     data = '<button type="button" onClick="reply_click(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
                     }
                   return data;

@@ -150,6 +150,16 @@ FAILURES = [
      'cause': 'Mockbuild failed for unknown reason',
      },
 
+    {'category': 'Programming',
+     'name': 'Wrong Type',
+     'pattern': 'TypeError',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Fix the code :)',
+     'cause': 'an operation or function is applied to ' +
+     'an object of inappropriate type',
+     },
+
     {'category': 'CI workflow',
      'name': 'Git failure',
      'pattern': 'possibly due to conflict resolution',
@@ -189,12 +199,12 @@ FAILURES = [
      'cause': 'Couldnt figure out why it happened',
      },
 
-    {'category': 'CI framework',
-     'name': 'Missing file or directory',
-     'pattern': 'No such file or directory',
+    {'category': 'Product',
+     'name': 'Tests Failures',
+     'pattern': 'The test run failed',
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
-     'action': 'Fix file or directory name',
-     'cause': 'The file or directory you specified doesnt exists',
+     'action': 'Fix the bugs in your project :)',
+     'cause': 'No idea',
      },
 ]

@@ -193,7 +193,6 @@ def get_artifacts(job, build):
 
 def check_match(data):
     """Simple comparison to find out if there is a match."""
-    print "hi Im here"
     for line in data:
         if line:
             for failure in Failure.query.all():
@@ -224,9 +223,7 @@ def analyze_failure(job, build):
                 break
             log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
                                                         str(log.relativePath))
-            print log_url
             log_data = urllib2.urlopen(log_url)
-            print log_data
             match, failure_text, failure_name = check_match(log_data)
             if match:
                 update_failure(job, build, failure_name, failure_text)
@@ -240,4 +237,9 @@ def analyze_failure(job, build):
             if match:
                 update_failure(job, build, failure_name, failure_text)
         if not match:
+                LOG.info("Was unable to figure out " +
+                         "why job %s build %s failed" % (job, build))
                 update_failure(job, build, 'Unknown', '')
+        else:
+            LOG.info("The failure for job %s build %s is %s" % (job, build,
+                                                                failure_name))

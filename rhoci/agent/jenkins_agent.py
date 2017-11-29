@@ -121,15 +121,13 @@ class JenkinsAgent(agent.Agent):
                 LOG.info("Unable to fetch information for %s: %s" % (
                     job['name'], e.message))
             if last_build_number:
-                if not models.Build.query.filter_by(
-                   number=last_build_number).count():
-                    last_build_status = build_lib.get_build_status(
-                        self.conn, job['name'], last_build_number)
-                    db_build = models.Build(job=job['name'],
-                                            number=last_build_number,
-                                            status=last_build_status)
-                    db.session.add(db_build)
-                    db.session.commit()
+                last_build_status = build_lib.get_build_status(
+                    self.conn, job['name'], last_build_number)
+                db_build = models.Build(job=job['name'],
+                                        number=last_build_number,
+                                        status=last_build_status)
+                db.session.add(db_build)
+                db.session.commit()
 
             # Update entry in database
             models.Job.query.filter_by(

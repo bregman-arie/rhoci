@@ -14,10 +14,10 @@
 from flask import render_template
 from flask import Blueprint
 from flask import jsonify
+from flask import redirect
 import logging
 
-from rhoci.models import Test
-from rhoci.models import TestBuild
+import rhoci.models as models
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ tests = Blueprint('tests', __name__)
 @tests.route('/test_runs', methods=['GET'])
 def test_runs():
 
-    db_tests = TestBuild.query.all()
+    db_tests = models.TestBuild.query.all()
     all_tests = [test.serialize for test in db_tests]
 
     return render_template('tests.html', all_tests=all_tests)
@@ -37,7 +37,7 @@ def test_runs():
 @tests.route('/unique_tests', methods=['GET'])
 def unique_tests():
 
-    db_tests = Test.query.all()
+    db_tests = models.Test.query.all()
     all_tests = [test.serialize for test in db_tests]
 
     return render_template('unique_tests.html', all_tests=all_tests)
@@ -49,9 +49,21 @@ def top_failing_tests():
     results = dict()
     results['data'] = list()
 
-    db_tests = Test.query.limit(5).all()
+    db_tests = models.Test.query.limit(5).all()
 
     for test in db_tests:
         results['data'].append([test.class_name, test.failure, test.success])
 
     return jsonify(results)
+
+
+@tests.route('/get_tests/<job>_<build>', methods=['GET'])
+def get_tests(job=None, build=None):
+
+    if models.TestBuild.query.filter_by(job=job, build=build).count():
+        tests = models.TestBuild.query.filter_by(job=job, build=build).all()
+        return render_template('tests.html', all_tests=tests)
+    else:
+        agent = models.Agent.query.one()
+        tests_url = agent.url + '/job/' + job + '/' + build + '/testReport'
+        return redirect(tests_url)

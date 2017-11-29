@@ -123,12 +123,14 @@
 <script>
     $('#failing_tests').DataTable( {
         "ajax": "{{ url_for('tests.top_failing_tests') }}",
+    "order": [[ 1, "desc" ]],
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         $('td', nRow).css('background-color', '#f2dede' );
     }
     });
 
     $('#failure_types').DataTable( {
+    "order": [[ 2, "desc" ]],
         "ajax": "{{ url_for('builds.top_failure_types') }}",
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         $('td', nRow).css('background-color', '#f2dede' );

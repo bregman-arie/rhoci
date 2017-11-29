@@ -103,7 +103,8 @@ def exists():
 
     if exists:
         if Build.query.filter_by(job=job, number=int(build)).count():
-            build_db = Build.query.filter_by(job=job, number=int(build)).first()
+            build_db = Build.query.filter_by(
+                job=job, number=int(build)).first()
             build_status = build_db.status
             if build_db.failure_name:
                 known_failure = True
@@ -124,7 +125,8 @@ def exists():
                        action=failure.action,
                        failure_line=build_db.failure_text)
     else:
-        return jsonify(exists=exists, message=message, known_failure=known_failure)
+        return jsonify(exists=exists, message=message,
+                       known_failure=known_failure)
 
 
 @builds.route('/obtain_logs')
