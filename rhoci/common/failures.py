@@ -150,16 +150,6 @@ FAILURES = [
      'cause': 'Mockbuild failed for unknown reason',
      },
 
-    {'category': 'Programming',
-     'name': 'Wrong Type',
-     'pattern': 'TypeError',
-     'upper_bound_pattern': 'TASK [',
-     'lower_bound_pattern': '',
-     'action': 'Fix the code :)',
-     'cause': 'an operation or function is applied to ' +
-     'an object of inappropriate type',
-     },
-
     {'category': 'CI workflow',
      'name': 'Git failure',
      'pattern': 'possibly due to conflict resolution',
