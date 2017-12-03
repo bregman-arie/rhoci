@@ -95,7 +95,7 @@ def get_tests_datatable(job=None, build=None):
     if models.TestBuild.query.filter_by(job=job, build=build).count():
         tests = models.TestBuild.query.filter_by(job=job, build=build).all()
         for test in tests:
-            results['data'].append([test.class_name, test.status])
+            results['data'].append([test.class_name, test.name, test.status])
         return jsonify(results)
     else:
         try:
@@ -107,8 +107,9 @@ def get_tests_datatable(job=None, build=None):
             tests = models.TestBuild.query.filter_by(
                 job=job, build=build).all()
             for test in tests:
-                results['data'].append([test.class_name, test.status])
+                results['data'].append([test.class_name, test.name,
+                                        test.status])
         except urllib2.HTTPError:
-                results['data'].append(["No tests", "No tests"])
+                results['data'].append(["No tests", "No tests", "No tests"])
 
         return jsonify(results)

@@ -241,8 +241,8 @@ $("#table1").DataTable({
                 targets:4,
                 render: function ( data, type, row, meta ) {
                     data = "<a href={{ url_for('tests.get_tests', job='JOB', build='BUILD') }}>Tests</a>".replace("JOB", row['job_name']).replace("BUILD", row['last_build_number']);
-                }
                     return data;
+                }
             },
         ],
   dom: "t",

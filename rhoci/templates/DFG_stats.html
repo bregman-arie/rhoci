@@ -35,7 +35,7 @@
 
 <!-- Tests Modal -->
 <div id="tests_modal" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg" style="width:1250px;">
 
     <!-- Modal content-->
     <div class="modal-content">
@@ -49,6 +49,7 @@
           <thead>
             <tr>
                 <th>Class Name</th>
+                <th>Test Name</th>
                 <th>Status</th>
             </tr>
           </thead>
@@ -114,11 +115,11 @@ function show_tests(job, build)
           "url": "{{ url_for('tests.get_tests_datatable') }}",
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData[1] == "PASSED" )
+            if ( aData[2] == "PASSED" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData[1] == "FAILED" )
+            else if ( aData[2] == "FAILED" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
@@ -129,10 +130,15 @@ function show_tests(job, build)
           },
         columnDefs: [
             {
-                targets:0,
+                targets:[0, 1],
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && data != 'No tests'){
-                        data = '<a href="{{ agent.url }}/job/' + job + '/' + build + '/artifact/tempest-results/tempest-results-network.1.html' + '">' + data + '</a>';
+                        replacement = '/';
+                        old_class_name = row[0];
+                        old_test_name = row[1];
+                        class_name = old_class_name.replace(/\.([^\.]*)$/,replacement+'$1');
+                        var test_name = old_test_name.replace(/-/g, "_").replace('[', '_').replace(']', '_').replace(',', '_');
+                        data = '<a href="{{ agent.url }}/job/' + job + '/' + build + '/testReport/' + class_name + '/' + test_name + '">' + data + '</a>';
                     }
                     return data;
                 }
