@@ -78,12 +78,13 @@ def update_tests(tests_data, job, build):
                                               'errorStackTrace'])
                 db.session.add(test_build_db)
                 db.session.commit()
-                LOG.debug("Added test build %s %s %s" % (test['className'], job,
+                LOG.debug("Added test build %s %s %s" % (test['className'],
+                                                         job,
                                                          build))
             if test['status'] == 'PASSED':
                 Test.query.filter_by(class_name=test['className']).update(
                     {'success': Test.success + 1})
-            else:
+            elif test['status'] == 'FAILED':
                 Test.query.filter_by(class_name=test['className']).update(
                     {'failure': Test.failure + 1})
             db.session.commit()
@@ -144,6 +145,12 @@ def update_in_db(data):
         Job.query.filter_by(name=name).update(dict(last_build_number=number,
                                                    last_build_status=status))
         db.session.commit()
+
+        # If build failed, anaylze failure
+        if status == 'FAILURE':
+            analyze_failure(name, number)
+
+        # Check for tests
         url = current_app.config.get("url")
         tests_raw_data = urllib2.urlopen(
             url + "/job/" + name + "/" +
@@ -262,3 +269,4 @@ def analyze_failure(job, build):
         else:
             LOG.info("Was unable to figure out " +
                      "why job %s build %s failed" % (job, build))
+            update_failure(job, build, 'Unknown', '')

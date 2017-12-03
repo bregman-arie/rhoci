@@ -169,6 +169,18 @@ FAILURES = [
      'cause': 'It looks like you specified a missing repo or barnch',
      },
 
+
+    {'category': 'Infrastructure',
+     'name': 'Internal Server Error',
+     'pattern': 'Server Error for url',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Check if infrastucture is under maintenance. If not, please ' +
+     'open a ticket for your support team.',
+     'cause': 'Looks like internal error occured in the server you are ' +
+     'trying to reach',
+     },
+
     {'category': 'Packages',
      'name': 'Missing Packages',
      'pattern': 'Error: Package:',
@@ -187,6 +199,15 @@ FAILURES = [
      'lower_bound_pattern': '',
      'action': 'User - retrigger job. Admin - investigate Jenkins logs',
      'cause': 'Couldnt figure out why it happened',
+     },
+
+    {'category': 'Application',
+     'name': 'Application Failure',
+     'pattern': 'failed unexpectedly',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Check app logs to see why they failed',
+     'cause': 'No idea :(',
      },
 
     {'category': 'Product',

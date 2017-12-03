@@ -3,6 +3,7 @@
 *.egg-info
 *.pyc
 *.log.*
+*.log
 .test
 .testrepository
 .tox

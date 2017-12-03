@@ -240,14 +240,9 @@ $("#table1").DataTable({
             {
                 targets:4,
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row['last_build_status'] == 'UNSTABLE' ){
-                        data = "<a href={{ url_for('tests.get_tests', job='JOB', build='BUILD') }}>Tests</a>".replace("JOB", row['job_name']).replace("BUILD", row['last_build_number']);
-                    }
-                    else if (type === 'display' && row[2] != 0) {
-                        data = '<a href="{{ agent.url }}/job/' + row['job_name'] + '/' + row['last_build_number'] + '/testReport'+ '">Tests</a>';
-                    }
-                    return data;
+                    data = "<a href={{ url_for('tests.get_tests', job='JOB', build='BUILD') }}>Tests</a>".replace("JOB", row['job_name']).replace("BUILD", row['last_build_number']);
                 }
+                    return data;
             },
         ],
   dom: "t",

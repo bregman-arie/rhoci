@@ -15,6 +15,7 @@ from flask import render_template
 from flask import Blueprint
 from flask import jsonify
 from flask import redirect
+from flask import request
 import logging
 import urllib2
 
@@ -78,3 +79,36 @@ def get_tests(job=None, build=None):
 
         tests_url = agent.url + '/job/' + job + '/' + build + '/testReport'
         return redirect(tests_url)
+
+
+@tests.route('/get_tests_datatable/<job>_<build>', methods=['GET'])
+@tests.route('/get_tests_datatable/', methods=['GET'])
+def get_tests_datatable(job=None, build=None):
+
+    results = dict()
+    results['data'] = list()
+    agent = models.Agent.query.one()
+    if not job:
+        job = request.args.get('job')
+        build = request.args.get('build')
+
+    if models.TestBuild.query.filter_by(job=job, build=build).count():
+        tests = models.TestBuild.query.filter_by(job=job, build=build).all()
+        for test in tests:
+            results['data'].append([test.class_name, test.status])
+        return jsonify(results)
+    else:
+        try:
+            tests_raw_data = urllib2.urlopen(agent.url + "/job/" + job + "/" +
+                                             build +
+                                             "/testReport/api/json").read()
+            if 'Not found' not in tests_raw_data:
+                jenkins_build.update_tests(tests_raw_data, job, build)
+            tests = models.TestBuild.query.filter_by(
+                job=job, build=build).all()
+            for test in tests:
+                results['data'].append([test.class_name, test.status])
+        except urllib2.HTTPError:
+                results['data'].append(["No tests", "No tests"])
+
+        return jsonify(results)
