@@ -61,4 +61,5 @@ def stats(dfg_name):
             'number': item.number,
             'dfg': dfg_name})
 
-    return render_template('DFG_stats.html', releases=data, agent=agent)
+    return render_template('DFG_stats.html', releases=data, agent=agent,
+                           dfg=dfg_name)

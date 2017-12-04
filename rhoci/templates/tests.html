@@ -186,7 +186,7 @@ $("#table1").DataTable({
   ],
   data: dataSet,
   "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-      if ( aData['status'] == "FAILED" )
+      if ( aData[2] == "FAILED" || aData[2] == "REGRESSION" )
       {
       $('td', nRow).css('background-color', '#f2dede' );
       }

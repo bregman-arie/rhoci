@@ -134,7 +134,7 @@ class TestBuild(db.Model):
     build = db.Column(db.String(64), primary_key=True)
     status = db.Column(db.String(64))
     skipped = db.Column(db.String(64))
-    name = db.Column(db.String(64))
+    name = db.Column(db.String(64), primary_key=True)
     duration = db.Column(db.String(64))
     errorStackTrace = db.Column(db.Text)
 

@@ -16,10 +16,12 @@ import jenkins
 import logging
 from concurrent.futures import ThreadPoolExecutor
 
+from rhoci.db.base import db
 import rhoci.jenkins.build as jenkins_lib
 import rhoci.jenkins.server as jenkins_server
 import rhoci.models as models
-from rhoci.db.base import db
+import rhoci.rhosp.jenkins as rhosp_jenkins
+import rhoci.rhosp.dfg as rhosp_dfg
 
 LOG = logging.getLogger(__name__)
 
@@ -74,7 +76,16 @@ def job_db_delete(job):
                                         name=test.test_name).update(
                                             {'failure': models.Test.failure -
                                              1})
+        db.session.commit()
     models.TestBuild.query.filter_by(job=job).delete()
+    db.session.commit()
+
+    if rhosp_jenkins.get_job_type(job) == 'dfg':
+        dfg = rhosp_dfg.get_dfg_name(job)
+        if models.Job.query.filter(models.Job.name.contains(
+                'DFG-%s' % dfg)).count() == 1:
+            models.dfg.filter_by(name=dfg).delete()
+            db.session.commit()
 
 
 def job_db_update(job, conn):

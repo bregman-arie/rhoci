@@ -53,7 +53,7 @@ def top_failing_tests():
     results['data'] = list()
 
     db_tests = models.Test.query.order_by(
-        models.Test.failure.desc()).limit(4).all()
+        models.Test.failure.desc()).limit(5).all()
 
     for test in db_tests:
         results['data'].append([test.class_name, test.test_name,
@@ -115,3 +115,24 @@ def get_tests_datatable(job=None, build=None):
                 results['data'].append(["No tests", "No tests", "No tests"])
 
         return jsonify(results)
+
+
+@tests.route('/failing_tests_dfg/<dfg>')
+def failing_tests_dfg(dfg):
+    """Get all the failed tests for a given DFG."""
+    results = dict()
+    results['data'] = list()
+
+    tests = models.TestBuild.query.filter(models.TestBuild.job.contains(
+        'DFG-%s' % dfg),
+        (models.TestBuild.status.like('FAILED') | models.TestBuild.status.like('REGRESSION'))).distinct(models.TestBuild.job)
+
+    if tests:
+        for test in tests:
+            results['data'].append([test.class_name, test.name, test.job,
+                                    test.build, test.status])
+    else:
+        results['data'].append(["No Tests", "No Tests", "No Tests",
+                                "No Tests", "No Tests"])
+
+    return jsonify(results)
