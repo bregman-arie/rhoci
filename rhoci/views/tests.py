@@ -52,10 +52,12 @@ def top_failing_tests():
     results = dict()
     results['data'] = list()
 
-    db_tests = models.Test.query.limit(5).all()
+    db_tests = models.Test.query.order_by(
+        models.Test.failure.desc()).limit(4).all()
 
     for test in db_tests:
-        results['data'].append([test.class_name, test.failure, test.success])
+        results['data'].append([test.class_name, test.test_name,
+                                test.failure])
 
     return jsonify(results)
 

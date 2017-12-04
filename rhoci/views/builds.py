@@ -223,7 +223,7 @@ def top_failure_types():
     results = dict()
     results['data'] = list()
 
-    db_failures = Failure.query.order_by(Failure.count.desc()).limit(5).all()
+    db_failures = Failure.query.order_by(Failure.count.desc()).limit(7).all()
 
     for failure in db_failures:
         if failure.count:

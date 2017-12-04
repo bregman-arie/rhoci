@@ -92,8 +92,8 @@
             <thead>
               <tr>
                 <th>Class Name</th>
-                <th>Failure Count</th>
-                <th>Success Count</th>
+                <th>Test Name</th>
+                <th>Failures</th>
               </tr>
             </thead>
           </table>
@@ -123,7 +123,7 @@
 <script>
     $('#failing_tests').DataTable( {
         "ajax": "{{ url_for('tests.top_failing_tests') }}",
-    "order": [[ 1, "desc" ]],
+    "order": [[ 2, "desc" ]],
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         $('td', nRow).css('background-color', '#f2dede' );
     }

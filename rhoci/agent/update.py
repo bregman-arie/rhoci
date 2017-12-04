@@ -18,9 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import rhoci.jenkins.build as jenkins_lib
 import rhoci.jenkins.server as jenkins_server
-from rhoci.models import Agent
-from rhoci.models import Job
-from rhoci.models import Build
+import rhoci.models as models
 from rhoci.db.base import db
 
 LOG = logging.getLogger(__name__)
@@ -29,7 +27,7 @@ LOG = logging.getLogger(__name__)
 def shallow_jobs_update():
     """Perform shallow (level 0) update of all the jobs."""
     # Get connection to Jenkins
-    agent = Agent.query.all()[0]
+    agent = models.Agent.query.all()[0]
     conn = jenkins_server.get_connection(agent.url, agent.user, agent.password)
 
     # Get a list of all jobs from Jenkins
@@ -41,7 +39,7 @@ def shallow_jobs_update():
             executor.submit(job_db_update, job, conn)
 
     # Check if some jobs no longer exist
-    deleted_jobs = set([x.name for x in Job.query.all()]).difference(
+    deleted_jobs = set([x.name for x in models.Job.query.all()]).difference(
         set([x['name'] for x in all_jobs]))
     if deleted_jobs:
         LOG.info("Found jobs in DB that no longer exist: %s" % deleted_jobs)
@@ -54,10 +52,29 @@ def shallow_jobs_update():
 
 def job_db_delete(job):
     """Delete job entry from DB."""
-    db_job = Job.query.filter_by(name=job).first()
+    db_job = models.Job.query.filter_by(name=job).first()
     db.session.delete(db_job)
     db.session.commit()
     LOG.info("Removed job %s from the DB" % job)
+    models.Build.query.filter_by(job=job).delete()
+    tests_build = models.TestBuild.query.filter_by(job=job).all()
+    for test in tests_build:
+        unique_test = models.Test.query.filter_by(
+            name=test.test_name, class_name=test.class_name).count()
+        if (unique_test.failure == 1 and unique_test.success == 0) or (
+                unique_test.failure == 0 and unique_test.success == 1):
+            db.session.delete(unique_test)
+        elif test.status == 'PASSED':
+            models.Test.query.filter_by(class_name=test.class_name,
+                                        name=test.test_name).update(
+                                            {'success': models.Test.success -
+                                             1})
+        else:
+            models.Test.query.filter_by(class_name=test.class_name,
+                                        name=test.test_name).update(
+                                            {'failure': models.Test.failure -
+                                             1})
+    models.TestBuild.query.filter_by(job=job).delete()
 
 
 def job_db_update(job, conn):
@@ -73,7 +90,7 @@ def job_db_update(job, conn):
         if isinstance(e, jenkins.NotFoundException):
             LOG.info("Removing job %s since it no longer exist on Jenkins" %
                      job['name'])
-            job_db = Job.query.filter_by(name=job['name']).first()
+            job_db = models.Job.query.filter_by(name=job['name']).first()
             db.session.delete(job_db)
             db.session.commit()
 
@@ -84,7 +101,7 @@ def job_db_update(job, conn):
         last_build_status = "None"
 
     # Update entry in database
-    Job.query.filter_by(
+    models.Job.query.filter_by(
         name=job['name']).update(
             dict(last_build_number=last_build_number,
                  last_build_status=last_build_status))
@@ -93,8 +110,8 @@ def job_db_update(job, conn):
 def build_db_update(build_data):
     """Update DB with given build data."""
     if db.session.query(
-        Build).filter_by(job=build_data['name'],
-                         number=build_data['build']['number']).scalar():
+        models.Build).filter_by(job=build_data['name'],
+                                number=build_data['build']['number']).scalar():
         LOG.debug("Build exists. Updating its records.")
     else:
         pass

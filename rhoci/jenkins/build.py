@@ -60,13 +60,15 @@ def update_tests(tests_data, job, build):
         # Avoid setUpClass
         if test['className'] != '':
             if not Test.query.filter_by(class_name=test['className']).count():
-                test_db = Test(class_name=test['className'],
+                test_db = Test(test_name=test['name'],
+                               class_name=test['className'],
                                failure=0,
                                success=0)
                 db.session.add(test_db)
                 db.session.commit()
                 LOG.debug("Added test %s" % test['className'])
             if (not TestBuild.query.filter_by(class_name=test['className'],
+                                              name=test['name'],
                                               job=job, build=build).count()):
                 test_build_db = TestBuild(job=job, build=build,
                                           status=test['status'],
@@ -82,10 +84,12 @@ def update_tests(tests_data, job, build):
                                                          job,
                                                          build))
             if test['status'] == 'PASSED':
-                Test.query.filter_by(class_name=test['className']).update(
+                Test.query.filter_by(class_name=test['className'],
+                                     test_name=test['name']).update(
                     {'success': Test.success + 1})
             elif test['status'] == 'FAILED':
-                Test.query.filter_by(class_name=test['className']).update(
+                Test.query.filter_by(class_name=test['className'],
+                                     test_name=test['name']).update(
                     {'failure': Test.failure + 1})
             db.session.commit()
 

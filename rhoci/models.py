@@ -108,6 +108,7 @@ class Test(db.Model):
 
     id = db.Column(db.Integer)
     class_name = db.Column(db.String(128), primary_key=True)
+    test_name = db.Column(db.String(128), primary_key=True)
     failure = db.Column(db.Integer)
     success = db.Column(db.Integer)
 
@@ -116,6 +117,7 @@ class Test(db.Model):
         """Return test object data in serializeable format"""
         return {
             'class_name': self.class_name,
+            'test_name': self.class_name,
             'failure': self.failure,
             'success': self.success
         }
