@@ -156,11 +156,14 @@ def update_in_db(data):
 
         # Check for tests
         url = current_app.config.get("url")
-        tests_raw_data = urllib2.urlopen(
-            url + "/job/" + name + "/" +
-            str(number) + "/testReport/api/json").read()
-        if 'Not found' not in tests_raw_data:
-            update_tests(tests_raw_data, name, number)
+        try:
+            tests_raw_data = urllib2.urlopen(
+                url + "/job/" + name + "/" +
+                str(number) + "/testReport/api/json").read()
+            if 'Not found' not in tests_raw_data:
+                update_tests(tests_raw_data, name, number)
+        except urllib2.HTTPError:
+            LOG.warning("Couldn't get tests for %s" % name)
 
 
 def check_active_builds(conn):
@@ -170,7 +173,7 @@ def check_active_builds(conn):
         try:
             conn.get_build_info(build.job, build.number)
         except jenkins.NotFoundException:
-            LOG.info("Couldn't find build. Job is removed from Jenkins.")
+            LOG.warning("Couldn't find build. Job is removed from Jenkins.")
             job = Job.query.filter_by(name=build.job).first()
             db.session.delete(job)
             db.session.delete(build)
@@ -201,8 +204,12 @@ def get_artifacts(job, build):
     if not Artifact.query.filter_by(job=job, build=int(build)).count():
         agent = Agent.query.one()
         conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-        artifacts = conn.get_build_info(job, int(build))['artifacts']
-        update_artifacts_db(artifacts, job, build)
+        try:
+            artifacts = conn.get_build_info(job, int(build))['artifacts']
+            update_artifacts_db(artifacts, job, build)
+        except jenkins.JenkinsException:
+            LOG.warning("Couldn't get artifacts for job %s build %s" % (
+                job, build))
 
 
 def check_match(data):

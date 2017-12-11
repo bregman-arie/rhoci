@@ -23,5 +23,5 @@ def get_connection(url, user, password):
         conn = jenkins.Jenkins(url, user, password)
         return conn
     except Exception:
-        LOG.info("Couldn't connect")
+        LOG.warning("Couldn't connect")
         return None

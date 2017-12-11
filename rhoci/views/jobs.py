@@ -60,5 +60,4 @@ def jobs_status(status, dfg, release):
         else:
             results['data'].append([job.name, job.last_build_status,
                                     job.last_build_number, ''])
-    print results
     return jsonify(results)
