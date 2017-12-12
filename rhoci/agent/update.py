@@ -62,18 +62,18 @@ def job_db_delete(job):
     tests_build = models.TestBuild.query.filter_by(job=job).all()
     for test in tests_build:
         unique_test = models.Test.query.filter_by(
-            name=test.test_name, class_name=test.class_name).count()
+            name=test.name, class_name=test.class_name).count()
         if (unique_test.failure == 1 and unique_test.success == 0) or (
                 unique_test.failure == 0 and unique_test.success == 1):
             db.session.delete(unique_test)
         elif test.status == 'PASSED':
             models.Test.query.filter_by(class_name=test.class_name,
-                                        name=test.test_name).update(
+                                        name=test.name).update(
                                             {'success': models.Test.success -
                                              1})
         else:
             models.Test.query.filter_by(class_name=test.class_name,
-                                        name=test.test_name).update(
+                                        name=test.name).update(
                                             {'failure': models.Test.failure -
                                              1})
         db.session.commit()

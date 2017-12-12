@@ -90,6 +90,7 @@
     <tr>
       <th><label class="sr-only" for="selectAll">Select all rows</label><input type="checkbox" id="selectAll" name="selectAll"></th>
       <th>Class Name</th>
+      <th>Test Name</th>
       <th>Success Count</th>
       <th>Failure Count</th>
       <th colspan="2">Actions</th>
@@ -154,6 +155,7 @@ var dataSet = [
 {% for test in all_tests %}
 {
   class_name: "{{ test.class_name }}",
+  test_name: "{{ test.name }}",
   success_count: "{{ test.success }}",
   failure_count: "{{ test.failure }}",
 },
@@ -174,6 +176,7 @@ $("#table1").DataTable({
       sortable: false
     },
     { data: "class_name" },
+    { data: "test_name" },
     { data: "success_count" },
     { data: "failure_count" },
     { data: null,
@@ -216,9 +219,12 @@ $("#table1").DataTable({
         placeholder: "Filter By Class Name..."
       }, {
         optionSelector: "#filter2",
-        placeholder: "Filter By Success Count..."
+        placeholder: "Filter By Test Name..."
       }, {
         optionSelector: "#filter3",
+        placeholder: "Filter By Success Count..."
+      }, {
+        optionSelector: "#filter4",
         placeholder: "Filter By Failure Count..."
       }
     ],

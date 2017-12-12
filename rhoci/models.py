@@ -117,7 +117,7 @@ class Test(db.Model):
         """Return test object data in serializeable format"""
         return {
             'class_name': self.class_name,
-            'test_name': self.class_name,
+            'test_name': self.test_name,
             'failure': self.failure,
             'success': self.success
         }
