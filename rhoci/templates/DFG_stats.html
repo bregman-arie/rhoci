@@ -159,7 +159,7 @@ function show_tests(job, build)
                         old_class_name = row[0];
                         old_test_name = row[1];
                         class_name = old_class_name.replace(/\.([^\.]*)$/,replacement+'$1');
-                        var test_name = old_test_name.replace(/-/g, "_").replace('[', '_').replace(']', '_').replace(',', '_');
+                        var test_name = old_test_name.replace(/-/g, "_").replace('[', '_').replace(']', '_').replace(/,/g, "_").replace(/ /g,"_").replace(/\(/g, "_").replace(/\)/g, "_");
                         data = '<a href="{{ agent.url }}/job/' + job + '/' + build + '/testReport/' + class_name + '/' + test_name + '">' + data + '</a>';
                     }
                     return data;

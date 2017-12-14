@@ -125,7 +125,7 @@ def failing_tests_dfg(dfg):
 
     tests = models.TestBuild.query.filter(models.TestBuild.job.contains(
         'DFG-%s' % dfg),
-        (models.TestBuild.status.like('FAILED') | models.TestBuild.status.like('REGRESSION'))).distinct(models.TestBuild.job)
+        (models.TestBuild.status.like('FAILED') | models.TestBuild.status.like('REGRESSION'))).distinct(models.TestBuild.job).distinct(models.TestBuild.build)
 
     if tests:
         for test in tests:
