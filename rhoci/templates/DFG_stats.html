@@ -10,6 +10,55 @@
   <div class="row text-center">
   </div>
 
+<!-- Add Bug Modal -->
+<div id="add_bug_modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="modal-title">Add a new bug</h4>
+      </div>
+      <div class="modal-body">
+
+                <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-danger active" style="height:35px; width:105px; font-size: 120%;">
+                  <input type="radio" name="options" id="option1" autocomplete="off" checked > Bugzilla
+                </label>
+                <label class="btn btn-warning" style="height:35px; width:105px; font-size: 120%;">
+                  <input type="radio" name="options" id="option2" autocomplete="off"> Launchpad
+                </label>
+                </div>
+
+                <br><br>
+
+                <div class="input-group col-xs-4" style="white-space: pre-line;">
+                  <span class="input-group-addon">#</span>
+                  <input id="bug_num" type="text" class="form-control" placeholder="Bug number">
+                </div> 
+
+                <div class="input-group col-xs-8" style="white-space: pre-line;">
+                  <span class="input-group-addon">Job Name</span>
+                  <input id="job_name" type="text" class="form-control" disabled>
+                </div> 
+
+                <br>
+
+                <input type="checkbox" data-toggle="toggle" data-width="300" data-on="Apply on all tests in the class" data-off="Don't apply on all tests in the class">
+
+                <br><br>
+                <button type="button" onClick="submit_bug()" class="btn btn-primary" style="height:35px; width:105px; font-size: 120%;">Add bug</button>
+                <br><br>
+                <div class="alert alert-danger hidden" id="bug_alert_div" style="white-space: pre-line;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- Failure Modal -->
 <div id="failure_modal" class="modal fade" role="dialog">
@@ -52,6 +101,7 @@
                 <th>Class Name</th>
                 <th>Test Name</th>
                 <th>Status</th>
+                <th>Bugs</th>
             </tr>
           </thead>
         </table>
@@ -72,6 +122,7 @@
                 <th>Last Build Status</th>
                 <th>Last Build Number</th>
                 <th>Tests</th>
+                <th id="bugs_th">Bugs</th>
             </tr>
         </thead>
 </table>
@@ -99,6 +150,7 @@
                 <th>Job Name</th>
                 <th>Build Number</th>
                 <th>Status</th>
+                <th>Bugs</th>
               </tr>
             </thead>
           </table>
@@ -127,6 +179,39 @@ function reply_click(job, build)
     }
   });
 
+}
+
+function add_bug(job, build, id)
+{
+      var s = document.getElementById("job_name");
+      s.value = id;
+      $("#add_bug_modal").modal();
+      $("#bug_alert_div").addClass('hidden');
+}
+
+
+function submit_bug()
+{
+  var bug_num = document.getElementById("bug_num").value;
+  var bug_cell_id = document.getElementById("job_name").value;
+  $("#bug_alert_div").addClass('hidden');
+
+  $.ajax({
+    type:"GET",
+    dataType: "json",
+    data: {'bug_num': bug_num},
+    url: "{{ url_for('home.bug_exists') }}",
+    success: function(response){
+      if (response.exists) {
+      $( "<button type='button' style='margin-right: 5px;' class='btn btn-danger'>" + bug_num + "</button>" ).insertAfter( "#" + bug_cell_id );
+      $("#add_bug_modal").modal('hide');
+      }
+  else {
+        $("#bug_alert_div").removeClass('hidden');
+        $("#bug_alert_div").text("Couldn't find such bug");
+  }
+    }
+  });
 }
 
 function show_tests(job, build)

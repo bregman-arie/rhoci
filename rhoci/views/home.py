@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import bugzilla
 from flask import render_template
 from flask import Blueprint
 from flask import jsonify
@@ -21,6 +22,13 @@ import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
 import rhoci.models as models
 from rhoci.views.doc import auto
+import sys
+
+if sys.version_info[0] >= 3:
+    from xmlrpc.client import Fault
+else:
+    from xmlrpclib import Fault
+
 
 LOG = logging.getLogger(__name__)
 
@@ -167,3 +175,20 @@ def releases():
                            phase2=jobs['phase2'],
                            dfg=jobs['dfg'],
                            agent=agent)
+
+
+@home.route('/bug_exists/')
+def bug_exists():
+    exists = True
+    bug_num = request.args.get('bug_num')
+
+    bzapi = bugzilla.Bugzilla("bugzilla.redhat.com")
+    try:
+        bug = bzapi.getbug(bug_num)
+        if not models.Bug.query.filter_by(summary=bug.summary).count():
+            pass
+    except Fault:
+        LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
+        exists = False
+
+    return jsonify(exists=exists)

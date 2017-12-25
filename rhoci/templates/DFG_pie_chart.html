@@ -102,14 +102,21 @@
                     }
                     return data;
                 }
+            },
+            {
+                targets:4,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                    data = '<button type="button" id=\'' + row[0] +'\' onClick="add_bug(\'' + row[0] + '\', \'' + row[2] + '\', id)" class="btn btn-success btn-lg" style="margin-right: 5px;">+</button>'
+                    }
+                    return data;
+                }
             }
         ]
     } );
     
     
     },
-    onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-    onmouseout: function (d, i) { console.log("onmouseout", d, i); }
   };
 
   // Pie Chart without Legend

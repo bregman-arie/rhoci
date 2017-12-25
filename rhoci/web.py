@@ -53,11 +53,9 @@ views = (
 class WebApp(object):
     """rhoci Web Application."""
 
-    DEFAULT_BIND_HOST = '0.0.0.0'
-    DEFAULT_PORT = 5000
     DEFAULT_CONFIG_FILE = '/etc/rhoci/rhoci.conf'
 
-    def __init__(self, args_ns):
+    def __init__(self, args_ns=None):
 
         self._setup_logging()
         self._setup_config(args_ns)
@@ -130,12 +128,13 @@ class WebApp(object):
         logger.info("Configuration: %s" % self.config)
 
     def _setup_logging(self):
-        """Setup logging level."""
+        """Setup logging level and format."""
 
         format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
         level = logging.INFO
         logging.basicConfig(level=level, format=format)
-        handler = RotatingFileHandler('rhoci.log', maxBytes=2000000,
+        handler = RotatingFileHandler('rhoci.log',
+                                      maxBytes=2000000,
                                       backupCount=10)
         logging.getLogger().addHandler(handler)
 

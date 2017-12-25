@@ -3,5 +3,6 @@ flask
 flask-autodoc
 Flask-SQLAlchemy
 futures
+python-bugzilla
 python-jenkins
 sqlalchemy-migrate

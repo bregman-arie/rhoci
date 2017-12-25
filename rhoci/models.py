@@ -246,3 +246,26 @@ class Failure(db.Model):
             'cause': self.cause,
             'count': self.count,
         }
+
+
+class Bug(db.Model):
+    """Represents a bug"""
+
+    __tablename__ = 'bug'
+
+    id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.Integer)
+    summary = db.Column(db.String(128), unique=True)
+    system = db.Column(db.String(128))
+    status = db.Column(db.String(32))
+
+    @property
+    def serialize(self):
+        """Return build object data in serializeable format"""
+        return {
+            'id': self.id,
+            'number': self.number,
+            'summary': self.summary,
+            'system': self.system,
+            'status': self.status,
+        }

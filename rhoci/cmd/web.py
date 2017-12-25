@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import rhoci.parser.web as web_parser
+import rhoci.cmd.parsers.web as web_parser
 import rhoci.web
 
 
@@ -29,6 +29,5 @@ def launch_app(args=None):
 
 def main():
     """Main entry for running the web server."""
-
     args = create_parser()
     launch_app(args)

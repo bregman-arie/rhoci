@@ -270,11 +270,15 @@ def analyze_failure(job, build):
             LOG.info("The failure for job %s build %s is %s" % (job, build,
                                                                 failure_name))
     else:
-        console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
-                                                        str(job),
-                                                        str(build))
-        console_data = urllib2.urlopen(console_url)
-        match, failure_text, failure_name = check_match(console_data)
+        try:
+            console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
+                                                            str(job),
+                                                            str(build))
+            console_data = urllib2.urlopen(console_url)
+            match, failure_text, failure_name = check_match(console_data)
+        except urllib2.HTTPError:
+            LOG.debug("Couldnt read console output for job %s build %s." % (
+                job, build))
         if match:
             update_failure(job, build, failure_name, failure_text)
         else:

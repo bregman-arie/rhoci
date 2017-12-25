@@ -33,23 +33,28 @@ def shallow_jobs_update():
     conn = jenkins_server.get_connection(agent.url, agent.user, agent.password)
 
     # Get a list of all jobs from Jenkins
-    all_jobs = conn.get_all_jobs()
+    try:
+        all_jobs = conn.get_all_jobs()
 
-    # Update every found job
-    with ThreadPoolExecutor(100) as executor:
-        for job in all_jobs:
-            executor.submit(job_db_update, job, conn)
+        # Update every found job
+        with ThreadPoolExecutor(100) as executor:
+            for job in all_jobs:
+                executor.submit(job_db_update, job, conn)
 
-    # Check if some jobs no longer exist
-    deleted_jobs = set([x.name for x in models.Job.query.all()]).difference(
-        set([x['name'] for x in all_jobs]))
-    if deleted_jobs:
-        LOG.info("Found jobs in DB that no longer exist: %s" % deleted_jobs)
-        for job in deleted_jobs:
-            job_db_delete(job)
+        # Check if some jobs no longer exist
+        deleted_jobs = set(
+            [x.name for x in models.Job.query.all()]).difference(
+                set([x['name'] for x in all_jobs]))
+        if deleted_jobs:
+            LOG.info(
+                "Found jobs in DB that no longer exist: %s" % deleted_jobs)
+            for job in deleted_jobs:
+                job_db_delete(job)
 
-    agent.update_time = datetime.datetime.utcnow()
-    db.session.commit()
+        agent.update_time = datetime.datetime.utcnow()
+        db.session.commit()
+    except jenkins.JenkinsException:
+        LOG.warning("Could not update. I'll try again next time")
 
 
 def job_db_delete(job):

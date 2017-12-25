@@ -4,14 +4,15 @@
 
 RHOCI (Red Hat OpenStack CI)
 
-A web service based on Jenkins to enhance user experience for Red Hat OpenStack CI users.
-This project allows you to:
+A web service that meant to enhance Jenkins user experience for Red Hat OpenStack CI users.
+There is an effort to create a more generic project [here](https://github.com/bregman-arie/infuse) that will allow you to use it with any Jenkins server.
+
+Some of the things this project allows you to do:
 
     * View all jobs in one datatable where you can filter them based on different parameters
     * View all builds in one datatable where you can filter them based on different parameters
     * View all unique tests and how many times they failed or passed
     * Generate job definitions based on given input
-    * Analyze build failures
 
 * [Requirements](#requirements)
 * [Installation](#installation)
@@ -30,7 +31,6 @@ This project allows you to:
     virtualenv .venv && source .venv/bin/activate
     pip install .
 
-Make sure you allow HTTP traffic
 Note that you can instead run the following two scripts
 
     chmod +x scripts/initial_setup.sh && scripts/initial_setup.sh
@@ -42,10 +42,16 @@ Note that you can instead run the following two scripts
 
 ## Configuration 
 
+Configuration precedence is as follows
+
+    Environment variable start with 'RHOCI_'
+    CLI parameters as provided by the user
+    Configuration file (default or as provided by user)
+
 The default location for RHOCI configuration is '/etc/rhoci/rhoci.conf'.
 You can specify it by using the CLI: --conf <conf_file_path>
 
-You can find sample in samples/rhoci.conf
+A sample can be found in samples/rhoci.conf
 
 ## API
 
