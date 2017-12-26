@@ -11,6 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from datetime import datetime
+
 from rhoci.db.base import db
 
 
@@ -54,6 +56,7 @@ class Build(db.Model):
     parameters = db.Column(db.Text)
     failure_text = db.Column(db.Text)
     failure_name = db.Column(db.String(128))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
     def serialize(self):
@@ -85,6 +88,7 @@ class Job(db.Model):
     job_type = db.Column(db.String(64))
     release_number = db.Column(db.Integer, db.ForeignKey('release.number'))
     release = db.relationship("Release", uselist=False, backref="release")
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
     def serialize(self):
@@ -137,6 +141,7 @@ class TestBuild(db.Model):
     name = db.Column(db.String(64), primary_key=True)
     duration = db.Column(db.String(64))
     errorStackTrace = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
     def serialize(self):

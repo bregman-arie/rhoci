@@ -22,6 +22,7 @@ import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
 import rhoci.models as models
 from rhoci.views.doc import auto
+import rhoci.rhosp.bug as rhosp_bug
 import sys
 
 if sys.version_info[0] >= 3:
@@ -186,9 +187,19 @@ def bug_exists():
     try:
         bug = bzapi.getbug(bug_num)
         if not models.Bug.query.filter_by(summary=bug.summary).count():
-            pass
+            rhosp_bug.add_bug(bug_num, bug.summary, bug.status,
+                              system="bugzilla")
     except Fault:
         LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
         exists = False
 
     return jsonify(exists=exists)
+
+
+@home.route('/bugs')
+def bugs():
+    """Bugs page."""
+    bugs = models.Bug.query.all()
+    agent = models.Agent.query.one()
+
+    return render_template('bugs.html', bugs=bugs, agent=agent)
