@@ -63,3 +63,8 @@ def add_new_job(name):
     db.session.add(db_job)
     db.session.commit()
     LOG.debug("Added job: %s to the DB" % name)
+
+
+def add_bug(job, bug_num):
+    """Adds a bug to."""
+    pass

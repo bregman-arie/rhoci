@@ -75,6 +75,13 @@ class Build(db.Model):
         }
 
 
+bugs = db.Table('bugs',
+                db.Column('bug_id', db.Integer, db.ForeignKey('bug.id'),
+                          primary_key=True),
+                db.Column('job_id', db.Integer, db.ForeignKey('job.id'),
+                          primary_key=True))
+
+
 class Job(db.Model):
     """Represents Jenkins job."""
 
@@ -89,6 +96,8 @@ class Job(db.Model):
     release_number = db.Column(db.Integer, db.ForeignKey('release.number'))
     release = db.relationship("Release", uselist=False, backref="release")
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    bugs = db.relationship('Bug', secondary=bugs, lazy='subquery',
+                           backref=db.backref('jobs', lazy=True))
 
     @property
     def serialize(self):

@@ -23,6 +23,7 @@ from rhoci.jenkins import manager
 import rhoci.models as models
 from rhoci.views.doc import auto
 import rhoci.rhosp.bug as rhosp_bug
+import rhoci.jenkins.job as jenkins_job
 import sys
 
 if sys.version_info[0] >= 3:
@@ -182,6 +183,7 @@ def releases():
 def bug_exists():
     exists = True
     bug_num = request.args.get('bug_num')
+    job_name = request.args.get('job')
 
     bzapi = bugzilla.Bugzilla("bugzilla.redhat.com")
     try:
@@ -189,6 +191,8 @@ def bug_exists():
         if not models.Bug.query.filter_by(summary=bug.summary).count():
             rhosp_bug.add_bug(bug_num, bug.summary, bug.status,
                               system="bugzilla")
+            jenkins_job.add_bug(job_name, bug_num)
+
     except Fault:
         LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
         exists = False
@@ -203,3 +207,9 @@ def bugs():
     agent = models.Agent.query.one()
 
     return render_template('bugs.html', bugs=bugs, agent=agent)
+
+
+@home.route('/changelog')
+def changelog():
+    """Changelog page."""
+    return render_template('changelog.html')
