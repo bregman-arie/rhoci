@@ -10,6 +10,7 @@
   <div class="row text-center">
   </div>
 
+
 <!-- Add Bug Modal -->
 <div id="add_bug_modal" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -104,6 +105,39 @@
           </thead>
         </table>
               </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Remove Bug Modal -->
+<div id="remove_bug_modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="modal-title">Remove bug from RHOCI</h4>
+      </div>
+      <div class="modal-body">
+
+                <div class="input-group col-xs-4" style="white-space: pre-line;">
+                  <span class="input-group-addon">#</span>
+                  <input id="remove_bug_num" type="text" class="form-control" disabled>
+                </div> 
+
+                <br>
+
+                Remove from all jobs and tests?  <input id="remove_all" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" style="margin-left: 15px;">
+
+                <br><br>
+                <button type="button" onClick="remove_bug_from_db()" class="btn btn-danger" style="height:35px; width:105px; font-size: 120%;">Remove</button>
+                <br><br>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -229,7 +263,7 @@ function show_bugs(job)
                 targets:[4],
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
-                        data = '<button type="button" onClick="remove_bug(\'' + row[1] + '\')" class="btn btn-info btn-lg">remove</button>'
+                        data = '<button type="button" onClick="remove_bug(\'' + row[1] + '\')" data-id=\'' + row[1] +'\' class="btn btn-info btn-lg">remove</button>'
                         return data;
                 }
             },
@@ -238,6 +272,22 @@ function show_bugs(job)
 
       document.getElementById("modal-title-bugs").innerHTML = job + "  bugs";
       $("#bugs_modal").modal();
+}
+
+function remove_bug_from_db()
+{
+  var all = $('#remove_all').prop('checked');
+  var id = $('#remove_bug_modal').data('id');
+  console.log(id);
+  $('[data-id='+id+']').parents('tr').remove();
+  $("#remove_bug_modal").modal('hide');
+}
+
+function remove_bug(bug_num)
+{
+      var s = document.getElementById("remove_bug_num");
+      s.value = bug_num;
+      $('#remove_bug_modal').data('id', bug_num).modal('show');
 }
 
 function add_bug(job, build, id)
