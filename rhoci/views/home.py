@@ -229,3 +229,14 @@ def get_bugs_datatable(job=None):
             results['data'].append([bug.summary, bug.number,
                                     bug.status, bug.system, ''])
         return jsonify(results)
+
+
+@home.route('/remove_bug/', methods=['GET'])
+@home.route('/remove_bug/<bug_num>_<job>_<test>_<remove_all>', methods=['GET'])
+def remove_bug(bug_num=None, job=None, test=None, remove_all=None):
+    """Removes bug from the database."""
+    bug_num = request.args.get('bug_num')
+    remove_all = request.args.get('remove_all')
+    if remove_all:
+        rhosp_bug.remove_from_all(bug_num)
+    return jsonify(dict(status="OK"))

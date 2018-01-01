@@ -115,7 +115,7 @@
 </div>
 
 <!-- Remove Bug Modal -->
-<div id="remove_bug_modal" class="modal fade" role="dialog">
+<div id="remove_bug_modal" class="modal fade" role="dialog" tabindex="-1">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -136,7 +136,7 @@
                 Remove from all jobs and tests?  <input id="remove_all" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" style="margin-left: 15px;">
 
                 <br><br>
-                <button type="button" onClick="remove_bug_from_db()" class="btn btn-danger" style="height:35px; width:105px; font-size: 120%;">Remove</button>
+                <button type="button" onClick="remove_bug_from_db()" class="btn btn-danger" style="height:35px; width:105px; font-size: 120%;">Confirm</button>
                 <br><br>
       </div>
       <div class="modal-footer">
@@ -278,7 +278,15 @@ function remove_bug_from_db()
 {
   var all = $('#remove_all').prop('checked');
   var id = $('#remove_bug_modal').data('id');
-  console.log(id);
+
+  $.ajax({
+    type:"GET",
+    dataType: "json",
+    data: {'bug_num': id, 'job': 'x', 'test': 'y', 'remove_all': all},
+    url: "{{ url_for('home.remove_bug') }}",
+  });
+
+
   $('[data-id='+id+']').parents('tr').remove();
   $("#remove_bug_modal").modal('hide');
 }

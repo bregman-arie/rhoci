@@ -25,3 +25,10 @@ def add_bug(number, summary, status, system):
               system=system)
     db.session.add(bug)
     db.session.commit()
+
+
+def remove_from_all(number):
+    """Removes bug entirely."""
+    bug = Bug.query.filter_by(number=number).first()
+    db.session.delete(bug)
+    db.session.commit()
