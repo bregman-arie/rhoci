@@ -53,11 +53,14 @@ def jobs_status(status, dfg, release):
             if build_db.failure_name:
                 results['data'].append([job.name, build_db.failure_name,
                                         job.last_build_number,
-                                        build_db.failure_text, '', ''])
+                                        build_db.failure_text, '', [
+                                            i.serialize for i in job.bugs]])
             else:
                 results['data'].append([job.name, job.last_build_status,
-                                        job.last_build_number, '', ''])
+                                        job.last_build_number, '', [
+                                            i.serialize for i in job.bugs]])
         else:
             results['data'].append([job.name, job.last_build_status,
-                                    job.last_build_number, '', ''])
+                                    job.last_build_number, '', [
+                                        i.serialize for i in job.bugs]])
     return jsonify(results)

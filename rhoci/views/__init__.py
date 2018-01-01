@@ -20,6 +20,5 @@ from .add_job import add_job  # noqa
 from .job_analyzer import job_analyzer  # noqa
 from .doc import doc  # noqa
 from .review_statistics import review_statistics  # noqa
-from .jenkins_notifications import jenkins_notifications  # noqa
 from .tests import tests  # noqa
 from .dfg import dfg  # noqa

@@ -183,7 +183,7 @@ def releases():
 def bug_exists():
     exists = True
     bug_num = request.args.get('bug_num')
-    job_name = request.args.get('job')
+    job_name = request.args.get('job_name')
 
     bzapi = bugzilla.Bugzilla("bugzilla.redhat.com")
     try:
@@ -191,7 +191,7 @@ def bug_exists():
         if not models.Bug.query.filter_by(summary=bug.summary).count():
             rhosp_bug.add_bug(bug_num, bug.summary, bug.status,
                               system="bugzilla")
-            jenkins_job.add_bug(job_name, bug_num)
+        jenkins_job.add_bug(job_name, bug_num)
 
     except Fault:
         LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
@@ -213,3 +213,19 @@ def bugs():
 def changelog():
     """Changelog page."""
     return render_template('changelog.html')
+
+
+@home.route('/get_bugs_datatable/<job>', methods=['GET'])
+@home.route('/get_bugs_datatable/', methods=['GET'])
+def get_bugs_datatable(job=None):
+
+    results = dict()
+    results['data'] = list()
+    if not job:
+        job = request.args.get('job')
+
+        job_db = models.Job.query.filter_by(name=job).first()
+        for bug in job_db.bugs:
+            results['data'].append([bug.summary, bug.number,
+                                    bug.status, bug.system, ''])
+        return jsonify(results)

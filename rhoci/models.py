@@ -108,7 +108,13 @@ class Job(db.Model):
             'last_build_number': self.last_build_number,
             'last_build_status': self.last_build_status,
             'job_type': self.job_type,
+            'timestamp': self.timestamp,
+            'bugs': self.serialize_bugs,
         }
+
+    @property
+    def serialize_bugs(self):
+        return [item.serialize for item in self.bugs]
 
     def __repr__(self):
         return self.serialize()

@@ -1,6 +1,6 @@
 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
   <div class="card-pf card-pf-view">                                                                                                                                                          
-    <div class="card-pf-body">
+    <div class="card-pf-body text-center">
       <div class="card-pf-top-element">
       <h2 class="card-pf-title text-center">
         RHOSP {{ release['number'] }}
@@ -42,6 +42,7 @@
 
     $('#dfg_jobs_table').DataTable( {
       "ajax": "{{ url_for('jobs.jobs_status', status='FAILURE', dfg=release.dfg, release=release.number) }}".replace("FAILURE", d.id),
+      className: "text-center",
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
           if ( aData[1] == 'None' )
           {
@@ -96,6 +97,7 @@
             },
             {
                 targets:3,
+                className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[2] != 0){
                     data = '<button type="button" onClick="show_tests(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-info btn-lg">Tests</button>'
@@ -105,9 +107,14 @@
             },
             {
                 targets:4,
+                className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                     data = '<button type="button" id=\'' + row[0] +'\' onClick="add_bug(\'' + row[0] + '\', \'' + row[2] + '\', id)" class="btn btn-success btn-lg" style="margin-right: 5px;">+</button>'
+                      var arrayLength = row[4].length;
+                      if(arrayLength > 0){
+                        data = data + '<button type="button" onClick="show_bugs(\'' + row[0] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
+                      }
                     }
                     return data;
                 }

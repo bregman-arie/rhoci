@@ -41,7 +41,6 @@ views = (
     (rhoci.views.builds, '/builds'),
     (rhoci.views.tests, '/tests'),
     (rhoci.views.nodes, '/nodes'),
-    (rhoci.views.jenkins_notifications, '/jenkins_notifications'),
     (rhoci.views.plugins, '/plugins'),
     (rhoci.views.dfg, '/dfg'),
     (rhoci.views.add_job, '/add_job'),

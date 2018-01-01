@@ -48,7 +48,7 @@ def get_build_status(conn, job_name, build_number):
 def update_failure(job, number, failure_name, text):
     """Update the failure cause of a specific build."""
     Build.query.filter_by(job=job, number=int(number)).update(
-        dict(failure_text=unicode(text, 'utf-8'), failure_name=failure_name))
+        dict(failure_text=text.encode('utf-8'), failure_name=failure_name))
     db.session.commit()
 
 
