@@ -110,10 +110,10 @@ def get_tests_datatable(job=None, build=None):
                 job=job, build=build).all()
             for test in tests:
                 results['data'].append([test.class_name, test.name,
-                                        test.status, ''])
+                                        test.status, '', ''])
         except urllib2.HTTPError:
                 results['data'].append(["No tests", "No tests", "No tests",
-                                        "No tests"])
+                                        "No tests", "No tests"])
 
         return jsonify(results)
 
@@ -132,10 +132,19 @@ def failing_tests_dfg(dfg):
 
     if tests:
         for test in tests:
+            unique_test = models.Test.query.filter_by(
+                test_name=test.name, class_name=test.class_name).first()
+            if not unique_test:
+                jenkins_build.add_unique_test(test.name, test.class_name,
+                                              test.status)
+                bugs = []
+            else:
+                bugs = unique_test.bugs
+
             results['data'].append([test.class_name, test.name, test.job,
-                                    test.build, test.status])
+                                    test.build, test.status, bugs])
     else:
         results['data'].append(["No Tests", "No Tests", "No Tests",
-                                "No Tests", "No Tests"])
+                                "No Tests", "No Tests", "No tests"])
 
     return jsonify(results)

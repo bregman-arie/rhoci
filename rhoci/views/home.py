@@ -108,13 +108,8 @@ def get_job(job_name):
 @auto.doc(groups=['tests', 'public'])
 @home.route('/v2.0/tests', methods=['GET', 'POST'])
 def list_tests():
-    """Returns all tests in the DB."""
-    if request.method == 'POST':
-        tests = models.TestBuild.query.filter_by(
-            job_name=request.form['job_name'],
-            build_number=request.form['build_number']).all()
-    else:
-        tests = [i.serialize for i in models.TestBuild.query.all()]
+    """Returns all unique tests in the DB."""
+    tests = [i.serialize for i in models.Test.query.all()]
 
     return jsonify(tests=tests)
 
@@ -182,6 +177,7 @@ def releases():
 @home.route('/bug_exists/')
 def bug_exists():
     exists = True
+    err_msg = ""
     bug_num = request.args.get('bug_num')
     job_name = request.args.get('job_name')
 
@@ -195,9 +191,15 @@ def bug_exists():
 
     except Fault:
         LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
+        err_msg = "Couldn't find a bug using the given bug number."
         exists = False
 
-    return jsonify(exists=exists)
+    except OverflowError:
+        LOG.warning("User provided bug number that is too big")
+        err_msg = "The number is too big!"
+        exists = False
+
+    return jsonify(exists=exists, err_msg=err_msg)
 
 
 @home.route('/bugs')

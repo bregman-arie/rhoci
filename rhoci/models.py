@@ -120,6 +120,13 @@ class Job(db.Model):
         return self.serialize()
 
 
+bugs_tests = db.Table('bugs_tests',
+                      db.Column('bug_id', db.Integer, db.ForeignKey('bug.id'),
+                                primary_key=True),
+                      db.Column('test_id', db.Integer,
+                                db.ForeignKey('test.id'), primary_key=True))
+
+
 class Test(db.Model):
     """Represents a single unique test."""
 
@@ -130,6 +137,9 @@ class Test(db.Model):
     test_name = db.Column(db.String(128), primary_key=True)
     failure = db.Column(db.Integer)
     success = db.Column(db.Integer)
+    skipped = db.Column(db.Integer)
+    bugs = db.relationship('Bug', secondary=bugs_tests, lazy='subquery',
+                           backref=db.backref('tests', lazy=True))
 
     @property
     def serialize(self):
@@ -138,6 +148,7 @@ class Test(db.Model):
             'class_name': self.class_name,
             'test_name': self.test_name,
             'failure': self.failure,
+            'skipped': self.skipped,
             'success': self.success
         }
 
