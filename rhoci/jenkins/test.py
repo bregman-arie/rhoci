@@ -19,10 +19,16 @@ import rhoci.models as models
 LOG = logging.getLogger(__name__)
 
 
-def add_bug(class_name, test_name, bug_num):
+def add_bug(class_name, test_name, bug_num, apply_on_class):
     """Links between a given test and a bug."""
-    test_db = models.Test.query.filter_by(class_name=class_name,
-                                          test_name=test_name).first()
     bug_db = models.Bug.query.filter_by(number=bug_num).first()
-    test_db.bugs.append(bug_db)
+
+    if apply_on_class == 'true':
+        tests = models.Test.query.filter_by(class_name=class_name).all()
+        for test in tests:
+            test.bugs.append(bug_db)
+    else:
+        test_db = models.Test.query.filter_by(class_name=class_name,
+                                              test_name=test_name).first()
+        test_db.bugs.append(bug_db)
     db.session.commit()

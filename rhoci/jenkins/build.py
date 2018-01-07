@@ -54,15 +54,15 @@ def update_tests(tests_data, job, build):
     for test in tests:
         # Avoid setUpClass
         if test['className'] != '':
-            if not models.Test.query.filter_by(
-                    class_name=test['className']).count():
-                test_db = models.Test(test_name=test['name'],
-                                      class_name=test['className'],
-                                      failure=0,
-                                      skipped=0,
-                                      success=0)
-                db.session.add(test_db)
-                db.session.commit()
+            if not models.Test.query.filter_by(class_name=test['className'],
+                                               test_name=test['name']).count():
+                    test_db = models.Test(test_name=test['name'],
+                                          class_name=test['className'],
+                                          failure=0,
+                                          skipped=0,
+                                          success=0)
+                    db.session.add(test_db)
+                    db.session.commit()
             if (not models.TestBuild.query.filter_by(class_name=test[
                     'className'], name=test['name'], job=job,
                     build=build).count()):

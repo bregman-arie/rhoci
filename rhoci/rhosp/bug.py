@@ -12,6 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from rhoci.models import Bug
+from rhoci.models import Job
+from rhoci.models import Test
 from rhoci.db.base import db
 
 import logging
@@ -31,4 +33,21 @@ def remove_from_all(number):
     """Removes bug entirely."""
     bug = Bug.query.filter_by(number=number).first()
     db.session.delete(bug)
+    db.session.commit()
+
+
+def remove_from_job(bug_num, job_name):
+    """Removes bug from the given job."""
+    bug = Bug.query.filter_by(number=bug_num).first()
+    job = Job.query.filter_by(name=job_name).first()
+    job.bugs.remove(bug)
+    db.session.commit()
+
+
+def remove_from_test(bug_num, test_class, test_name):
+    """Unlinks between a test and a bug."""
+    bug = Bug.query.filter_by(number=bug_num).first()
+    test = Test.query.filter_by(class_name=test_class,
+                                test_name=test_name).first()
+    test.bugs.remove(bug)
     db.session.commit()

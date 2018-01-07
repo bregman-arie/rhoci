@@ -59,7 +59,10 @@ def dfg_summary(dfg):
 
 def get_percentage(num1, num2):
     """Returns the percentage of two given numbers."""
-    return int(100 * (float(num1) / float(num2)))
+    if num1 and num2:
+        return int(100 * (float(num1) / float(num2)))
+    else:
+        return 0
 
 
 @home.route('/')
@@ -249,6 +252,7 @@ def bug_exists():
     job_name = request.args.get('job_name')
     test_name = request.args.get('test_name')
     class_name = request.args.get('test_class')
+    apply_on_class = request.args.get('apply_on_class')
 
     bzapi = bugzilla.Bugzilla("bugzilla.redhat.com")
     try:
@@ -260,7 +264,8 @@ def bug_exists():
             if job_name:
                 jenkins_job.add_bug(job_name, bug_num)
             else:
-                jenkins_test.add_bug(class_name, test_name, bug_num)
+                jenkins_test.add_bug(class_name, test_name, bug_num,
+                                     apply_on_class)
         else:
             exists = False
             err_msg = "The chosen bug is closed"
@@ -322,8 +327,8 @@ def get_bugs_datatable(job=None, test_class=None, test_name=None):
 
 
 @home.route('/remove_bug/', methods=['GET'])
-@home.route('/remove_bug/<bug_num>_<job>_<test>_<remove_all>', methods=['GET'])
-def remove_bug(bug_num=None, job=None, test=None, remove_all=None):
+@home.route('/remove_bug/<bug_num>_<job>_<remove_all>', methods=['GET'])
+def remove_bug(bug_num=None, job=None, remove_all=None):
     """Removes bug from the database."""
     bug_num = request.args.get('bug_num')
     job = request.args.get('job')
@@ -331,5 +336,25 @@ def remove_bug(bug_num=None, job=None, test=None, remove_all=None):
     if remove_all == "true":
         rhosp_bug.remove_from_all(bug_num)
     else:
-        rhosp_bug.remove_from_job(job)
+        rhosp_bug.remove_from_job(bug_num, job)
+    return jsonify(dict(status="OK"))
+
+
+@home.route('/remove_tests_bug/', methods=['GET'])
+@home.route(
+    '/remove_tests_bug/<bug_num>_<test_name>_<test_class>_<remove_all>',
+    methods=['GET'])
+def remove_tests_bug(bug_num=None, test_name=None, test_class=None,
+                     remove_all=None):
+    """Unlink bug from a given test or a test class."""
+    bug_num = request.args.get('bug_num')
+    test_name = request.args.get('test_name')
+    test_class = request.args.get('test_class')
+    remove_all = request.args.get('remove_all')
+
+    if remove_all == "true":
+        rhosp_bug.remove_from_all(bug_num)
+    else:
+        rhosp_bug.remove_from_test(bug_num, test_class, test_name)
+
     return jsonify(dict(status="OK"))

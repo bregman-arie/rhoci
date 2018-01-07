@@ -47,7 +47,7 @@
 
                 <br>
 
-                Apply on all tests in the class  <input type="checkbox" data-toggle="toggle" style="margin-left: 15px;">
+                Apply on all tests in the class  <input id="apply_on_class" type="checkbox" data-toggle="toggle" style="margin-left: 15px;">
 
                 <br><br>
                 <button type="button" onClick="submit_tests_bug()" class="btn btn-primary" style="height:35px; width:105px; font-size: 120%;">Add bug</button>
@@ -138,30 +138,39 @@
   </div>
 </div>
 
-<!-- Bugs Modal -->
-<div id="bugs_modal" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg" style="width:1250px;">
+
+<!-- Remove Tests Bug Modal -->
+<div id="remove_tests_bug_modal" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog">
 
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" id="modal-title-bugs">Modal Header</h4>
+        <h4 class="modal-title" id="modal-title">Remove bug from RHOCI</h4>
       </div>
       <div class="modal-body">
-              <div id="bugs_body_div">
-        <table id="bugs_table" class="table table-striped table-bordered table-hover">
-          <thead>
-            <tr>
-                <th>Summary</th>
-                <th>Number</th>
-                <th>Status</th>
-                <th>System</th>
-                <th>Action</th>
-            </tr>
-          </thead>
-        </table>
-              </div>
+
+                <div class="input-group col-xs-4" style="white-space: pre-line;">
+                  <span class="input-group-addon">#</span>
+                  <input id="remove_tests_bug_num" type="text" class="form-control" disabled>
+                </div> 
+                <div class="input-group col-xs-12" style="white-space: pre-line;">
+                  <span class="input-group-addon">Class </span>
+                  <input id="remove_bug_test_class" type="text" class="form-control" disabled>
+                </div> 
+                <div class="input-group col-xs-12" style="white-space: pre-line;">
+                  <span class="input-group-addon">Test </span>
+                  <input id="remove_bug_test_name" type="text" class="form-control" disabled>
+                </div> 
+
+                <br>
+
+                Remove from all tests and jobs?  <input id="tests_remove_all" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" style="margin-left: 15px;">
+
+                <br><br>
+                <button type="button" onClick="remove_tests_bug_from_db()" class="btn btn-danger" style="height:35px; width:105px; font-size: 120%;">Confirm</button>
+                <br><br>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -186,6 +195,10 @@
                 <div class="input-group col-xs-4" style="white-space: pre-line;">
                   <span class="input-group-addon">#</span>
                   <input id="remove_bug_num" type="text" class="form-control" disabled>
+                </div> 
+                <div class="input-group col-xs-12" style="white-space: pre-line;">
+                  <span class="input-group-addon">Job </span>
+                  <input id="remove_bug_job" type="text" class="form-control" disabled>
                 </div> 
 
                 <br>
@@ -223,6 +236,39 @@
                 <th>Test Name</th>
                 <th>Status</th>
                 <th>Bugs</th>
+            </tr>
+          </thead>
+        </table>
+              </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bugs Modal -->
+<div id="bugs_modal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg" style="width:1250px;">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="modal-title-bugs">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+              <div id="bugs_body_div">
+        <table id="bugs_table" class="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+                <th>Summary</th>
+                <th>Number</th>
+                <th>Status</th>
+                <th>System</th>
+                <th>Action</th>
             </tr>
           </thead>
         </table>
@@ -328,7 +374,12 @@ function show_bugs(job, test_class, test_name)
                 targets:[4],
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
-                        data = '<button type="button" onClick="remove_bug(\'' + row[1] + '\')" data-id=\'' + row[1] +'\' class="btn btn-info btn-lg">remove</button>'
+                        if (job === undefined || job === null || job === '') {
+                        data = '<button type="button" onClick="remove_tests_bug(\'' + row[1] + '\', \'' + test_class + '\', \'' + test_name + '\')" data-id=\'' + row[1] +'\' data-test=\'' + test_name + '\' class="btn btn-info btn-lg">remove</button>'
+                        }
+                        else {
+                        data = '<button type="button" onClick="remove_bug(\'' + row[1] + '\', \'' + job + '\')" data-id=\'' + row[1] +'\' class="btn btn-info btn-lg">remove</button>'
+                        }
                         return data;
                 }
             },
@@ -336,18 +387,38 @@ function show_bugs(job, test_class, test_name)
       });
 
       document.getElementById("modal-title-bugs").innerHTML = job + "  bugs";
-      $("#bugs_modal").modal();
+      $("#bugs_modal").modal({show:true, backdrop: false});
+}
+
+function remove_tests_bug_from_db()
+{
+  var all = $('#tests_remove_all').prop('checked');
+  var id = $('#remove_tests_bug_modal').data('id');
+  var test_class = $('#remove_tests_bug_modal').data('test_class');
+  var test_name = $('#remove_tests_bug_modal').data('test_name');
+
+  $.ajax({
+    type:"GET",
+    dataType: "json",
+    data: {'bug_num': id, 'test_name': test_name, 'test_class': test_class, 'remove_all': all},
+    url: "{{ url_for('home.remove_tests_bug') }}",
+  });
+
+
+  $('[data-id='+id+']').parents('tr').remove();
+  $("#remove_tests_bug_modal").modal('hide');
 }
 
 function remove_bug_from_db()
 {
   var all = $('#remove_all').prop('checked');
   var id = $('#remove_bug_modal').data('id');
+  var job = $('#remove_bug_modal').data('job');
 
   $.ajax({
     type:"GET",
     dataType: "json",
-    data: {'bug_num': id, 'job': 'x', 'test': 'y', 'remove_all': all},
+    data: {'bug_num': id, 'job': job, 'test': 'y', 'remove_all': all},
     url: "{{ url_for('home.remove_bug') }}",
   });
 
@@ -356,11 +427,24 @@ function remove_bug_from_db()
   $("#remove_bug_modal").modal('hide');
 }
 
-function remove_bug(bug_num)
+function remove_tests_bug(bug_num, test_class, test_name)
+{
+      var s = document.getElementById("remove_tests_bug_num");
+      s.value = bug_num;
+      var x = document.getElementById("remove_bug_test_class");
+      x.value = test_class;
+      var y = document.getElementById("remove_bug_test_name");
+      y.value = test_name;
+      $('#remove_tests_bug_modal').data('id', bug_num).data('test_class', test_class).data('test_name', test_name).modal('show');
+}
+
+function remove_bug(bug_num, job)
 {
       var s = document.getElementById("remove_bug_num");
       s.value = bug_num;
-      $('#remove_bug_modal').data('id', bug_num).modal('show');
+      var x = document.getElementById("remove_bug_job");
+      x.value = job;
+      $('#remove_bug_modal').data('id', bug_num).data('job', job).modal('show');
 }
 
 function add_bug(job, build, id)
@@ -379,7 +463,7 @@ function add_tests_bug(test_class, test_name, id)
       var x = document.getElementById("test_name");
       x.value = test_name;
 
-      $("#add_tests_bug_modal").modal();
+      $("#add_tests_bug_modal").data('id', id).modal('show');
       $("#tests_bug_alert_div").addClass('hidden');
 }
 
@@ -417,6 +501,8 @@ function submit_tests_bug()
   var tests_bug_num = document.getElementById("tests_bug_num").value;
   var test_class = document.getElementById("class_name").value;
   var test_name = document.getElementById("test_name").value;
+  var id = $('#add_tests_bug_modal').data('id');
+  var apply_on_class = $('#apply_on_class').prop('checked');
 
   $("#tests_bug_alert_div").addClass('hidden');
   $("#add_tests_bug_spinner").removeClass('hidden');
@@ -424,13 +510,13 @@ function submit_tests_bug()
   $.ajax({
     type:"GET",
     dataType: "json",
-    data: {'bug_num': tests_bug_num, 'test_class': test_class, 'test_name': test_name},
+    data: {'bug_num': tests_bug_num, 'test_class': test_class, 'test_name': test_name, 'apply_on_class': apply_on_class},
     url: "{{ url_for('home.bug_exists') }}",
     success: function(response){
       $("#add_tests_bug_spinner").addClass('hidden');
       if (response.exists) {
-        if ($('#button-' + test_name).length == 0) {
-      $( '<button id="button-'+ test_name +'" type="button" style="margin-right: 5px;" onClick="show_bugs(\'' + test_name + '\')" class="btn btn-danger btn-lg">Bugs</button>' ).insertAfter( "#" + test_name );
+        if ($('#button-' + test_class).length == 0) {
+      $( '<button id="button-'+ id +'" type="button" style="margin-right: 5px;" onClick="show_bugs(\'\', \'' + test_class + '\', \'' + test_name + '\')" class="btn btn-danger btn-lg">Bugs</button>' ).insertAfter( "#" + id );
         }
       $("#add_tests_bug_modal").modal('hide');
       }
@@ -485,8 +571,8 @@ function show_tests(job, build)
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                    data = '<button type="button" id=\'' + row[0] +'\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
-                      var arrayLength = row[4].length;
+                    data = '<button type="button" id=id=\'' + meta.row + meta.cell + '\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
+                      var arrayLength = row[3].length;
                       if(arrayLength > 0){
                         data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'\', \'' + row[0] + '\', \'' + row[1] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
                       }
@@ -527,7 +613,7 @@ function show_tests(job, build)
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                    data = '<button type="button" id=\'' + row[0] +'\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
+                    data = '<button type="button" id=\'' + meta.row + '\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
                       var arrayLength = row[5].length;
                       if(arrayLength > 0){
                         data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'\', \'' + row[0] + '\', \'' + row[1] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
@@ -539,6 +625,13 @@ function show_tests(job, build)
           ],
     });
 
+$(document).on('show.bs.modal', '.modal', function () {
+    var zIndex = 1040 + (10 * $('.modal:visible').length);
+    $(this).css('z-index', zIndex);
+    setTimeout(function() {
+        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+    }, 0);
+});
 </script>
 
 {% endblock %}
