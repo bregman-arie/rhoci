@@ -1,4 +1,4 @@
-# Copyright 2017 Arie Bregman
+# Copyright 2018 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,27 +11,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import re
+import logging
 
 from rhoci.db.base import db
-from rhoci.models import Release
+import rhoci.models as models
+
+LOG = logging.getLogger(__name__)
 
 
-RELEASE_MAP = {'6': 'juno',
-               '7': 'kilo',
-               '8': 'liberty',
-               '9': 'mitaka',
-               '10': 'newton',
-               '11': 'ocata',
-               '12': 'pike',
-               '13': 'queens'}
-
-
-def extract_release(string):
-    m = re.search('-\d{1,2}', string)
-    return m.group().split('-')[1] if m else 0
-
-
-def get_last_release():
-    """Return last release number."""
-    return db.session.query(db.func.max(Release.number)).scalar()
+def add_bug(class_name, test_name, bug_num):
+    """Links between a given test and a bug."""
+    test_db = models.Test.query.filter_by(class_name=class_name,
+                                          test_name=test_name).first()
+    bug_db = models.Bug.query.filter_by(number=bug_num).first()
+    test_db.bugs.append(bug_db)
+    db.session.commit()

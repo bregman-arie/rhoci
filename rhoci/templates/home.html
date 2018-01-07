@@ -2,84 +2,309 @@
 
 {% block content %}
 
-<br>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+
+<!-- First row - cards --> 
+
+<div class="container-fluid container-cards-pf">
+
+   <div class="row row-cards-pf">
+     <div class="col-xs-6 col-md-2">
+       <div class="card-pf card-pf-accented card-pf-aggregate-status">
+         <h2 class="card-pf-title">
+           <a href="{{ url_for('jobs.index') }}">
+             <span class="card-pf-aggregate-status-count"></span> Jobs {{ jobs_num }}
+           </a>
+         </h2>
+         <div class="card-pf-body">
+           <p class="card-pf-aggregate-status-notifications">
+           </p>
+         </div>
+       </div>
+     </div>
+     <div class="col-xs-12 col-md-2">
+       <div class="card-pf card-pf-accented card-pf-aggregate-status">
+         <h2 class="card-pf-title">
+           <a href="{{ url_for('builds.all_builds') }}">
+             <span class="card-pf-aggregate-status-count"></span> Builds {{ builds_num }}
+           </a>
+         </h2>
+         <div class="card-pf-body">
+           <p class="card-pf-aggregate-status-notifications">
+           </p>
+         </div>
+       </div>
+     </div>
+     <div class="col-xs-12 col-md-2">
+       <div class="card-pf card-pf-accented card-pf-aggregate-status">
+         <h2 class="card-pf-title">
+           <a href="{{ url_for('tests.unique_tests') }}">
+             <span class="card-pf-aggregate-status-count"></span> Tests {{ tests_num }}
+           </a>
+         </h2>
+         <div class="card-pf-body">
+           <p class="card-pf-aggregate-status-notifications">
+           </p>
+         </div>
+       </div>
+     </div>
+     <div class="col-xs-12 col-md-2">
+       <div class="card-pf card-pf-accented card-pf-aggregate-status">
+         <h2 class="card-pf-title">
+           <a href="{{ url_for('plugins.index') }}">
+             <span class="card-pf-aggregate-status-count"></span> Plugins {{ plugins_num }}
+           </a>
+         </h2>
+         <div class="card-pf-body">
+           <p class="card-pf-aggregate-status-notifications">
+           </p>
+         </div>
+       </div>
+     </div>
+     <div class="col-xs-12 col-md-2">
+       <div class="card-pf card-pf-accented card-pf-aggregate-status">
+         <h2 class="card-pf-title">
+           <a href="{{ url_for('nodes.index') }}">
+             <span class="card-pf-aggregate-status-count"></span> Nodes {{ nodes_num }}
+           </a>
+         </h2>
+         <div class="card-pf-body">
+           <p class="card-pf-aggregate-status-notifications">
+           </p>
+         </div>
+       </div>
+     </div>
+     <div class="col-xs-12 col-md-2">
+       <div class="card-pf card-pf-accented card-pf-aggregate-status">
+         <h2 class="card-pf-title">
+           <a href="{{ url_for('home.bugs') }}">
+             <span class="card-pf-aggregate-status-count"></span> Bugs {{ bugs_num }}
+           </a>
+         </h2>
+         <div class="card-pf-body">
+           <p class="card-pf-aggregate-status-notifications">
+           </p>
+         </div>
+       </div>
+     </div>
+   </div>
+
+<!-- The end of first row - cards -->
+
+
+
+   <div class="row row-cards-pf">
+         <div class="col-md-8">
+           <div class="card-pf card-pf-utilization">
+             <div class="card-pf-heading">
+               <p class="card-pf-heading-details"><a href="{{ url_for('dfg.index') }}"><button class="btn btn-primary">More DFGs</button></a></p>
+               <h2 class="card-pf-title">
+                 DFG Summary
+               </h2>
+             </div>
+             <div class="card-pf-body">
+               <div class="row">
+                 <div class="col-xs-12 col-sm-4 col-md-4">
+                   <h3 class="card-pf-subtitle"><b>Storage</b></h3>
+                   <p class="card-pf-utilization-details">
+                     <span class="card-pf-utilization-card-details-count">{{ storage['count'] }} Jobs</span>
+                     <span class="card-pf-utilization-card-details-description">
+                     </span>
+                   </p>
+                   <div id="chart-pf-donut-1"></div>
+                   <div class="chart-pf-sparkline" id="chart-pf-sparkline-1"></div>
+                   <div id="pie-chart-storage" class="example-pie-chart-right-legend" style="display:inline-block"></div>
+
+
+<script>
+  var c3ChartDefaults = $().c3ChartDefaults();
+
+  var pieData = {
+    type : 'pie',
+    colors: {
+      Failure: $.pfPaletteColors.red,
+      Unstable: $.pfPaletteColors.gold,
+      None: '#E8E8E8',
+      Success: $.pfPaletteColors.green
+    },
+    columns: [
+      ['Failure', {{ storage['FAILURE'] }}],
+      ['Unstable', {{ storage['UNSTABLE'] }}],
+      ['None', {{ storage['None'] }}],
+      ['Success', {{ storage['SUCCESS'] }}]
+    ],
+    };
+
+  // Pie Chart without Legend
+  var pieChartConfig = c3ChartDefaults.getDefaultPieConfig();
+  pieChartConfig.bindto = '#pie-chart-storage';
+  pieChartConfig.data = pieData;
+  pieChartConfig.size = {
+    width: 200,
+    height: 171
+  };
+  var pieChartNoLegend = c3.generate(pieChartConfig);
+
+</script>
+
+                 </div>
+
+
+                 <div class="col-xs-12 col-sm-4 col-md-4">
+                   <h3 class="card-pf-subtitle"><b>Network</b></h3>
+                   <p class="card-pf-utilization-details">
+                     <span class="card-pf-utilization-card-details-count">{{ network['count'] }} Jobs</span>
+                   </p>
+                   <div id="chart-pf-donut-1"></div>
+                   <div class="chart-pf-sparkline" id="chart-pf-sparkline-1"></div>
+                   <div id="pie-chart-network" class="example-pie-chart-right-legend" style="display:inline-block"></div>
+                 </div>
+
+
+<script>
+  var c3ChartDefaults = $().c3ChartDefaults();
+
+  var pieData = {
+    type : 'pie',
+    colors: {
+      Failure: $.pfPaletteColors.red,
+      Unstable: $.pfPaletteColors.gold,
+      None: '#E8E8E8',
+      Success: $.pfPaletteColors.green
+    },
+    columns: [
+      ['Failure', {{ network['FAILURE'] }}],
+      ['Unstable', {{ network['UNSTABLE'] }}],
+      ['None', {{ network['None'] }}],
+      ['Success', {{ network['SUCCESS'] }}]
+    ],
+    };
+
+  // Pie Chart without Legend
+  var pieChartConfig = c3ChartDefaults.getDefaultPieConfig();
+  pieChartConfig.bindto = '#pie-chart-network';
+  pieChartConfig.data = pieData;
+  pieChartConfig.size = {
+    width: 200,
+    height: 171
+  };
+  var pieChartNoLegend = c3.generate(pieChartConfig);
+
+</script>
+
+                 <div class="col-xs-12 col-sm-4 col-md-4">
+                   <h3 class="card-pf-subtitle"><b>Compute</b></h3>
+                   <p class="card-pf-utilization-details">
+                     <span class="card-pf-utilization-card-details-count">{{ compute['count'] }} Jobs</span>
+                   </p>
+                   <div id="chart-pf-donut-1"></div>
+                   <div class="chart-pf-sparkline" id="chart-pf-sparkline-1"></div>
+                   <div id="pie-chart-compute" class="example-pie-chart-right-legend" style="display:inline-block"></div>
+                 </div>
+
+
+<script>
+  var c3ChartDefaults = $().c3ChartDefaults();
+
+  var pieData = {
+    type : 'pie',
+    colors: {
+      Failure: $.pfPaletteColors.red,
+      Unstable: $.pfPaletteColors.gold,
+      None: '#E8E8E8',
+      Success: $.pfPaletteColors.green
+    },
+    columns: [
+      ['Failure', {{ compute['FAILURE'] }}],
+      ['Unstable', {{ compute['UNSTABLE'] }}],
+      ['None', {{ compute['None'] }}],
+      ['Success', {{ compute['SUCCESS'] }}]
+    ],
+    };
+
+  // Pie Chart without Legend
+  var pieChartConfig = c3ChartDefaults.getDefaultPieConfig();
+  pieChartConfig.bindto = '#pie-chart-compute';
+  pieChartConfig.data = pieData;
+  pieChartConfig.size = {
+    width: 200,
+    height: 171
+  };
+  var pieChartNoLegend = c3.generate(pieChartConfig);
+
+</script>
+
+               </div>
+             </div>
+           </div>
+         </div>
+
+ <!-- Views -->
+
+   <div class="col-xs-12 col-md-4">
+                 <div class="card-pf">
+                   <div class="card-pf-heading">
+                     <h2 class="card-pf-title">
+                       Next Release - RHOSP {{ last_release['number'] }}
+                     </h2>
+                   </div>
+                   <div class="card-pf-body">
+                     <div class="progress-description">
+                       Failed
+                     </div>
+                     <div class="progress progress-label-top-right">
+                       <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ last_release['failed_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['failed_percent'] }}%;"  data-toggle="tooltip">
+                         <span><strong>{{ last_release['failed_jobs'] }} of {{ last_release['total_jobs'] }} Jobs</strong></span>
+                       </div>
+                       <div class="progress-bar progress-bar-remaining" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" style="width: 5%;" data-toggle="tooltip" title="5% Available">
+                         <span class="sr-only">5% Available</span>
+                       </div>
+                     </div>
+                     <div class="progress-description">
+                       Passed
+                     </div>
+                     <div class="progress progress-label-top-right">
+                       <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ last_release['passed_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['passed_percent'] }}%;"  data-toggle="tooltip">
+                         <span><strong>{{ last_release['passed_jobs'] }} of {{ last_release['total_jobs'] }} Jobs</strong></span>
+                       </div>
+                       <div class="progress-bar progress-bar-remaining" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%;" data-toggle="tooltip" title="50% Available">
+                         <span class="sr-only">50% Available</span>
+                       </div>
+                     </div>
+                     <div class="progress-description">
+                       Unstable
+                     </div>
+                     <div class="progress progress-label-top-right">
+                       <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{ last_release['unstable_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['unstable_percent'] }}%;"  data-toggle="tooltip">
+                         <span><strong>{{ last_release['unstable_jobs'] }} of {{ last_release['total_jobs'] }} Jobs</strong></span>
+                       </div>
+                       <div class="progress-bar progress-bar-remaining" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%;" data-toggle="tooltip" title="30% Available">
+                         <span class="sr-only">30% Available</span>
+                       </div>
+                     </div>
+                     <div class="progress-description">
+                       Never Executed
+                     </div>
+                     <div class="progress progress-label-top-right">
+                       <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ last_release['never_executed_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['never_executed_percent'] }}%;"  data-toggle="tooltip">
+                         <span><strong>{{ last_release['never_executed_jobs'] }} of {{ last_release['total_jobs'] }} Jobs</strong></span>
+                       </div>
+                       <div class="progress-bar progress-bar-remaining" role="progressbar" aria-valuenow="23.5" aria-valuemin="0" aria-valuemax="100" style="width: 23.5%;" data-toggle="tooltip" title="23.5% Available">
+                         <span class="sr-only">23.5% Available</span>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+
+
 <!-- Main container -->
 
 <div class="container-fluid col-md-custom col-md-offset-custom">
-  <div class="row text-center">
-  </div>
 
    <body class="cards-pf">
-      <div class="container-fluid container-cards-pf col-md-offset-0">
-        <div class="row row-cards-pf">
 
-     <div class="col-xs-6 col-sm-4 col-md-4">
-            <div class="card-pf card-pf-accented card-pf-aggregate-status card-pf-aggregate-status-mini">
-  <h2 class="card-pf-title">
-    <a href="#">
-      <span class="pficon pficon-registry"></span>
-      <a href="{{ url_for('jobs.index') }}">
-          <span class="card-pf-aggregate-status-count">{{ jobs_num }} Jobs</span>
-      </a>
-    </a>
-  </h2>
-  <div class="card-pf-body">
-    <p class="card-pf-aggregate-status-notifications">
-    </p>
-  </div>
-  </div>
-  </div>
-
-
-     <div class="col-xs-6 col-sm-4 col-md-4">
-            <div class="card-pf card-pf-accented card-pf-aggregate-status card-pf-aggregate-status-mini">
-  <h2 class="card-pf-title">
-    <a href="#">
-      <span class="pficon pficon-cluster"></span>
-      <a href="{{ url_for('nodes.index') }}">
-          <span class="card-pf-aggregate-status-count">{{ nodes_num }} Nodes</span>
-      </a>
-    </a>
-  </h2>
-  <div class="card-pf-body">
-    <p class="card-pf-aggregate-status-notifications">
-    </p>
-  </div>
-  </div>
-  </div>
-
-     <div class="col-xs-6 col-sm-4 col-md-4">
-            <div class="card-pf card-pf-accented card-pf-aggregate-status card-pf-aggregate-status-mini">
-  <h2 class="card-pf-title">
-    <a href="#">
-      <span class="pficon pficon-bundle"></span>
-      <a href="{{ url_for('plugins.index') }}">
-          <span class="card-pf-aggregate-status-count">{{ plugins_num }} Plugins</span>
-      </a>
-    </a>
-  </h2>
-  <div class="card-pf-body">
-    <p class="card-pf-aggregate-status-notifications">
-    </p>
-  </div>
-  </div>
-  </div>
-
-</div>
-</div>
-
-<br><br><br>
-
-      <div class="row">
-  <div class="form-group">
-    <div class="col-sm-offset-4 col-sm-4">
-      <a href="{{ url_for('dfg.index') }}"><button class="btn btn-warning btn-lg" style="height:130px;width:250px"><font size="5">DFG View</font></button></a>
-      <a href="{{ url_for('home.releases') }}"><button class="btn btn-primary btn-lg" style="height:130px;width:250px"><font size="5">Release View</font></button></a>
-</div>
-  </div>
-      </div>
-
-  <br><br><br><br>
 
   <div class="container-fluid">
   <!-- Top Failing Tests Table -->

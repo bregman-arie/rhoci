@@ -132,9 +132,9 @@ class Test(db.Model):
 
     __tablename__ = 'test'
 
-    id = db.Column(db.Integer)
-    class_name = db.Column(db.String(128), primary_key=True)
-    test_name = db.Column(db.String(128), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    class_name = db.Column(db.String(128))
+    test_name = db.Column(db.String(128))
     failure = db.Column(db.Integer)
     success = db.Column(db.Integer)
     skipped = db.Column(db.Integer)
@@ -149,8 +149,13 @@ class Test(db.Model):
             'test_name': self.test_name,
             'failure': self.failure,
             'skipped': self.skipped,
-            'success': self.success
+            'success': self.success,
+            'bugs': self.serialize_bugs,
         }
+
+    @property
+    def serialize_bugs(self):
+        return [item.serialize for item in self.bugs]
 
 
 class TestBuild(db.Model):
@@ -202,11 +207,13 @@ class Release(db.Model):
     __tablename__ = 'release'
 
     id = db.Column(db.Integer, primary_key=True)
-    number = db.Column(db.String, index=True, unique=True)
+    number = db.Column(db.Integer, index=True, unique=True)
     name = db.Column(db.String(64), unique=True)
 
-    def __repr__(self):
-        return "<Release %r" % (self.name)
+    @property
+    def serialize(self):
+        """Return serialized Release object."""
+        return {'number': self.number}
 
 
 class Plugin(db.Model):
@@ -231,10 +238,8 @@ class DFG(db.Model):
 
     @property
     def serialize(self):
-        """Return DFG object data in serializeable format"""
-        return {
-            'name': self.name,
-        }
+        """Return serialized DFG object"""
+        return {'name': self.name}
 
 
 class Artifact(db.Model):

@@ -53,7 +53,8 @@ def top_failing_tests():
     results['data'] = list()
 
     db_tests = models.Test.query.order_by(
-        models.Test.failure.desc()).limit(5).all()
+        models.Test.failure.desc()).filter(models.Test.failure > 0).limit(
+            5).all()
 
     for test in db_tests:
         results['data'].append([test.class_name, test.test_name,
@@ -110,7 +111,8 @@ def get_tests_datatable(job=None, build=None):
                 job=job, build=build).all()
             for test in tests:
                 results['data'].append([test.class_name, test.name,
-                                        test.status, '', ''])
+                                        test.status, '',
+                                        [i.serialize for i in test.bugs]])
         except urllib2.HTTPError:
                 results['data'].append(["No tests", "No tests", "No tests",
                                         "No tests", "No tests"])
@@ -142,7 +144,8 @@ def failing_tests_dfg(dfg):
                 bugs = unique_test.bugs
 
             results['data'].append([test.class_name, test.name, test.job,
-                                    test.build, test.status, bugs])
+                                    test.build, test.status,
+                                    [i.serialize for i in bugs]])
     else:
         results['data'].append(["No Tests", "No Tests", "No Tests",
                                 "No Tests", "No Tests", "No tests"])

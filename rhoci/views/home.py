@@ -17,6 +17,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import request
 import logging
+import sys
 
 import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
@@ -24,7 +25,8 @@ import rhoci.models as models
 from rhoci.views.doc import auto
 import rhoci.rhosp.bug as rhosp_bug
 import rhoci.jenkins.job as jenkins_job
-import sys
+import rhoci.jenkins.test as jenkins_test
+import rhoci.rhosp.release as release
 
 if sys.version_info[0] >= 3:
     from xmlrpc.client import Fault
@@ -37,6 +39,29 @@ LOG = logging.getLogger(__name__)
 home = Blueprint('home', __name__)
 
 
+def dfg_summary(dfg):
+    """Returns a dictionary which represents the summary of a given DFG."""
+    return {'FAILURE': models.Job.query.filter(models.Job.name.contains(
+        'DFG-%s' % dfg), models.Job.last_build_status.like('FAILURE')).count(),
+        'SUCCESS': models.Job.query.filter(
+            models.Job.name.contains(
+                'DFG-%s' % dfg), models.Job.last_build_status.like(
+                'SUCCESS')).count(), 'UNSTABLE': models.Job.query.filter(
+                    models.Job.name.contains('DFG-%s' % dfg),
+                    models.Job.last_build_status.like(
+                        'UNSTABLE')).count(),
+        'None': models.Job.query.filter(models.Job.name.contains(
+            'DFG-%s' % dfg), models.Job.last_build_status.like(
+                'None')).count(),
+        'count': models.Job.query.filter(
+            models.Job.name.contains('DFG-%s' % dfg)).count()}
+
+
+def get_percentage(num1, num2):
+    """Returns the percentage of two given numbers."""
+    return int(100 * (float(num1) / float(num2)))
+
+
 @home.route('/')
 def index():
     """Home page."""
@@ -46,17 +71,50 @@ def index():
     jobs['phase2'] = models.Job.query.filter_by(job_type='phase2')
     jobs['dfg'] = models.Job.query.filter_by(job_type='dfg')
     jobs_num = models.Job.query.count()
+    builds_num = models.Build.query.count()
+    tests_num = models.Test.query.count()
+    bugs_num = models.Bug.query.count()
     nodes_num = models.Node.query.count()
     plugins_num = models.Plugin.query.count()
 
+    storage = dfg_summary('storage')
+    network = dfg_summary('network')
+    compute = dfg_summary('compute')
+
+    last_rel_num = release.get_last_release()
+    last_release = {'number': last_rel_num,
+                    'total_jobs': models.Job.query.filter_by(
+                        release_number=last_rel_num).count(),
+                    'failed_jobs': models.Job.query.filter_by(
+                        release_number=last_rel_num,
+                        last_build_status='FAILURE').count(),
+                    'passed_jobs': models.Job.query.filter_by(
+                        release_number=last_rel_num,
+                        last_build_status='SUCCESS').count(),
+                    'unstable_jobs': models.Job.query.filter_by(
+                        release_number=last_rel_num,
+                        last_build_status='UNSTABLE').count(),
+                    'never_executed_jobs': models.Job.query.filter_by(
+                        release_number=last_rel_num,
+                        last_build_status='None').count()}
+
+    last_release['failed_percent'] = get_percentage(
+        last_release['failed_jobs'], last_release['total_jobs'])
+    last_release['passed_percent'] = get_percentage(
+        last_release['passed_jobs'], last_release['total_jobs'])
+    last_release['unstable_percent'] = get_percentage(
+        last_release['unstable_jobs'], last_release['total_jobs'])
+    last_release['never_executed_percent'] = get_percentage(
+        last_release['never_executed_jobs'], last_release['total_jobs'])
+
     return render_template('home.html',
-                           releases=releases,
-                           phase1=jobs['phase1'],
-                           phase2=jobs['phase2'],
-                           dfg=jobs['dfg'],
-                           jobs_num=jobs_num,
-                           nodes_num=nodes_num,
-                           plugins_num=plugins_num)
+                           releases=releases, phase1=jobs['phase1'],
+                           phase2=jobs['phase2'], dfg=jobs['dfg'],
+                           jobs_num=jobs_num, nodes_num=nodes_num,
+                           plugins_num=plugins_num, builds_num=builds_num,
+                           tests_num=tests_num, bugs_num=bugs_num,
+                           network=network, compute=compute, storage=storage,
+                           last_release=last_release)
 
 
 @home.route('/releases/ajax/jobs/<job_type>_<release>')
@@ -112,6 +170,15 @@ def list_tests():
     tests = [i.serialize for i in models.Test.query.all()]
 
     return jsonify(tests=tests)
+
+
+@auto.doc(groups=['release', 'public'])
+@home.route('/v2.0/releases', methods=['GET'])
+def list_releases():
+    """Returns all the releases in the DB."""
+    releases = [i.serialize for i in models.Release.query.all()]
+
+    return jsonify(releases=releases)
 
 
 @auto.doc(groups=['update', 'public'])
@@ -180,14 +247,23 @@ def bug_exists():
     err_msg = ""
     bug_num = request.args.get('bug_num')
     job_name = request.args.get('job_name')
+    test_name = request.args.get('test_name')
+    class_name = request.args.get('test_class')
 
     bzapi = bugzilla.Bugzilla("bugzilla.redhat.com")
     try:
         bug = bzapi.getbug(bug_num)
-        if not models.Bug.query.filter_by(summary=bug.summary).count():
-            rhosp_bug.add_bug(bug_num, bug.summary, bug.status,
-                              system="bugzilla")
-        jenkins_job.add_bug(job_name, bug_num)
+        if bug.is_open:
+            if not models.Bug.query.filter_by(summary=bug.summary).count():
+                rhosp_bug.add_bug(bug_num, bug.summary, bug.status,
+                                  system="bugzilla")
+            if job_name:
+                jenkins_job.add_bug(job_name, bug_num)
+            else:
+                jenkins_test.add_bug(class_name, test_name, bug_num)
+        else:
+            exists = False
+            err_msg = "The chosen bug is closed"
 
     except Fault:
         LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
@@ -218,19 +294,31 @@ def changelog():
 
 
 @home.route('/get_bugs_datatable/<job>', methods=['GET'])
+@home.route('/get_bugs_datatable/<job>_<test_class>_<test_name>',
+            methods=['GET'])
 @home.route('/get_bugs_datatable/', methods=['GET'])
-def get_bugs_datatable(job=None):
+def get_bugs_datatable(job=None, test_class=None, test_name=None):
 
     results = dict()
     results['data'] = list()
     if not job:
         job = request.args.get('job')
+    if not test_class:
+        test_class = request.args.get('test_class')
+        test_name = request.args.get('test_name')
 
+    if job:
         job_db = models.Job.query.filter_by(name=job).first()
-        for bug in job_db.bugs:
-            results['data'].append([bug.summary, bug.number,
-                                    bug.status, bug.system, ''])
-        return jsonify(results)
+        bugs = job_db.bugs
+    else:
+        test_db = models.Test.query.filter_by(class_name=test_class,
+                                              test_name=test_name).first()
+        bugs = test_db.bugs
+
+    for bug in bugs:
+        results['data'].append([bug.summary, bug.number,
+                                bug.status, bug.system, ''])
+    return jsonify(results)
 
 
 @home.route('/remove_bug/', methods=['GET'])
@@ -238,7 +326,10 @@ def get_bugs_datatable(job=None):
 def remove_bug(bug_num=None, job=None, test=None, remove_all=None):
     """Removes bug from the database."""
     bug_num = request.args.get('bug_num')
+    job = request.args.get('job')
     remove_all = request.args.get('remove_all')
-    if remove_all:
+    if remove_all == "true":
         rhosp_bug.remove_from_all(bug_num)
+    else:
+        rhosp_bug.remove_from_job(job)
     return jsonify(dict(status="OK"))

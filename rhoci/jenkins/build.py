@@ -50,7 +50,8 @@ def update_tests(tests_data, job, build):
     """Checks if build ran tests. If yes, updates DB with the tests."""
     #  TODO(abregman): move this code to python-jenkins
     LOG.info("Adding tests to DB for job %s build %s" % (job, build))
-    for test in json.loads(tests_data)['suites'][0]['cases']:
+    tests = json.loads(tests_data)['suites'][0]['cases']
+    for test in tests:
         # Avoid setUpClass
         if test['className'] != '':
             if not models.Test.query.filter_by(
@@ -62,7 +63,6 @@ def update_tests(tests_data, job, build):
                                       success=0)
                 db.session.add(test_db)
                 db.session.commit()
-                LOG.debug("Added test %s" % test['className'])
             if (not models.TestBuild.query.filter_by(class_name=test[
                     'className'], name=test['name'], job=job,
                     build=build).count()):
@@ -77,9 +77,6 @@ def update_tests(tests_data, job, build):
                                                          'errorStackTrace'])
                     db.session.add(test_build_db)
                     db.session.commit()
-                    LOG.debug("Added test build %s %s %s" % (test['className'],
-                                                             job,
-                                                             build))
             if test['status'] == 'PASSED':
                 models.Test.query.filter_by(class_name=test['className'],
                                             test_name=test['name']).update(
@@ -93,6 +90,7 @@ def update_tests(tests_data, job, build):
                                             test_name=test['name']).update(
                     {'skipped': models.Test.skipped + 1})
             db.session.commit()
+    LOG.info("Added %s tests" % len(tests))
 
 
 def add_new_build(job, number):
@@ -200,7 +198,9 @@ def check_active_builds(conn):
 
 
 def update_artifacts_db(artifacts, job, build):
+    "Adds given artifacts to the DB."""
     logs = []
+
     for art in artifacts:
         if art['fileName'].endswith(".log"):
             logs.append(art['fileName'])
@@ -209,7 +209,8 @@ def update_artifacts_db(artifacts, job, build):
                                       relativePath=art['relativePath'])
         db.session.add(db_artifact)
         db.session.commit()
-        LOG.info("Added artifact in DB: %s" % art['fileName'])
+
+    LOG.info("Added %s artifacts" % len(artifacts))
     return logs
 
 

@@ -21,6 +21,7 @@
             <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Class Name <span class="caret"></span></button>
             <ul class="dropdown-menu">
               <li><a href="#" id="filter1">Test Class Name</a></li>
+              <li><a href="#" id="filter1">Test Name</a></li>
               <li><a href="#" id="filter3">Success Count</a></li>
               <li><a href="#" id="filter3">Failed Count</a></li>
             </ul>
@@ -155,7 +156,7 @@ var dataSet = [
 {% for test in all_tests %}
 {
   class_name: "{{ test.class_name }}",
-  test_name: "{{ test.name }}",
+  test_name: "{{ test.test_name }}",
   success_count: "{{ test.success }}",
   failure_count: "{{ test.failure }}",
 },
