@@ -294,14 +294,16 @@ class Bug(db.Model):
     summary = db.Column(db.String(128), unique=True)
     system = db.Column(db.String(128))
     status = db.Column(db.String(32))
+    assigned_to = db.Column(db.String(128))
 
     @property
     def serialize(self):
-        """Return build object data in serializeable format"""
+        """Return serialized object of Bug model."""
         return {
             'id': self.id,
             'number': self.number,
             'summary': self.summary,
             'system': self.system,
             'status': self.status,
+            'assigned_to': self.assigned_to,
         }

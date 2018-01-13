@@ -106,12 +106,12 @@
                 }
             },
             {
-                targets:4,
+                targets:6,
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                     data = '<button type="button" id=\'' + row[0] +'\' onClick="add_bug(\'' + row[0] + '\', \'' + row[2] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
-                      var arrayLength = row[4].length;
+                      var arrayLength = row[6].length;
                       if(arrayLength > 0){
                         data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'' + row[0] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
                       }

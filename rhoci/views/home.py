@@ -184,6 +184,15 @@ def list_releases():
     return jsonify(releases=releases)
 
 
+@auto.doc(groups=['bugs', 'public'])
+@home.route('/v2.0/bugs', methods=['GET'])
+def list_bugs():
+    """Returns all the bugs in the DB."""
+    bugs = [i.serialize for i in models.Bug.query.all()]
+
+    return jsonify(bugs=bugs)
+
+
 @auto.doc(groups=['update', 'public'])
 @home.route('/v2.0/update_jobs', methods=['GET', 'POST'])
 def update_jobs():
@@ -260,7 +269,7 @@ def bug_exists():
         if bug.is_open:
             if not models.Bug.query.filter_by(summary=bug.summary).count():
                 rhosp_bug.add_bug(bug_num, bug.summary, bug.status,
-                                  system="bugzilla")
+                                  bug.assigned_to, system="bugzilla")
             if job_name:
                 jenkins_job.add_bug(job_name, bug_num)
             else:

@@ -289,6 +289,8 @@
                 <th>Last Build Status</th>
                 <th>Last Build Number</th>
                 <th>Tests</th>
+                <th>Bug Assignee</th>
+                <th>Bug Status</th>
                 <th id="bugs_th">Bugs</th>
             </tr>
         </thead>
@@ -317,6 +319,8 @@
                 <th>Job Name</th>
                 <th>Build Number</th>
                 <th>Status</th>
+                <th>Bug Assignee</th>
+                <th>Bug Status</th>
                 <th>Bugs</th>
               </tr>
             </thead>
@@ -572,7 +576,7 @@ function show_tests(job, build)
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                     data = '<button type="button" id=id=\'' + meta.row + meta.cell + '\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
-                      var arrayLength = row[3].length;
+                      var arrayLength = row[5].length;
                       if(arrayLength > 0){
                         data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'\', \'' + row[0] + '\', \'' + row[1] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
                       }
@@ -609,12 +613,12 @@ function show_tests(job, build)
                 }
             },
           {
-                targets:5,
+                targets:7,
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                     data = '<button type="button" id=\'' + meta.row + '\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
-                      var arrayLength = row[5].length;
+                      var arrayLength = row[7].length;
                       if(arrayLength > 0){
                         data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'\', \'' + row[0] + '\', \'' + row[1] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
                       }

@@ -81,7 +81,7 @@ def update_tests(tests_data, job, build):
                 models.Test.query.filter_by(class_name=test['className'],
                                             test_name=test['name']).update(
                     {'success': models.Test.success + 1})
-            elif test['status'] == 'FAILED':
+            elif test['status'] == 'FAILED' or test['status'] == 'REGRESSION':
                 models.Test.query.filter_by(class_name=test['className'],
                                             test_name=test['name']).update(
                     {'failure': models.Test.failure + 1})

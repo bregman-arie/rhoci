@@ -21,10 +21,10 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def add_bug(number, summary, status, system):
+def add_bug(number, summary, status, assigned_to, system):
     """Adds a given bug to the DB."""
     bug = Bug(number=int(number), summary=summary, status=status,
-              system=system)
+              assigned_to=assigned_to, system=system)
     db.session.add(bug)
     db.session.commit()
 
