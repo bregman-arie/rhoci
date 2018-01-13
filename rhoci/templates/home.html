@@ -106,7 +106,7 @@
              <div class="card-pf-body">
                <div class="row">
                  <div class="col-xs-12 col-sm-4 col-md-4">
-                   <h3 class="card-pf-subtitle"><b>Storage</b></h3>
+               <h3 class="card-pf-subtitle"><b><a href="{{ url_for('dfg.stats', dfg_name='storage') }}">Storage</a></b></h3>
                    <p class="card-pf-utilization-details">
                      <span class="card-pf-utilization-card-details-count">{{ storage['count'] }} Jobs</span>
                      <span class="card-pf-utilization-card-details-description">
@@ -154,7 +154,7 @@
 
 
                  <div class="col-xs-12 col-sm-4 col-md-4">
-                   <h3 class="card-pf-subtitle"><b>Network</b></h3>
+               <h3 class="card-pf-subtitle"><b><a href="{{ url_for('dfg.stats', dfg_name='network') }}">Network</a></b></h3>
                    <p class="card-pf-utilization-details">
                      <span class="card-pf-utilization-card-details-count">{{ network['count'] }} Jobs</span>
                    </p>
@@ -198,7 +198,7 @@
 </script>
 
                  <div class="col-xs-12 col-sm-4 col-md-4">
-                   <h3 class="card-pf-subtitle"><b>Compute</b></h3>
+               <h3 class="card-pf-subtitle"><b><a href="{{ url_for('dfg.stats', dfg_name='compute') }}">Compute</a></b></h3>
                    <p class="card-pf-utilization-details">
                      <span class="card-pf-utilization-card-details-count">{{ compute['count'] }} Jobs</span>
                    </p>

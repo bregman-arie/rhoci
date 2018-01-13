@@ -234,7 +234,9 @@
             <tr>
                 <th>Class Name</th>
                 <th>Test Name</th>
-                <th>Status</th>
+                <th>Test Status</th>
+                <th>Bug Assignee</th>
+                <th>Bug Status</th>
                 <th>Bugs</th>
             </tr>
           </thead>
@@ -318,7 +320,7 @@
                 <th>Test Name</th>
                 <th>Job Name</th>
                 <th>Build Number</th>
-                <th>Status</th>
+                <th>Test Status</th>
                 <th>Bug Assignee</th>
                 <th>Bug Status</th>
                 <th>Bugs</th>
@@ -384,6 +386,14 @@ function show_bugs(job, test_class, test_name)
                         else {
                         data = '<button type="button" onClick="remove_bug(\'' + row[1] + '\', \'' + job + '\')" data-id=\'' + row[1] +'\' class="btn btn-info btn-lg">remove</button>'
                         }
+                        return data;
+                }
+            },
+            {
+                targets:[0, 1],
+                className: "text-center",
+                render: function ( data, type, row, meta ) {
+                        data = '<a href="http://bugzilla.redhat.com/' + row[1] + '">' + data + '</a>';
                         return data;
                 }
             },
@@ -571,7 +581,7 @@ function show_tests(job, build)
                 }
             },
           {
-                targets:3,
+                targets:5,
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
@@ -608,6 +618,16 @@ function show_tests(job, build)
                         class_name = old_class_name.replace(/\.([^\.]*)$/,replacement+'$1');
                         var test_name = old_test_name.replace(/-/g, "_").replace('[', '_').replace(']', '_').replace(/,/g, "_").replace(/ /g,"_").replace(/\(/g, "_").replace(/\)/g, "_");
                         data = '<a href="{{ agent.url }}/job/' + row[2] + '/' + row[3] + '/testReport/' + class_name + '/' + test_name + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:[5, 6],
+                className: "text-center",
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && data != 'No bugs'){
+                        data = '<a href="http://bugzilla.redhat.com/' + row[8] + '">' + data + '</a>';
                     }
                     return data;
                 }

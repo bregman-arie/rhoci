@@ -91,6 +91,8 @@ def get_tests_datatable(job=None, build=None):
     results = dict()
     results['data'] = list()
     agent = models.Agent.query.one()
+    bug_assigned_to = 'No bugs'
+    bug_status = 'No bugs'
     if not job:
         job = request.args.get('job')
         build = request.args.get('build')
@@ -100,7 +102,12 @@ def get_tests_datatable(job=None, build=None):
         for test in tests:
             unq_test = models.Test.query.filter_by(
                 test_name=test.name, class_name=test.class_name).first()
+            if unq_test.bugs:
+                rnd_bug = unq_test.bugs[0]
+                bug_assigned_to = rnd_bug.assigned_to
+                bug_status = rnd_bug.status
             results['data'].append([test.class_name, test.name, test.status,
+                                    bug_assigned_to, bug_status,
                                     [i.serialize for i in unq_test.bugs]])
         return jsonify(results)
     else:
@@ -119,9 +126,6 @@ def get_tests_datatable(job=None, build=None):
                     rnd_bug = unq_test.bugs[0]
                     bug_assigned_to = rnd_bug.assigned_to
                     bug_status = rnd_bug.bug_status
-                else:
-                    bug_assigned_to = 'No bugs'
-                    bug_status = 'No bugs'
                 results['data'].append([test.class_name, test.name,
                                         test.status, '', bug_assigned_to,
                                         bug_status,
@@ -148,6 +152,7 @@ def failing_tests_dfg(dfg):
 
     bug_assigned_to = "No bugs"
     bug_status = "No bugs"
+    bug_number = "No bugs"
 
     if tests:
         for test in tests:
@@ -162,11 +167,12 @@ def failing_tests_dfg(dfg):
                 if bugs:
                     bug_assigned_to = bugs[0].assigned_to
                     bug_status = bugs[0].status
+                    bug_number = bugs[0].number
 
             results['data'].append([test.class_name, test.name, test.job,
                                     test.build, test.status, bug_assigned_to,
                                     bug_status,
-                                    [i.serialize for i in bugs]])
+                                    [i.serialize for i in bugs], bug_number])
     else:
         results['data'].append(["No Tests", "No Tests", "No Tests",
                                 "No Tests", "No Tests", "No tests"])
