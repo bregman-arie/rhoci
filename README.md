@@ -73,10 +73,6 @@ API is documented in /doc view and generated automatically
 
 <div align="center"><img src="./doc/home_page.png" alt="RHOCI Home Page"></div><hr />
 
-### Jobs page
-
-<div align="center"><img src="./doc/jobs_page.png" alt="RHOCI Jobs Page"></div><hr />
-
 ## How to add a new page
 
 * Create the html templates in rhoci/rhoci/templates/<new_page_name>.html

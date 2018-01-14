@@ -6,22 +6,22 @@ function show_bugs(job, test_class, test_name)
           "url": "{{ url_for('home.get_bugs_datatable') }}",
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData[2] == "CLOSED" )
+            if ( aData[3] == "CLOSED" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            if ( aData[2] == "NEW" )
+            if ( aData[3] == "NEW" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            if ( aData[2] == "ASSIGNED" )
+            if ( aData[3] == "ASSIGNED" || aData[3] == "ON_QA" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }
         },
         columnDefs: [
             {
-                targets:[4],
+                targets:[5],
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                         if (job === undefined || job === null || job === '') {

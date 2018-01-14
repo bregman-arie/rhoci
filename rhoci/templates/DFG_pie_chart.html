@@ -81,7 +81,7 @@
                     data = "Failure <a href={{ url_for('builds.failure_analyze', job='JOB', build='BUILD') }}>(Why did it fail?)</a>".replace("JOB", row[0]).replace("BUILD", row[2]);
                     }
                     else if (type === 'display' && row[1] != 'None' ){
-                    data = '<button type="button" onClick="reply_click(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
+                    data = '<button type="button" onClick="show_failure(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
                     }
                   return data;
                 }

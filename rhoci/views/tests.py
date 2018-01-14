@@ -91,8 +91,6 @@ def get_tests_datatable(job=None, build=None):
     results = dict()
     results['data'] = list()
     agent = models.Agent.query.one()
-    bug_assigned_to = 'No bugs'
-    bug_status = 'No bugs'
     if not job:
         job = request.args.get('job')
         build = request.args.get('build')
@@ -100,6 +98,8 @@ def get_tests_datatable(job=None, build=None):
     if models.TestBuild.query.filter_by(job=job, build=build).count():
         tests = models.TestBuild.query.filter_by(job=job, build=build).all()
         for test in tests:
+            bug_assigned_to = 'No bugs'
+            bug_status = 'No bugs'
             unq_test = models.Test.query.filter_by(
                 test_name=test.name, class_name=test.class_name).first()
             if unq_test.bugs:
@@ -120,20 +120,21 @@ def get_tests_datatable(job=None, build=None):
             tests = models.TestBuild.query.filter_by(
                 job=job, build=build).all()
             for test in tests:
+                bug_assigned_to = 'No bugs'
+                bug_status = 'No bugs'
                 unq_test = models.Test.query.filter_by(
                     test_name=test.name, class_name=test.class_name).first()
                 if unq_test.bugs:
                     rnd_bug = unq_test.bugs[0]
                     bug_assigned_to = rnd_bug.assigned_to
-                    bug_status = rnd_bug.bug_status
+                    bug_status = rnd_bug.status
                 results['data'].append([test.class_name, test.name,
-                                        test.status, '', bug_assigned_to,
+                                        test.status, bug_assigned_to,
                                         bug_status,
                                         [i.serialize for i in unq_test.bugs]])
         except urllib2.HTTPError:
                 results['data'].append(["No tests", "No tests", "No tests",
-                                        "No tests", "No tests", "No tests",
-                                        "No tests"])
+                                        "No tests", "No tests", "No tests"])
 
         return jsonify(results)
 

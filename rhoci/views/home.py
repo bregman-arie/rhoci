@@ -330,7 +330,7 @@ def get_bugs_datatable(job=None, test_class=None, test_name=None):
         bugs = test_db.bugs
 
     for bug in bugs:
-        results['data'].append([bug.summary, bug.number,
+        results['data'].append([bug.summary, bug.number, bug.assigned_to,
                                 bug.status, bug.system, ''])
     return jsonify(results)
 

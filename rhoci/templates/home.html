@@ -5,8 +5,15 @@
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
 
-{% include "bugs/modal_datatable.html" -%}
 {% include "bugs/add_bug_modal.html" -%}
+{% include "bugs/add_tests_bug_modal.html" -%}
+{% include "bugs/remove_tests_bug_modal.html" -%}
+{% include "bugs/remove_bug_modal.html" -%}
+{% include "bugs/show_bugs_modal_datatable.html" -%}
+
+{% include "failures/show_failure_modal.html" -%}
+
+{% include "tests/show_tests_modal_datatable.html" -%}
 
 <!-- Jobs Modal -->
 <div id="jobs_modal" class="modal fade" role="dialog">
@@ -418,9 +425,21 @@
 </script>
 
   <script>
-      {% include "bugs/show_datatable.js" -%}
-      {% include "bugs/add_bug.js" -%}
-      {% include "common/modal_order.js" -%}
+    {% include "failures/show_failure.js" -%}
+
+    {% include "bugs/show_bugs.js" -%}
+    {% include "bugs/remove_tests_bug_from_db.js" -%}
+    {% include "bugs/remove_tests_bug.js" -%}
+    {% include "bugs/remove_bug_from_db.js" -%}
+    {% include "bugs/remove_bug.js" -%}
+    {% include "bugs/add_bug.js" -%}
+    {% include "bugs/add_tests_bug.js" -%}
+    {% include "bugs/submit_bug.js" -%}
+    {% include "bugs/submit_tests_bug.js" -%}
+
+    {% include "tests/show_tests.js" -%}
+
+    {% include "common/modal_order.js" -%}
   </script>
 
 {% endblock %}
