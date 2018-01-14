@@ -11,14 +11,24 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import rhoci.cmd.parsers.web as web_parser
+import argparse
+
 import rhoci.web
 
 
 def create_parser():
-    """Returns parsed arguments from parser."""
-    parser = web_parser.create()
-    return parser.parse_args()
+    """Returns argparse parser."""
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--debug', action='store_true',
+                        dest="RHOCI_DEBUG", help='Turn DEBUG on')
+    parser.add_argument('--conf', '-c', dest="RHOCI_CONFIG_FILE",
+                        help='RHOCI configuration file')
+    parser.add_argument('--port', '-p', dest="RHOCI_SERVER_PORT",
+                        help='RHOCI server port')
+
+    return parser
 
 
 def launch_app(args=None):
@@ -29,5 +39,6 @@ def launch_app(args=None):
 
 def main():
     """Main entry for running the web server."""
-    args = create_parser()
+    parser = create_parser()
+    args = parser.parse_args()
     launch_app(args)

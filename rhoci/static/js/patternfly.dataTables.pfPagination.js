@@ -128,7 +128,7 @@
     ctx._pfPagination.totalPages = $(TOTAL_PAGES_SELECTOR, opts.paginationSelector); // Total pages
 
     // Set initial page size
-    ctx._pfPagination.currentPageSize = (opts.pageSize !== undefined) ? opts.pageSize : 30;
+    ctx._pfPagination.currentPageSize = (opts.pageSize !== undefined) ? opts.pageSize : 15;
 
     // Handle page navigation
     handleCurrentPage(dt);

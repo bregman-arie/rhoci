@@ -60,7 +60,7 @@ class WebApp(object):
         self._setup_config(args_ns)
 
         # If user turned on debug, update logging level
-        if self.config['DEBUG']:
+        if self.config['RHOCI_DEBUG']:
             self._update_logging_level(logging.DEBUG)
 
         # Initialize API documentation
@@ -82,7 +82,8 @@ class WebApp(object):
         """Load configuration from file"""
 
         self.config = self._load_config_from_cli(args_ns)
-        config_f = vars(args_ns)['config_file'] or self.DEFAULT_CONFIG_FILE
+        config_f = vars(
+            args_ns)['RHOCI_CONFIG_FILE'] or self.DEFAULT_CONFIG_FILE
 
         # If configuration file exists, load it and update the app config
         if os.path.exists(config_f):
@@ -146,7 +147,8 @@ class WebApp(object):
         """Runs the web server."""
         logger.info("Running rhoci web server")
 
-        app.run(threaded=True, host='0.0.0.0', port=int(app.config['PORT']))
+        app.run(threaded=True, host='0.0.0.0', port=int(
+            app.config['RHOCI_SERVER_PORT']))
 
     def _load_failures(self):
         """Loads RHOCI built-in failure to DB."""

@@ -79,6 +79,7 @@ def index():
     bugs_num = models.Bug.query.count()
     nodes_num = models.Node.query.count()
     plugins_num = models.Plugin.query.count()
+    agent = models.Agent.query.one()
 
     storage = dfg_summary('storage')
     network = dfg_summary('network')
@@ -117,7 +118,7 @@ def index():
                            plugins_num=plugins_num, builds_num=builds_num,
                            tests_num=tests_num, bugs_num=bugs_num,
                            network=network, compute=compute, storage=storage,
-                           last_release=last_release)
+                           last_release=last_release, agent=agent)
 
 
 @home.route('/releases/ajax/jobs/<job_type>_<release>')
@@ -206,7 +207,6 @@ def update_jobs():
 def jenkins_notifications():
     """Recieving notifications from Jenkins."""
     LOG.info("Recieved notification from Jenkins.")
-    LOG.debug("Data: %s" % request.data)
     status = manager.update_db(request.get_json(silent=True))
     return jsonify({'notification': status})
 

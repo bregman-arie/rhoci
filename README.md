@@ -38,7 +38,7 @@ Note that you can instead run the following two scripts
 
 ## Run RHOCI
 
-    rhoci run
+    rhoci-server
 
 ## Configuration 
 

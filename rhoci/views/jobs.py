@@ -40,13 +40,13 @@ def jobs_status(status, dfg, release):
     """Get jobs with specific status"""
     results = dict()
     results['data'] = list()
-    bug_assigned_to = 'No bugs'
-    bug_status = 'No bugs'
 
     jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
                             Job.last_build_status.like(status),
                             Job.release_number.like(release))
     for job in jobs:
+        bug_assigned_to = 'No bugs'
+        bug_status = 'No bugs'
         if job.bugs:
             bug_assigned_to = job.bugs[0].assigned_to
             bug_status = job.bugs[0].status
@@ -58,8 +58,45 @@ def jobs_status(status, dfg, release):
                 number=job.last_build_number).first()
             if build_db.failure_name:
                 results['data'].append([job.name, build_db.failure_name,
-                                        job.last_build_number,
-                                        build_db.failure_text, '',
+                                        job.last_build_number, '',
+                                        bug_assigned_to, bug_status, [
+                                            i.serialize for i in job.bugs]])
+            else:
+                results['data'].append([job.name, job.last_build_status,
+                                        job.last_build_number, '',
+                                        bug_assigned_to, bug_status, [
+                                            i.serialize for i in job.bugs]])
+        else:
+            results['data'].append([job.name, job.last_build_status,
+                                    job.last_build_number, '',
+                                    bug_assigned_to, bug_status, [
+                                        i.serialize for i in job.bugs]])
+    return jsonify(results)
+
+
+@jobs.route('/home_jobs_status/<status>_<dfg>')
+def home_jobs_status(status, dfg):
+    """Get jobs with specific status"""
+    results = dict()
+    results['data'] = list()
+
+    jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
+                            Job.last_build_status.like(status))
+    for job in jobs:
+        bug_assigned_to = 'No bugs'
+        bug_status = 'No bugs'
+        if job.bugs:
+            bug_assigned_to = job.bugs[0].assigned_to
+            bug_status = job.bugs[0].status
+
+        if Build.query.filter_by(job=job.name,
+                                 number=job.last_build_number).count():
+            build_db = Build.query.filter_by(
+                job=job.name,
+                number=job.last_build_number).first()
+            if build_db.failure_name:
+                results['data'].append([job.name, build_db.failure_name,
+                                        job.last_build_number, '',
                                         bug_assigned_to, bug_status, [
                                             i.serialize for i in job.bugs]])
             else:

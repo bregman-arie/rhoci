@@ -1,0 +1,50 @@
+<!-- Add Bug Modal -->
+<div id="add_bug_modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="modal-title">Add a new bug</h4>
+      </div>
+      <div class="modal-body">
+
+
+                <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-danger active" style="height:35px; width:105px; font-size: 120%;">
+                  <input type="radio" name="options" id="option1" autocomplete="off" checked > Bugzilla
+                </label>
+                </div>
+
+                <br><br>
+
+                <div class="input-group col-xs-4" style="white-space: pre-line;">
+                  <span class="input-group-addon">#</span>
+                  <input id="bug_num" type="text" class="form-control" placeholder="Bug number">
+                </div> 
+
+                <div class="input-group col-xs-10" style="white-space: pre-line;">
+                  <span class="input-group-addon">Job Name</span>
+                  <input id="job_name" type="text" class="form-control" disabled>
+                </div> 
+
+                <br>
+
+                <!-- Apply on all tests in the class  <input type="checkbox" data-toggle="toggle" style="margin-left: 15px;"> -->
+
+                <br><br>
+                <button type="button" onClick="submit_bug()" class="btn btn-primary" style="height:35px; width:105px; font-size: 120%;">Add bug</button>
+                <br><br>
+
+                <div id="add_bug_spinner" class="spinner spinner-lg hidden"></div>
+
+                <div class="alert alert-danger hidden" id="bug_alert_div" style="white-space: pre-line;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>

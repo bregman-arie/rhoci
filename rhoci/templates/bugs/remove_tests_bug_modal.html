@@ -1,0 +1,40 @@
+<!-- Remove Tests Bug Modal -->
+<div id="remove_tests_bug_modal" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="modal-title">Remove bug from RHOCI</h4>
+      </div>
+      <div class="modal-body">
+
+                <div class="input-group col-xs-4" style="white-space: pre-line;">
+                  <span class="input-group-addon">#</span>
+                  <input id="remove_tests_bug_num" type="text" class="form-control" disabled>
+                </div> 
+                <div class="input-group col-xs-12" style="white-space: pre-line;">
+                  <span class="input-group-addon">Class </span>
+                  <input id="remove_bug_test_class" type="text" class="form-control" disabled>
+                </div> 
+                <div class="input-group col-xs-12" style="white-space: pre-line;">
+                  <span class="input-group-addon">Test </span>
+                  <input id="remove_bug_test_name" type="text" class="form-control" disabled>
+                </div> 
+
+                <br>
+
+                Remove from all tests and jobs?  <input id="tests_remove_all" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No" style="margin-left: 15px;">
+
+                <br><br>
+                <button type="button" onClick="remove_tests_bug_from_db()" class="btn btn-danger" style="height:35px; width:105px; font-size: 120%;">Confirm</button>
+                <br><br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
