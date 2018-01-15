@@ -40,7 +40,7 @@ function show_tests(job, build)
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                    data = '<button type="button" id=id=\'' + meta.row + meta.cell + '\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
+                    data = '<button type="button" id=\'' + meta.row + meta.col + '\' onClick="add_tests_bug(\'' + row[0] + '\', \'' + row[1] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
                       var arrayLength = row[5].length;
                       if(arrayLength > 0){
                         data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'\', \'' + row[0] + '\', \'' + row[1] + '\')" class="btn btn-danger btn-lg">Bugs</button>';

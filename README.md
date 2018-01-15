@@ -42,16 +42,23 @@ Note that you can instead run the following two scripts
 
 ## Configuration 
 
-Configuration precedence is as follows
+RHOCI loads configuration in this order:
 
-    Environment variable start with 'RHOCI_'
-    CLI parameters as provided by the user
-    Configuration file (default or as provided by user)
+    Default config.py - built-in. Part of RHOCI code base.
+    Environment varliabes - any of the environment vairables specified in the table below that the user export (e.g. `export RHOCI_SERVER_PORT=80`)
+    Configurtion file - the default configuration file (/etc/rhoci/server.conf) or the file you mentioned with parser/environment variable.
+    Parser - arguments you pass with rhoci command-line invocation.
 
-The default location for RHOCI configuration is '/etc/rhoci/rhoci.conf'.
-You can specify it by using the CLI: --conf <conf_file_path>
+| Name | Description | Required |
+| ---- | ----------- | -------- |
+| `RHOCI_JENKINS_URL` | Jenkins URL | Yes
+| `RHOCI_JENKINS_USER` | Jenkins username | Yes
+| `RHOCI_JENKINS_PASSWORD` | Jenkins username | Yes
+| `RHOCI_CONFIG_FILE` | The configuration file from where to load additional configuration | No
+| `RHOCI_DEBUG` | Turn on DEBUG | No
+| `RHOCI_SERVER_PORT` | The port to use when running RHOCI server | No
 
-A sample can be found in samples/rhoci.conf
+A sample can be found in samples/server.conf
 
 ## API
 

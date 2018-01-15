@@ -20,19 +20,21 @@ import os
 from rhoci.views.doc import auto
 from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
+from rhoci.common import exceptions
 from rhoci.filters import configure_template_filters
 import rhoci.models as models
 import rhoci.views
 from rhoci.rhosp.release import RELEASE_MAP
+from rhoci.server.config import Config
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 app = Flask(__name__)
 configure_template_filters(app)
 db.init_app(app)
 with app.app_context():
     db.create_all()
 
-import rhoci.agent.jenkins_agent as j_agent  # noqa
+from rhoci.agent.jenkins_agent import JenkinsAgent  # noqa
 
 views = (
     (rhoci.views.home, ''),
@@ -49,18 +51,16 @@ views = (
 )
 
 
-class WebApp(object):
-    """rhoci Web Application."""
+class Server(object):
+    """RHOCI Server"""
 
-    DEFAULT_CONFIG_FILE = '/etc/rhoci/rhoci.conf'
+    def __init__(self, args=None):
 
-    def __init__(self, args_ns=None):
-
-        self._setup_logging()
-        self._setup_config(args_ns)
+        self.setup_logging()
+        self.load_config(args)
 
         # If user turned on debug, update logging level
-        if self.config['RHOCI_DEBUG']:
+        if app.config['RHOCI_DEBUG']:
             self._update_logging_level(logging.DEBUG)
 
         # Initialize API documentation
@@ -78,20 +78,52 @@ class WebApp(object):
         for view, prefix in views:
             app.register_blueprint(view, url_prefix=prefix)
 
-    def _setup_config(self, args_ns):
-        """Load configuration from file"""
+    def load_config(self, args):
+        """Load configuration from different sources"""
+        app.config.from_object(Config)
 
-        self.config = self._load_config_from_cli(args_ns)
-        config_f = vars(
-            args_ns)['RHOCI_CONFIG_FILE'] or self.DEFAULT_CONFIG_FILE
+        # Check if user pointed to a different config file from CLI or ENV vars
+        if vars(args)['RHOCI_CONFIG_FILE']:
+            app.config['RHOCI_CONFIG_FILE'] = vars(args)['RHOCI_CONFIG_FILE']
+        elif 'RHOCI_CONFIG_FILE' in os.environ:
+            app.config['RHOCI_CONFIG_FILE'] = os.environ['RHOCI_CONFIG_FILE']
 
-        # If configuration file exists, load it and update the app config
-        if os.path.exists(config_f):
-            self._load_config_from_file(config_f)
-        app.config.update(self.config)
+        self.load_config_from_env()
+        self.load_config_from_file()
+        self.load_config_from_parser(args)
 
         # Load DB configuration
         app.config.from_object('rhoci.db.config')
+        LOG.info("Loaded the following configuration: %s" % app.config)
+
+        # Make sure critical configuration is provided
+        for k in ['JENKINS_URL', 'JENKINS_USER', 'JENKINS_PASSWORD']:
+            if not app.config.get('RHOCI_' + k):
+                raise exceptions.MissingInputException(parameter='RHOCI_' + k)
+
+    def load_config_from_env(self):
+        """Loads configuration from environment variables."""
+        rhoci_envs = filter(
+            lambda s: s.startswith('RHOCI_'), os.environ.keys())
+        for env_key in rhoci_envs:
+            if os.environ[env_key]:
+                app.config[env_key] = os.environ[env_key]
+
+    def load_config_from_file(self):
+        """Loads configuration from a file."""
+        cfg_parser = ConfigParser()
+        cfg_parser.read(app.config['RHOCI_CONFIG_FILE'])
+
+        for section in cfg_parser.sections():
+            for key in cfg_parser.options(section):
+                k = "RHOCI_%s_%s" % (section.upper(), key.upper())
+                app.config[k] = cfg_parser.get(section, key)
+
+    def load_config_from_parser(self, args):
+        """Loads configuration based on provided arguments by the user."""
+        for k, v in vars(args).items():
+            if v:
+                app.config[k] = v
 
     def _setup_database(self):
         """Sets up the database by setting versioning and creating
@@ -102,39 +134,12 @@ class WebApp(object):
         with app.app_context():
             db.create_all()
 
-    def _load_config_from_cli(self, args_ns):
-        """Load arguments as passed by the user.
-
-        returns dictionary of configartion options and their values.
-        """
-        config = {}
-
-        # Convert Namespace instance into a dictionary of args:values
-        # so we can load them into Flask configuration
-        for k, v in vars(args_ns).iteritems():
-            config[k.upper()] = v
-
-        return config
-
-    def _load_config_from_file(self, config_f):
-        """Loads configuration from file."""
-        parser = ConfigParser()
-        parser.read(config_f)
-
-        for section in parser.sections():
-                for option in parser.options(section):
-                    self.config[option] = parser.get(section, option)
-        logger.info("Updated config from file: %s" % config_f)
-        logger.info("Configuration: %s" % self.config)
-
-    def _setup_logging(self):
+    def setup_logging(self):
         """Setup logging level and format."""
-
         format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
         level = logging.INFO
         logging.basicConfig(level=level, format=format)
-        handler = RotatingFileHandler('rhoci.log',
-                                      maxBytes=2000000,
+        handler = RotatingFileHandler('rhoci.log', maxBytes=2000000,
                                       backupCount=10)
         logging.getLogger().addHandler(handler)
 
@@ -145,7 +150,7 @@ class WebApp(object):
 
     def run(self):
         """Runs the web server."""
-        logger.info("Running rhoci web server")
+        LOG.info("Running rhoci web server")
 
         app.run(threaded=True, host='0.0.0.0', port=int(
             app.config['RHOCI_SERVER_PORT']))
@@ -171,7 +176,7 @@ class WebApp(object):
 
     def _setup_releases(self):
         """Create DB entry for each release."""
-        for release in app.config['releases'].split(','):
+        for release in app.config['RHOCI_RELEASES'].split(','):
             with app.app_context():
                 if not models.Release.query.filter_by(
                         number=release).count():
@@ -183,11 +188,11 @@ class WebApp(object):
 
     def _setup_jenkins(self):
         """Create Jenkins agent to pull information from RHOSP Jenkins."""
-        agent = j_agent.JenkinsAgent(name="RHOSP",
-                                     user=app.config.get('user'),
-                                     password=app.config.get('password'),
-                                     url=app.config.get('url'),
-                                     app=app)
+        agent = JenkinsAgent(name="RHOSP",
+                             user=app.config.get('RHOCI_JENKINS_USER'),
+                             password=app.config.get('RHOCI_JENKINS_PASSWORD'),
+                             url=app.config.get('RHOCI_JENKINS_URL'),
+                             app=app)
         logging.debug("Starting connection to RHOSP Jenkins")
         agent.pre_run_process.start()
         agent.run_process.start()

@@ -23,7 +23,7 @@ import rhoci.models as models
 import rhoci.jenkins.build as jenkins_build
 
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 tests = Blueprint('tests', __name__)
 
@@ -91,6 +91,7 @@ def get_tests_datatable(job=None, build=None):
     results = dict()
     results['data'] = list()
     agent = models.Agent.query.one()
+
     if not job:
         job = request.args.get('job')
         build = request.args.get('build')
@@ -112,6 +113,9 @@ def get_tests_datatable(job=None, build=None):
         return jsonify(results)
     else:
         try:
+            LOG.debug(
+                "Didn't find tests in DB for %s build %s. Retrieving" % (
+                    job, build))
             tests_raw_data = urllib2.urlopen(agent.url + "/job/" + job + "/" +
                                              build +
                                              "/testReport/api/json").read()

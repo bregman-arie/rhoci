@@ -12,8 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-""" RHOCI base exception handling. """
-
 
 class RHOCIException(Exception):
     """Base RHOCI Exception.
@@ -31,4 +29,7 @@ class RHOCIException(Exception):
 
 class APIException(RHOCIException):
     msg = "Something, somewhere went terribly wrong"
-    code = 500
+
+
+class MissingInputException(RHOCIException):
+    message = "You forget to specify critical parameter: %(parameter)s"

@@ -33,7 +33,7 @@ def create_parser():
 
 def launch_app(args=None):
     """Runs Web application."""
-    web_server = rhoci.web.WebApp(args)
+    web_server = rhoci.web.Server(args)
     web_server.run()
 
 
