@@ -13,12 +13,13 @@
 #    under the License.
 import datetime
 import jenkins
+import json
 import logging
 from multiprocessing import Process
-from concurrent.futures import ThreadPoolExecutor
 import re
 import sys
 import time
+import urllib2
 
 from rhoci.agent import agent
 from rhoci.agent import update
@@ -82,25 +83,11 @@ class JenkinsAgent(agent.Agent):
                 LOG.debug("Updated agent timestamp")
 
                 # Do a shallow update (detailed description in docstring)
-                all_jobs = self.shallow_db_update()
-
-                # Update information regarding the job in the DB
-                with ThreadPoolExecutor(100) as executor:
-                    for job in all_jobs:
-                        executor.submit(self.update_job_in_db, job)
+                self.shallow_db_update()
 
             # In case application was restarted or crushed, check if active
             # builds in DB are still active
             build_lib.check_active_builds(self.conn)
-
-            # Analyze failed builds
-            failed_builds = models.Build.query.filter_by(
-                status='FAILURE').all()
-            for build_db in failed_builds:
-                if not build_db.failure_name:
-                    LOG.info("Analyzing job %s build %s" % (build_db.job,
-                                                            build_db.number))
-                    build_lib.analyze_failure(build_db.job, build_db.number)
 
     def remove_jobs_from_db(self, jobs):
         """Removes jobs from DB that no longer exist on Jenkins."""
@@ -171,7 +158,9 @@ class JenkinsAgent(agent.Agent):
         """Insert jobs, nodes and plugins to DB (names only)."""
 
         try:
-            all_jobs = self.conn.get_all_jobs()
+            all_jobs_api = "/api/json/?tree=jobs[name,lastBuild[result,number]]"
+            jobs_data = json.loads(
+                urllib2.urlopen(self.url + all_jobs_api).read())
             all_nodes = self.conn.get_nodes()
             all_plugins = self.conn.get_plugins()
         except Exception as e:
@@ -179,16 +168,29 @@ class JenkinsAgent(agent.Agent):
             self.active = False
             sys.exit(2)
 
-        for job in all_jobs:
-            if not models.Job.query.filter_by(name=job['name']).count():
-                job_t = self.get_job_type(job['name'].lower())
-                rel = self.get_job_release(job['name'])
-                db_job = models.Job(name=job['name'],
-                                    job_type=job_t,
-                                    release_number=int(rel))
-                db.session.add(db_job)
-                db.session.commit()
-                LOG.debug("Added job: %s to the DB" % (job['name']))
+        for job in jobs_data['jobs']:
+            print job
+            if job.get('lastBuild'):
+                lst_bld_number = job['lastBuild'].get('number')
+                last_build_status = job['lastBuild'].get('result')
+                if not models.Job.query.filter_by(name=job['name']).count():
+                    job_t = self.get_job_type(job['name'].lower())
+                    rel = self.get_job_release(job['name'])
+                    db_job = models.Job(name=job['name'],
+                                        job_type=job_t,
+                                        release_number=int(rel),
+                                        last_build_number=lst_bld_number,
+                                        last_build_status=last_build_status)
+                    if not models.Build.query.filter_by(job=job['name'],
+                                                        number=lst_bld_number
+                                                        ).count():
+                        db_build = models.Build(job=job['name'],
+                                                number=lst_bld_number,
+                                                status=last_build_status)
+                        db.session.add(db_build)
+                    db.session.add(db_job)
+                    LOG.debug("Added job: %s to the DB" % (job['name']))
+            db.session.commit()
 
         for node in all_nodes:
             if not models.Node.query.filter_by(name=node['name']).count():
@@ -205,5 +207,3 @@ class JenkinsAgent(agent.Agent):
                 db.session.add(db_plugin)
                 db.session.commit()
                 LOG.debug("Added plugin: %s to the DB" % (plugin_name))
-
-        return all_jobs

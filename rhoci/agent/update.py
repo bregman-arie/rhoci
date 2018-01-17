@@ -14,10 +14,8 @@
 import datetime
 import jenkins
 import logging
-from concurrent.futures import ThreadPoolExecutor
 
 from rhoci.db.base import db
-import rhoci.jenkins.build as jenkins_lib
 import rhoci.jenkins.server as jenkins_server
 import rhoci.models as models
 import rhoci.rhosp.jenkins as rhosp_jenkins
@@ -35,11 +33,6 @@ def shallow_jobs_update():
     # Get a list of all jobs from Jenkins
     try:
         all_jobs = conn.get_all_jobs()
-
-        # Update every found job
-        with ThreadPoolExecutor(100) as executor:
-            for job in all_jobs:
-                executor.submit(job_db_update, job, conn)
 
         # Check if some jobs no longer exist
         deleted_jobs = set(
@@ -91,36 +84,6 @@ def job_db_delete(job):
                 'DFG-%s' % dfg)).count() == 1:
             models.dfg.filter_by(name=dfg).delete()
             db.session.commit()
-
-
-def job_db_update(job, conn):
-    """Update a given job row in the DB."""
-
-    try:
-        job_info = conn.get_job_info(job['name'])
-        last_build_number = jenkins_lib.get_last_build_number(job_info)
-
-    except Exception as e:
-        LOG.info("Unable to fetch information for %s: %s" % (job['name'],
-                                                             e.message))
-        if isinstance(e, jenkins.NotFoundException):
-            LOG.info("Removing job %s since it no longer exist on Jenkins" %
-                     job['name'])
-            job_db = models.Job.query.filter_by(name=job['name']).first()
-            db.session.delete(job_db)
-            db.session.commit()
-
-    if last_build_number:
-        last_build_status = jenkins_lib.get_build_status(
-            conn, job['name'], last_build_number)
-    else:
-        last_build_status = "None"
-
-    # Update entry in database
-    models.Job.query.filter_by(
-        name=job['name']).update(
-            dict(last_build_number=last_build_number,
-                 last_build_status=last_build_status))
 
 
 def build_db_update(build_data):

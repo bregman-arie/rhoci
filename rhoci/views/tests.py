@@ -155,12 +155,11 @@ def failing_tests_dfg(dfg):
             'REGRESSION'))).distinct(models.TestBuild.job).distinct(
                 models.TestBuild.build)
 
-    bug_assigned_to = "No bugs"
-    bug_status = "No bugs"
-    bug_number = "No bugs"
-
     if tests:
         for test in tests:
+            bug_assigned_to = "No bugs"
+            bug_status = "No bugs"
+            bug_number = "No bugs"
             unique_test = models.Test.query.filter_by(
                 test_name=test.name, class_name=test.class_name).first()
             if not unique_test:
