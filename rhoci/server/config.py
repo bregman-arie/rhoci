@@ -21,3 +21,4 @@ class Config(object):
     RHOCI_CONFIG_FILE = '/etc/rhoci/server.conf'
     RHOCI_SERVER_LOG = 'rhoci.log'
     RHOCI_RELEASES = '6,7,8,9,10,11,12,13'
+    RHOCI_UPDATE_INTERVAL = 3600

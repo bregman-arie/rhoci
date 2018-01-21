@@ -49,14 +49,15 @@ RHOCI loads configuration in this order:
     Configurtion file - the default configuration file (/etc/rhoci/server.conf) or the file you mentioned with parser/environment variable.
     Parser - arguments you pass with rhoci command-line invocation.
 
-| Name | Description | Required |
-| ---- | ----------- | -------- |
-| `RHOCI_JENKINS_URL` | Jenkins URL | Yes
-| `RHOCI_JENKINS_USER` | Jenkins username | Yes
-| `RHOCI_JENKINS_PASSWORD` | Jenkins username | Yes
-| `RHOCI_CONFIG_FILE` | The configuration file from where to load additional configuration | No
-| `RHOCI_DEBUG` | Turn on DEBUG | No
-| `RHOCI_SERVER_PORT` | The port to use when running RHOCI server | No
+| Name | Description | Required | Default |
+| ---- | ----------- | -------- | ------- |
+| `RHOCI_JENKINS_URL` | Jenkins URL | Yes | -
+| `RHOCI_JENKINS_USER` | Jenkins username | Yes | -
+| `RHOCI_JENKINS_PASSWORD` | Jenkins username | Yes | -
+| `RHOCI_CONFIG_FILE` | The configuration file from where to load additional configuration | No | /etc/rhoci/server.conf
+| `RHOCI_DEBUG` | Turn on DEBUG | No | False
+| `RHOCI_SERVER_PORT` | The port to use when running RHOCI server | No | 5000
+| `RHOCI_UPDATE_INTERVAL` | The interval in seconds for to pull update from Jenkins | No | 3600 (Seconds)
 
 A sample can be found in samples/server.conf
 

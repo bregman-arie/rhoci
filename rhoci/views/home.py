@@ -42,17 +42,19 @@ home = Blueprint('home', __name__)
 def dfg_summary(dfg):
     """Returns a dictionary which represents the summary of a given DFG."""
     return {'FAILURE': models.Job.query.filter(models.Job.name.contains(
-        'DFG-%s' % dfg), models.Job.last_build_status.like('FAILURE')).count(),
+        'DFG-%s' % dfg), models.Job.last_build_result.like('FAILURE')).count(),
         'SUCCESS': models.Job.query.filter(
             models.Job.name.contains(
-                'DFG-%s' % dfg), models.Job.last_build_status.like(
+                'DFG-%s' % dfg), models.Job.last_build_result.like(
                 'SUCCESS')).count(), 'UNSTABLE': models.Job.query.filter(
                     models.Job.name.contains('DFG-%s' % dfg),
-                    models.Job.last_build_status.like(
+                    models.Job.last_build_result.like(
                         'UNSTABLE')).count(),
         'None': models.Job.query.filter(models.Job.name.contains(
-            'DFG-%s' % dfg), models.Job.last_build_status.like(
-                'None')).count(),
+            'DFG-%s' % dfg), models.Job.last_build_result.is_('None')).count(),
+        'ABORTED': models.Job.query.filter(models.Job.name.contains(
+            'DFG-%s' % dfg), models.Job.last_build_result.is_(
+                'ABORTED')).count(),
         'count': models.Job.query.filter(
             models.Job.name.contains('DFG-%s' % dfg)).count()}
 
@@ -91,16 +93,16 @@ def index():
                         release_number=last_rel_num).count(),
                     'failed_jobs': models.Job.query.filter_by(
                         release_number=last_rel_num,
-                        last_build_status='FAILURE').count(),
+                        last_build_result='FAILURE').count(),
                     'passed_jobs': models.Job.query.filter_by(
                         release_number=last_rel_num,
-                        last_build_status='SUCCESS').count(),
+                        last_build_result='SUCCESS').count(),
                     'unstable_jobs': models.Job.query.filter_by(
                         release_number=last_rel_num,
-                        last_build_status='UNSTABLE').count(),
+                        last_build_result='UNSTABLE').count(),
                     'never_executed_jobs': models.Job.query.filter_by(
                         release_number=last_rel_num,
-                        last_build_status='None').count()}
+                        last_build_result='None').count()}
 
     last_release['failed_percent'] = get_percentage(
         last_release['failed_jobs'], last_release['total_jobs'])
@@ -131,7 +133,7 @@ def ajax_jobs(job_type, release):
         job_type=job_type, release_number=int(release))
 
     for job in jobs:
-        results['data'].append([job.name, job.last_build_status,
+        results['data'].append([job.name, job.last_build_result,
                                 job.last_build_number])
 
     return jsonify(results)
@@ -277,7 +279,7 @@ def bug_exists():
                                      apply_on_class)
         else:
             exists = False
-            err_msg = "The chosen bug is closed"
+            err_msg = "You are trying to add closed bug. Outrageous."
 
     except Fault:
         LOG.warning("Couldn't find requested bug: %s" % str(bug_num))
@@ -286,7 +288,8 @@ def bug_exists():
 
     except OverflowError:
         LOG.warning("User provided bug number that is too big")
-        err_msg = "The number is too big!"
+        err_msg = ("...and server crashed again. Not sure why people provide"
+                   "these long numbers.")
         exists = False
 
     return jsonify(exists=exists, err_msg=err_msg)

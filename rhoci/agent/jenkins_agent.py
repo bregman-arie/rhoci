@@ -13,17 +13,15 @@
 #    under the License.
 import datetime
 import jenkins
-import json
 import logging
 from multiprocessing import Process
 import re
-import sys
 import time
-import urllib2
 
 from rhoci.agent import agent
 from rhoci.agent import update
 import rhoci.jenkins.build as build_lib
+import rhoci.jenkins.job as job_lib
 import rhoci.models as models
 from rhoci.db.base import db
 from rhoci.rhosp.dfg import get_dfg_name
@@ -45,15 +43,15 @@ class JenkinsAgent(agent.Agent):
             self.conn = jenkins.Jenkins(self.url, self.user, self.password)
             self.active = True
         except Exception as e:
-            LOG.info("Something went terribly wrong starting Jenkins agent: %s"
-                     % e.message)
+            LOG.info("Something went terribly wrong when " +
+                     "starting Jenkins agent: %s" % e.message)
             self.active = False
         self.add_agent_to_db()
 
     def start(self):
-        """Start running the jenkins agent."""
+        """Start running the Jenkins agent."""
         while True:
-            time.sleep(3600)
+            time.sleep(self.app.config['RHOCI_UPDATE_INTERVAL'])
             LOG.info("Updating jobs")
             with self.app.app_context():
                 update.shallow_jobs_update()
@@ -82,8 +80,8 @@ class JenkinsAgent(agent.Agent):
                         update_time=datetime.datetime.utcnow()))
                 LOG.debug("Updated agent timestamp")
 
-                # Do a shallow update (detailed description in docstring)
-                self.shallow_db_update()
+                # Populate db with jobs
+                job_lib.populate_db_with_jobs(self.url)
 
             # In case application was restarted or crushed, check if active
             # builds in DB are still active
@@ -97,7 +95,7 @@ class JenkinsAgent(agent.Agent):
                     LOG.debug("Removing job: %s from DB" % job)
 
     def update_job_in_db(self, job):
-        last_build_status = "None"
+        last_build_result = "None"
         with self.app.app_context():
             try:
                 job_info = self.conn.get_job_info(job['name'])
@@ -107,11 +105,11 @@ class JenkinsAgent(agent.Agent):
                 LOG.info("Unable to fetch information for %s: %s" % (
                     job['name'], e.message))
             if last_build_number:
-                last_build_status = build_lib.get_build_status(
+                last_build_result = build_lib.get_build_status(
                     self.conn, job['name'], last_build_number)
                 db_build = models.Build(job=job['name'],
                                         number=last_build_number,
-                                        status=last_build_status)
+                                        status=last_build_result)
                 db.session.add(db_build)
                 db.session.commit()
 
@@ -119,7 +117,7 @@ class JenkinsAgent(agent.Agent):
             models.Job.query.filter_by(
                 name=job['name']).update(
                     dict(last_build_number=last_build_number,
-                         last_build_status=last_build_status))
+                         last_build_result=last_build_result))
             db.session.commit()
             LOG.debug("Updated job from %s: %s" % (self.name, job['name']))
 
@@ -153,57 +151,3 @@ class JenkinsAgent(agent.Agent):
     def get_job_release(self, name):
         m = re.search('-\d{1,2}', name)
         return m.group().split('-')[1] if m else 0
-
-    def shallow_db_update(self):
-        """Insert jobs, nodes and plugins to DB (names only)."""
-
-        try:
-            all_jobs_api = "/api/json/?tree=jobs[name,lastBuild[result,number]]"
-            jobs_data = json.loads(
-                urllib2.urlopen(self.url + all_jobs_api).read())
-            all_nodes = self.conn.get_nodes()
-            all_plugins = self.conn.get_plugins()
-        except Exception as e:
-            LOG.error("Failed to retrieve data from Jenkins: %s", e)
-            self.active = False
-            sys.exit(2)
-
-        for job in jobs_data['jobs']:
-            print job
-            if job.get('lastBuild'):
-                lst_bld_number = job['lastBuild'].get('number')
-                last_build_status = job['lastBuild'].get('result')
-                if not models.Job.query.filter_by(name=job['name']).count():
-                    job_t = self.get_job_type(job['name'].lower())
-                    rel = self.get_job_release(job['name'])
-                    db_job = models.Job(name=job['name'],
-                                        job_type=job_t,
-                                        release_number=int(rel),
-                                        last_build_number=lst_bld_number,
-                                        last_build_status=last_build_status)
-                    if not models.Build.query.filter_by(job=job['name'],
-                                                        number=lst_bld_number
-                                                        ).count():
-                        db_build = models.Build(job=job['name'],
-                                                number=lst_bld_number,
-                                                status=last_build_status)
-                        db.session.add(db_build)
-                    db.session.add(db_job)
-                    LOG.debug("Added job: %s to the DB" % (job['name']))
-            db.session.commit()
-
-        for node in all_nodes:
-            if not models.Node.query.filter_by(name=node['name']).count():
-                db_node = models.Node(name=node['name'])
-                db.session.add(db_node)
-                db.session.commit()
-                LOG.debug("Added node: %s to the DB" % (node['name']))
-
-        for plugin in all_plugins.iteritems():
-            plugin_name = plugin[1]['longName']
-            if not models.Plugin.query.filter_by(
-                    name=plugin_name).count():
-                db_plugin = models.Plugin(name=plugin_name)
-                db.session.add(db_plugin)
-                db.session.commit()
-                LOG.debug("Added plugin: %s to the DB" % (plugin_name))

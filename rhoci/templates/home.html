@@ -138,12 +138,14 @@
       Failure: $.pfPaletteColors.red,
       Unstable: $.pfPaletteColors.gold,
       None: '#E8E8E8',
+      Aborted: $.pfPaletteColors.purple,
       Success: $.pfPaletteColors.green
     },
     columns: [
       ['Failure', {{ storage['FAILURE'] }}],
       ['Unstable', {{ storage['UNSTABLE'] }}],
       ['None', {{ storage['None'] }}],
+      ['Aborted', {{ storage['ABORTED'] }}],
       ['Success', {{ storage['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
@@ -189,12 +191,14 @@
       Failure: $.pfPaletteColors.red,
       Unstable: $.pfPaletteColors.gold,
       None: '#E8E8E8',
+      Aborted: $.pfPaletteColors.purple,
       Success: $.pfPaletteColors.green
     },
     columns: [
       ['Failure', {{ network['FAILURE'] }}],
       ['Unstable', {{ network['UNSTABLE'] }}],
       ['None', {{ network['None'] }}],
+      ['Aborted', {{ network['ABORTED'] }}],
       ['Success', {{ network['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
@@ -236,12 +240,14 @@
       Failure: $.pfPaletteColors.red,
       Unstable: $.pfPaletteColors.gold,
       None: '#E8E8E8',
+      Aborted: $.pfPaletteColors.purple,
       Success: $.pfPaletteColors.green
     },
     columns: [
       ['Failure', {{ compute['FAILURE'] }}],
       ['Unstable', {{ compute['UNSTABLE'] }}],
       ['None', {{ compute['None'] }}],
+      ['Aborted', {{ compute['ABORTED'] }}],
       ['Success', {{ compute['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
@@ -336,7 +342,7 @@
   <div class="container-fluid">
   <!-- Top Failing Tests Table -->
       <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-8">
           <h3>
               <strong>Top Failing Tests</strong>
           </h3>
@@ -353,7 +359,7 @@
 
 
     <!-- Top CI Failure Types table-->
-        <div class="col-lg-6">
+        <div class="col-lg-4">
           <h3>
               <strong>CI Failure Types</strong>
           </h3>
@@ -390,7 +396,7 @@
 </script>
 
   <script>
-    {% include "failures/show_failure.js" -%}
+    {% include "failures/analyze_failure.js" -%}
 
     {% include "bugs/show_bugs.js" -%}
     {% include "bugs/remove_tests_bug_from_db.js" -%}

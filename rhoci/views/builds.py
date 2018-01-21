@@ -17,19 +17,16 @@ import jenkins
 from flask import jsonify
 from flask import request
 import logging
-import urllib2
 
-from rhoci.db.base import db
-import rhoci.jenkins.build as jenkins_build
+import rhoci.jenkins.build as build_lib
 import rhoci.jenkins.job as jenkins_job
 from rhoci.models import Agent
-from rhoci.models import Artifact
 from rhoci.models import Build
 from rhoci.models import Failure
 from rhoci.models import Job
 
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 builds = Blueprint('builds', __name__)
 
@@ -67,17 +64,6 @@ def all_builds():
     return render_template('builds.html', all_builds=all_builds)
 
 
-@builds.route('/failure_anaylze', methods=['GET'])
-@builds.route('/failure_anaylze/<job>_<build>', methods=['GET'])
-def failure_analyze(job=None, build=None):
-
-    if job:
-        return render_template('start_failure_analyzer.html', job=job,
-                               build=build)
-    else:
-        return render_template('failure_analyzer.html')
-
-
 @builds.route('/exists/')
 def exists():
     exists = True
@@ -109,9 +95,8 @@ def exists():
             if build_db.failure_name:
                 known_failure = True
         else:
-            build_status = jenkins_build.get_build_status(conn,
-                                                          job, int(build))
-            jenkins_build.add_new_build(job, build)
+            build_status = build_lib.get_build_status(conn, job, int(build))
+            build_lib.add_new_build(job, build)
 
         if build_status != "FAILURE":
             exists = False
@@ -127,94 +112,6 @@ def exists():
     else:
         return jsonify(exists=exists, message=message,
                        known_failure=known_failure)
-
-
-@builds.route('/obtain_logs')
-def obtain_logs():
-    found = False
-    message = "Couldn't find logs :("
-
-    job = request.args.get('job')
-    build = request.args.get('build')
-
-    agent = Agent.query.one()
-    conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
-    if Artifact.query.filter_by(job=job, build=int(build)).count():
-        logs = [str(i.name) for i in Artifact.query.filter_by(
-            job=job, build=int(build)) if i.name.endswith(".log")]
-        found = True
-        message = "Found logs in DB"
-    else:
-        logs = conn.get_build_info(job, int(build))['artifacts']
-        if logs:
-            jenkins_build.update_artifacts_db(logs, job, build)
-            found = True
-            message = "Found logs in Jenkins"
-        logs = [str(i.name) for i in Artifact.query.filter_by(
-            job=job, build=int(build)) if i.name.endswith(".log")]
-
-    return jsonify(found=found, message=message, logs=logs)
-
-
-@builds.route('/find_failure')
-def find_failure():
-    found = False
-    cause = ''
-    action = ''
-    failure_line = ''
-
-    job = request.args.get('job')
-    build = request.args.get('build')
-
-    agent = Agent.query.one()
-    logs = [i for i in Artifact.query.filter_by(
-        job=job, build=int(build)) if i.name.endswith(".log")]
-
-    if logs:
-        for log in logs:
-            if found:
-                break
-            log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
-                                                        str(log.relativePath))
-            log_data = urllib2.urlopen(log_url)
-            for line in log_data:
-                for failure in Failure.query.all():
-                    if failure.pattern in line.decode('utf-8').strip():
-                        found = True
-                        failure_line = line
-                        cause = failure.cause
-                        action = failure.action
-                        failure_name = failure.name
-                        Failure.query.filter_by(
-                            name=failure.name).update(
-                                {'count': Failure.count + 1})
-                        db.session.commit()
-                        break
-    else:
-        console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
-                                                        str(job), str(build))
-        console_data = urllib2.urlopen(console_url)
-        for line in console_data:
-            if found:
-                break
-            for failure in Failure.query.all():
-                if failure.pattern in line.decode('utf-8').strip():
-                    found = True
-                    failure_line = line
-                    cause = failure.cause
-                    action = failure.action
-                    failure_name = failure.name
-                    Failure.query.filter_by(
-                        name=failure.name).update(
-                            {'count': Failure.count + 1})
-                    db.session.commit()
-                    break
-
-    if found:
-        jenkins_build.update_failure(job, build, failure_name, failure_line)
-
-    return jsonify(found=found, failure_line=failure_line,
-                   cause=cause, action=action)
 
 
 @builds.route('/top_failure_types', methods=['GET'])
@@ -245,3 +142,27 @@ def get_failure():
                    failure_text=build_db.failure_text,
                    failure_action=failure.action,
                    failure_cause=failure.cause)
+
+
+@builds.route('/analyze_failure')
+def analyze_failure():
+    """Try to find out why a given build failed."""
+    # Set build and job according to passed parameters
+    failure_name = "unknown"
+    job = request.args.get('job')
+    build = request.args.get('build')
+
+    LOG.debug("Obtaining log files names for job %s build %s" % (job, build))
+    logs = build_lib.get_log_files_names(job, build)
+
+    if logs:
+        LOG.debug("Looking for failure in logs for job %s build %s" % (
+            job, build))
+        failure_name = build_lib.find_failure_in_logs(logs, job, build)
+    if failure_name == "unknown":
+        LOG.debug("Looking for failure in console output for",
+                  "job %s build %s since",
+                  "I couldn't find anything in the logs" % (job, build))
+        failure_name = build_lib.find_failure_in_console_output(job, build)
+
+    return jsonify(failure_name=failure_name)

@@ -163,7 +163,7 @@ def update_in_db(data):
         models.Build.query.filter_by(job=name, number=number).update(dict(
             active=active, status=status))
         models.Job.query.filter_by(name=name).update(dict(
-            last_build_number=number, last_build_status=status))
+            last_build_number=number, last_build_result=status))
         db.session.commit()
 
         # If build failed, anaylze failure
@@ -303,3 +303,93 @@ def analyze_failure(job, build):
             LOG.info("Was unable to figure out " +
                      "why job %s build %s failed" % (job, build))
             update_failure(job, build, 'Unknown', '')
+
+
+def insert_build_data_into_db(job, build_data):
+    """Add build data into DB."""
+    if not models.Build.query.filter_by(job=job,
+                                        number=build_data['number']).count():
+
+        # Create DB build object
+        db_build = models.Build(job=job, number=build_data['number'],
+                                status=build_data['result'])
+
+        # Add the DB build object into the DB and commit the change
+        db.session.add(db_build)
+        db.session.commit()
+        LOG.debug("Build DB update: %s num %s" % (job, build_data['number']))
+
+
+def get_log_files_names(job, build):
+    """Get log files names only. Not including content."""
+    if not models.Artifact.query.filter_by(job=job, build=int(build)).count():
+        # Create connection to Jenkins
+        agent = models.Agent.query.one()
+        conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
+
+        logs = conn.get_build_info(job, int(build))['artifacts']
+        if logs:
+            update_artifacts_db(logs, job, build)
+    logs = [i for i in models.Artifact.query.filter_by(
+        job=job, build=int(build)) if i.name.endswith(".log")]
+
+    return logs
+
+
+def find_failure_in_logs(logs, job, build):
+    """Looks for a known failure in the given logs.
+
+    Returns the failure name
+    """
+    failure_name = "unknown"
+    found = False
+    agent = models.Agent.query.one()
+
+    for log in logs:
+        if found:
+            break
+        log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
+                                                    str(log.relativePath))
+        log_data = urllib2.urlopen(log_url)
+        for line in log_data:
+            for failure in models.Failure.query.all():
+                if failure.pattern in line.decode('utf-8').strip():
+                    found = True
+                    failure_line = line
+                    failure_name = failure.name
+                    update_failure(job, build, failure_name, failure_line)
+                    models.Failure.query.filter_by(
+                        name=failure.name).update(
+                            {'count': models.Failure.count + 1})
+                    db.session.commit()
+                    break
+    return failure_name
+
+
+def find_failure_in_console_output(job, build):
+    """Searches for failure in console output of the build.
+
+    Returns the failure name
+    """
+    failure_name = "unknown"
+    found = False
+    agent = models.Agent.query.one()
+
+    console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
+                                                    str(job), str(build))
+    console_data = urllib2.urlopen(console_url)
+    for line in console_data:
+        if found:
+            break
+        for failure in models.Failure.query.all():
+            if failure.pattern in line.decode('utf-8').strip():
+                found = True
+                failure_line = line
+                failure_name = failure.name
+                update_failure(job, build, failure_name, failure_line)
+                models.Failure.query.filter_by(
+                    name=failure.name).update(
+                        {'count': models.Failure.count + 1})
+                db.session.commit()
+                break
+    return failure_name

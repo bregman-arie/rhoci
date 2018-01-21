@@ -42,7 +42,7 @@ def jobs_status(status, dfg, release):
     results['data'] = list()
 
     jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
-                            Job.last_build_status.like(status),
+                            Job.last_build_result.like(status),
                             Job.release_number.like(release))
     for job in jobs:
         bug_assigned_to = 'No bugs'
@@ -62,12 +62,12 @@ def jobs_status(status, dfg, release):
                                         bug_assigned_to, bug_status, [
                                             i.serialize for i in job.bugs]])
             else:
-                results['data'].append([job.name, job.last_build_status,
+                results['data'].append([job.name, job.last_build_result,
                                         job.last_build_number, '',
                                         bug_assigned_to, bug_status, [
                                             i.serialize for i in job.bugs]])
         else:
-            results['data'].append([job.name, job.last_build_status,
+            results['data'].append([job.name, job.last_build_result,
                                     job.last_build_number, '',
                                     bug_assigned_to, bug_status, [
                                         i.serialize for i in job.bugs]])
@@ -81,7 +81,7 @@ def home_jobs_status(status, dfg):
     results['data'] = list()
 
     jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
-                            Job.last_build_status.like(status))
+                            Job.last_build_result.like(status))
     for job in jobs:
         bug_assigned_to = 'No bugs'
         bug_status = 'No bugs'
@@ -100,12 +100,12 @@ def home_jobs_status(status, dfg):
                                         bug_assigned_to, bug_status, [
                                             i.serialize for i in job.bugs]])
             else:
-                results['data'].append([job.name, job.last_build_status,
+                results['data'].append([job.name, job.last_build_result,
                                         job.last_build_number, '',
                                         bug_assigned_to, bug_status, [
                                             i.serialize for i in job.bugs]])
         else:
-            results['data'].append([job.name, job.last_build_status,
+            results['data'].append([job.name, job.last_build_result,
                                     job.last_build_number, '',
                                     bug_assigned_to, bug_status, [
                                         i.serialize for i in job.bugs]])
