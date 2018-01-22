@@ -38,9 +38,9 @@
     ],
     onclick: function (d, i) { 
     
-    $("#dfg_jobs_table").removeClass('hidden');
+    $("#jobs_table").removeClass('hidden');
 
-    $('#dfg_jobs_table').DataTable( {
+    $('#jobs_table').DataTable( {
       "ajax": "{{ url_for('jobs.jobs_status', status='FAILURE', dfg=release.dfg, release=release.number) }}".replace("FAILURE", d.id),
       className: "text-center",
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {

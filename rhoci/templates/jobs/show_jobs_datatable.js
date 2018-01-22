@@ -39,7 +39,7 @@
                     data = '<button type="button" onClick="analyze_failure(this, \'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">Failure - Tell me why!</button>'
                     }
                     else if (type === 'display' && row[1] != 'None' ){
-                    data = '<button type="button" onClick="reply_click(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
+                    data = '<button type="button" onClick="show_failure(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
                     }
                   return data;
                 }

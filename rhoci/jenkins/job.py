@@ -51,7 +51,6 @@ def insert_job_data_into_db(job):
         # Add to DB and commit the change
         db.session.add(db_job)
         db.session.commit()
-        LOG.debug("Job DB update: %s" % (job['name']))
 
 
 def job_exists(job):
@@ -87,13 +86,15 @@ def add_bug(job, bug_num):
     db.session.commit()
 
 
-def populate_db_with_jobs(url):
+def populate_db_with_jobs(agent):
 
     ALL_JOBS_API = ("/api/json/?tree=jobs"
                     "[name,lastBuild[result,number]]")
 
+    request = urllib2.Request(agent.url + ALL_JOBS_API)
     jobs_json = json.loads(
-        urllib2.urlopen(url + ALL_JOBS_API).read())
+        urllib2.urlopen(request).read())
 
     for job in jobs_json['jobs']:
-        insert_job_data_into_db(job)
+        if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':
+            insert_job_data_into_db(job)

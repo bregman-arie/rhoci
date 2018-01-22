@@ -166,7 +166,7 @@ FAILURES = [
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
      'action': 'Make sure the repo name and branch are correct',
-     'cause': 'It looks like you specified a missing repo or barnch',
+     'cause': 'It looks like you specified a missing repo or branch',
      },
 
 
@@ -175,9 +175,9 @@ FAILURES = [
      'pattern': 'Server Error for url',
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
-     'action': 'Check if infrastucture is under maintenance. If not, please ' +
-     'open a ticket for your support team.',
-     'cause': 'Looks like internal error occured in the server you are ' +
+     'action': 'Check if infrastructure is under maintenance. If not, ' +
+     'please open a ticket for your support team.',
+     'cause': 'Looks like internal error occurred in the server you are ' +
      'trying to reach',
      },
 
@@ -198,7 +198,7 @@ FAILURES = [
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
      'action': 'User - retrigger job. Admin - investigate Jenkins logs',
-     'cause': 'Couldnt figure out why it happened',
+     'cause': 'Could not figure out why it happened',
      },
 
     {'category': 'Application',
@@ -217,5 +217,16 @@ FAILURES = [
      'lower_bound_pattern': '',
      'action': 'Fix the bugs in your project :)',
      'cause': 'No idea',
+     },
+
+    {'category': 'Infrastructure',
+     'name': 'Timeout',
+     'pattern': 'ERROR: Timeout after',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Check if infrastructure is under maintenance. If not, ' +
+     'please open a ticket for your support team.',
+     'cause': 'Looks like there is something wrong with the server you are ' +
+     'trying to reach',
      },
 ]

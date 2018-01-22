@@ -13,6 +13,7 @@ Some of the things this project allows you to do:
     * View all builds in one datatable where you can filter them based on different parameters
     * View all unique tests and how many times they failed or passed
     * Generate job definitions based on given input
+    * Analyze build failures
 
 * [Requirements](#requirements)
 * [Installation](#installation)

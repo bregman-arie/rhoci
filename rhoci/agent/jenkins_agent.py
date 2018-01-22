@@ -81,7 +81,7 @@ class JenkinsAgent(agent.Agent):
                 LOG.debug("Updated agent timestamp")
 
                 # Populate db with jobs
-                job_lib.populate_db_with_jobs(self.url)
+                job_lib.populate_db_with_jobs(agent)
 
             # In case application was restarted or crushed, check if active
             # builds in DB are still active

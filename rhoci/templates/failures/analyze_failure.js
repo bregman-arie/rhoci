@@ -9,7 +9,7 @@ function analyze_failure(elem, job, build) {
     url: "{{ url_for('builds.analyze_failure') }}",
     success: function(response){
 		  $this.text(response.failure_name);
-      $this.attr("onclick","show_failure()");
+      $this.attr('onclick','show_failure(\''+ job + '\', \'' + build + '\')');
     }
   });
 

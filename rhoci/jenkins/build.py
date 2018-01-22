@@ -317,7 +317,6 @@ def insert_build_data_into_db(job, build_data):
         # Add the DB build object into the DB and commit the change
         db.session.add(db_build)
         db.session.commit()
-        LOG.debug("Build DB update: %s num %s" % (job, build_data['number']))
 
 
 def get_log_files_names(job, build):

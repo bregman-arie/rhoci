@@ -160,9 +160,9 @@ def analyze_failure():
             job, build))
         failure_name = build_lib.find_failure_in_logs(logs, job, build)
     if failure_name == "unknown":
-        LOG.debug("Looking for failure in console output for",
-                  "job %s build %s since",
-                  "I couldn't find anything in the logs" % (job, build))
+        LOG.debug("Looking for failure in console output for "
+                  "job {} build {} since "
+                  "I couldn't find anything in the logs".format(job, build))
         failure_name = build_lib.find_failure_in_console_output(job, build)
 
     return jsonify(failure_name=failure_name)

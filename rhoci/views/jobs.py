@@ -29,7 +29,14 @@ jobs = Blueprint('jobs', __name__)
 @jobs.route('/')
 def index():
     """Jenkins Jobs page."""
-    jobs = Job.query.all()
+    agent = Agent.query.one()
+
+    return render_template('jobs.html', agent=agent, jobs=jobs)
+
+
+@jobs.route('/all_jobs')
+def all_jobs():
+    """Jenkins Jobs page."""
     agent = Agent.query.one()
 
     return render_template('jobs.html', agent=agent, jobs=jobs)

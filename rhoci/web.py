@@ -94,7 +94,8 @@ class Server(object):
 
         # Load DB configuration
         app.config.from_object('rhoci.db.config')
-        LOG.info("Loaded the following configuration: %s" % app.config)
+        LOG.info("Loaded configuration:\n + {" + "\n".join("{}: {}".format(
+            k, v) for k, v in sorted(app.config.items())) + "}")
 
         # Make sure critical configuration is provided
         for k in ['JENKINS_URL', 'JENKINS_USER', 'JENKINS_PASSWORD']:
