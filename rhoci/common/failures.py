@@ -123,6 +123,15 @@ FAILURES = [
      'cause': 'The server you are trying to reach is unavailable',
      },
 
+    {'category': 'Infrastructure',
+     'name': 'Error cloning remote repo',
+     'pattern': 'Error cloning remote repo',
+     'upper_bound_pattern': '',
+     'lower_bound_pattern': '',
+     'action': 'Contact the git/gerrit support team',
+     'cause': 'The service you are trying to reach is unavailable/unstable',
+     },
+
     {'category': 'Product',
      'name': 'Overcloud Upgrade',
      'pattern': 'Overcloud upgrade composable step failed',
