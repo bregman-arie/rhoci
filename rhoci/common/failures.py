@@ -220,7 +220,7 @@ FAILURES = [
      },
 
     {'category': 'Infrastructure',
-     'name': 'Timeout',
+     'name': 'Service timeout',
      'pattern': 'ERROR: Timeout after',
      'upper_bound_pattern': 'TASK [',
      'lower_bound_pattern': '',
@@ -229,6 +229,17 @@ FAILURES = [
      'cause': 'Looks like there is something wrong with the server you are ' +
      'trying to reach',
      },
+
+    {'category': 'Infrastructure',
+     'name': 'Jenkins job timeout threshold hit',
+     'pattern': 'Timeout has been exceeded',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Check why the job takes so much time to run.',
+     'cause': 'The timeout threshold set for the job is expired. Possible ' +
+     'causes are: slow network while obtaining images, lengthy tests etc.',
+     },
+
 ]
 
 
