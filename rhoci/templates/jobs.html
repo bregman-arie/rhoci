@@ -8,7 +8,18 @@
   <div class="row text-center">
   </div>
 
-<!-- -->
+<!-- Includes -->
+{% include "failures/show_failure_modal.html" -%}
+{% include "bugs/add_bug_modal.html" -%}
+{% include "bugs/add_tests_bug_modal.html" -%}
+{% include "bugs/remove_tests_bug_modal.html" -%}
+{% include "bugs/remove_bug_modal.html" -%}
+{% include "bugs/show_bugs_modal_datatable.html" -%}
+
+{% include "failures/show_failure_modal.html" -%}
+
+{% include "tests/show_tests_modal_datatable.html" -%}
+
 
 <!-- Toolbar -->
 <div class="row toolbar-pf table-view-pf-toolbar" id="toolbar1">
@@ -141,36 +152,24 @@ $(document).ready(function() {
 
 // DataTable Config
 $("#jobs_table").DataTable({
-  "ajax": "{{ url_for('jobs.index') }}",
-  columns: [
-    { data: null,
-      className: "table-view-pf-select",
-      render: function (data, type, full, meta) {
-        // Select row checkbox renderer
-        var id = "select" + meta.row;
-        return '<label class="sr-only" for="' + id + '">Select row ' + meta.row +
-          '</label><input type="checkbox" id="' + id + '" name="' + id + '">';
-      },
-      sortable: false
-    },
-  ],
+  "ajax": "{{ url_for('jobs.all') }}",
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData['last_build_result'] == "FAILURE" )
+            if ( aData[1] == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData['last_build_result'] == "SUCCESS" )
+            else if ( aData[1] == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData['last_build_result'] == "UNSTABLE" )
+            else if ( aData[1] == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }
         },
         columnDefs: [
             {
-                targets:1,
+                targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                         data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
@@ -188,24 +187,38 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:[3],
+                targets:[1],
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && (row['last_build_status'] == 'UNSTABLE' || row['last_build_status'] == 'SUCCESS')){
-                        data = '<a href="{{ agent.url }}/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
+                    if(type === 'display' && (row[1] == 'UNSTABLE' || row[1] == 'SUCCESS' || row[1] == 'ABORTED' || row[1] == null)){
+                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[1] + '">' + data + '</a>';
                     }
                     else if (type === 'display' && row[1] == 'FAILURE') {
-                    data = '<button type="button" onClick="analyze_failure(this, \'' + row['job_name'] + '\', \'' + row['last_build_number'] + '\')" class="btn btn-danger btn-lg">Failure - Tell me why!</button>'
+                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">Failure - Tell me why!</button>'
                     }
                     else if (type === 'display' && row[1] != 'None' ){
-                    data = '<button type="button" onClick="show_failure(\'' + row['job_name'] + '\', \'' + row['last_build_number'] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
+                    data = '<button type="button" onClick="show_failure(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
                     }
                     return data;
                 }
             },
             {
-                targets:4,
+                targets:3,
                 render: function ( data, type, row, meta ) {
-                    data = "<a href={{ url_for('tests.get_tests', job='JOB', build='BUILD') }}>Tests</a>".replace("JOB", row['job_name']).replace("BUILD", row['last_build_number']);
+                    data = '<button type="button" onClick="show_tests(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-info btn-lg">Tests</button>'
+                    return data;
+                }
+            },
+            {
+                targets:6,
+                className: "text-center",
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                    data = '<button type="button" id=\'' + row[0] +'\' onClick="add_bug(\'' + row[0] + '\', \'' + row[2] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
+                      var arrayLength = row[6].length;
+                      if(arrayLength > 0){
+                        data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'' + row[0] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
+                      }
+                    }
                     return data;
                 }
             },
@@ -237,12 +250,7 @@ $("#jobs_table").DataTable({
     ],
     paginationSelector: "#pagination1",
     toolbarSelector: "#toolbar1",
-    selectAllSelector: 'th:first-child input[type="checkbox"]',
     colvisMenuSelector: '.table-view-pf-colvis-menu'
-  },
-  select: {
-    selector: 'td:first-child input[type="checkbox"]',
-    style: 'multi'
   },
 });
 
@@ -282,7 +290,6 @@ var emptyTableViewUtil = function (config) {
 
 // Initialize empty Table View util
 new emptyTableViewUtil({
-  data: dataSet,
   deleteRowsSelector: "#deleteRows1",
   restoreRowsSelector: "#restoreRows1",
   tableSelector: "#jobs_table"
@@ -315,6 +322,24 @@ new findTableViewUtil();
 $(document).ready(function() {
 $('.datatable').dataTable();
 });
+
+    {% include "failures/analyze_failure.js" -%}
+    {% include "failures/show_failure.js" -%}
+
+    {% include "bugs/show_bugs.js" -%}
+    {% include "bugs/remove_tests_bug_from_db.js" -%}
+    {% include "bugs/remove_tests_bug.js" -%}
+    {% include "bugs/remove_bug_from_db.js" -%}
+    {% include "bugs/remove_bug.js" -%}
+    {% include "bugs/add_bug.js" -%}
+    {% include "bugs/add_tests_bug.js" -%}
+    {% include "bugs/submit_bug.js" -%}
+    {% include "bugs/submit_tests_bug.js" -%}
+
+    {% include "tests/show_tests.js" -%}
+
+    {% include "common/modal_order.js" -%}
+
 </script>
   
 

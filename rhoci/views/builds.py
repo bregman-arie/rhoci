@@ -20,10 +20,8 @@ import logging
 
 import rhoci.jenkins.build as build_lib
 import rhoci.jenkins.job as jenkins_job
-from rhoci.models import Agent
-from rhoci.models import Build
-from rhoci.models import Failure
-from rhoci.models import Job
+from rhoci import models
+from rhoci.common.failures import UNKNOWN_FAILURE
 
 
 LOG = logging.getLogger(__name__)
@@ -48,9 +46,9 @@ def job_exists(job_name=None):
 @builds.route('/active_builds', methods=['GET'])
 def active():
 
-    db_builds = Build.query.filter_by(active=True)
+    db_builds = models.Build.query.filter_by(active=True)
     builds = [build.serialize for build in db_builds]
-    agent = Agent.query.one()
+    agent = models.Agent.query.one()
 
     return render_template('active_builds.html', agent=agent, builds=builds)
 
@@ -58,7 +56,7 @@ def active():
 @builds.route('/builds', methods=['GET'])
 def all_builds():
 
-    db_builds = Build.query.all()
+    db_builds = models.Build.query.all()
     all_builds = [build.serialize for build in db_builds]
 
     return render_template('builds.html', all_builds=all_builds)
@@ -75,11 +73,11 @@ def exists():
     if not job or not build:
         exists = False
         message = "Invalid input"
-    elif not Job.query.filter_by(name=job).count():
+    elif not models.Job.query.filter_by(name=job).count():
         exists, message = jenkins_job.exists(job)
         jenkins_job.add_new_job(job)
-    elif not Build.query.filter_by(job=job, number=int(build)).count():
-        agent = Agent.query.one()
+    elif not models.Build.query.filter_by(job=job, number=int(build)).count():
+        agent = models.Agent.query.one()
         conn = jenkins.Jenkins(agent.url, agent.user, agent.password)
         try:
             conn.get_build_info(job, int(build))
@@ -88,8 +86,8 @@ def exists():
             exists = False
 
     if exists:
-        if Build.query.filter_by(job=job, number=int(build)).count():
-            build_db = Build.query.filter_by(
+        if models.Build.query.filter_by(job=job, number=int(build)).count():
+            build_db = models.Build.query.filter_by(
                 job=job, number=int(build)).first()
             build_status = build_db.status
             if build_db.failure_name:
@@ -103,7 +101,8 @@ def exists():
             message = "The build didn't fail..."
 
     if known_failure:
-        failure = Failure.query.filter_by(name=build_db.failure_name).first()
+        failure = models.Failure.query.filter_by(
+            name=build_db.failure_name).first()
         return jsonify(exists=exists,
                        known_failure=known_failure,
                        cause=failure.cause,
@@ -120,7 +119,8 @@ def top_failure_types():
     results = dict()
     results['data'] = list()
 
-    db_failures = Failure.query.order_by(Failure.count.desc()).limit(7).all()
+    db_failures = models.Failure.query.order_by(
+        models.Failure.count.desc()).limit(7).all()
 
     for failure in db_failures:
         if failure.count:
@@ -135,11 +135,16 @@ def get_failure():
     job = request.args.get('job')
     build = request.args.get('build')
 
-    build_db = Build.query.filter_by(job=job, number=build).first()
-    failure = Failure.query.filter_by(name=build_db.failure_name).first()
+    build_db = models.Build.query.filter_by(job=job, number=build).first()
+    failure_text = build_db.failure_text
+    failure = models.Failure.query.filter_by(
+        name=build_db.failure_name).first()
+    if not failure:
+        failure = UNKNOWN_FAILURE
+        failure_text = failure.failure_text
 
     return jsonify(failure_name=failure.name,
-                   failure_text=build_db.failure_text,
+                   failure_text=failure_text,
                    failure_action=failure.action,
                    failure_cause=failure.cause)
 

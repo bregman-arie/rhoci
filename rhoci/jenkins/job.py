@@ -98,3 +98,38 @@ def populate_db_with_jobs(agent):
     for job in jobs_json['jobs']:
         if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':
             insert_job_data_into_db(job)
+
+
+def construct_jobs_dictionary(jobs):
+    """Returns structure that can be used by jquery datatable."""
+    results = dict()
+    results['data'] = list()
+    for job in jobs:
+
+        bug_assigned_to = 'No bugs'
+        bug_status = 'No bugs'
+        if job.bugs:
+            bug_assigned_to = job.bugs[0].assigned_to
+            bug_status = job.bugs[0].status
+
+        if models.Build.query.filter_by(job=job.name,
+                                        number=job.last_build_number).count():
+            build_db = models.Build.query.filter_by(
+                job=job.name,
+                number=job.last_build_number).first()
+            if build_db.failure_name:
+                results['data'].append([job.name, build_db.failure_name,
+                                        job.last_build_number, '',
+                                        bug_assigned_to, bug_status, [
+                                            i.serialize for i in job.bugs]])
+            else:
+                results['data'].append([job.name, job.last_build_result,
+                                        job.last_build_number, '',
+                                        bug_assigned_to, bug_status, [
+                                            i.serialize for i in job.bugs]])
+        else:
+            results['data'].append([job.name, job.last_build_result,
+                                    job.last_build_number, '',
+                                    bug_assigned_to, bug_status, [
+                                        i.serialize for i in job.bugs]])
+    return results

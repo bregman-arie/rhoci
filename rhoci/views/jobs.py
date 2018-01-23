@@ -16,9 +16,8 @@ from flask import Blueprint
 from flask import jsonify
 import logging
 
-from rhoci.models import Agent
-from rhoci.models import Build
-from rhoci.models import Job
+from rhoci import models
+import rhoci.jenkins.job as job_lib
 
 
 logger = logging.getLogger(__name__)
@@ -29,17 +28,18 @@ jobs = Blueprint('jobs', __name__)
 @jobs.route('/')
 def index():
     """Jenkins Jobs page."""
-    agent = Agent.query.one()
+    agent = models.Agent.query.one()
 
     return render_template('jobs.html', agent=agent, jobs=jobs)
 
 
-@jobs.route('/all_jobs')
-def all_jobs():
+@jobs.route('/all')
+def all():
     """Jenkins Jobs page."""
-    agent = Agent.query.one()
+    jobs = models.Job.query.all()
 
-    return render_template('jobs.html', agent=agent, jobs=jobs)
+    results = job_lib.construct_jobs_dictionary(jobs)
+    return jsonify(results)
 
 
 @jobs.route('/jobs_status/<status>_<dfg>_<release>')
@@ -48,9 +48,9 @@ def jobs_status(status, dfg, release):
     results = dict()
     results['data'] = list()
 
-    jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
-                            Job.last_build_result.like(status),
-                            Job.release_number.like(release))
+    jobs = models.Job.query.filter(models.Job.name.contains('DFG-%s' % dfg),
+                                   models.Job.last_build_result.like(status),
+                                   models.Job.release_number.like(release))
     for job in jobs:
         bug_assigned_to = 'No bugs'
         bug_status = 'No bugs'
@@ -58,9 +58,9 @@ def jobs_status(status, dfg, release):
             bug_assigned_to = job.bugs[0].assigned_to
             bug_status = job.bugs[0].status
 
-        if Build.query.filter_by(job=job.name,
-                                 number=job.last_build_number).count():
-            build_db = Build.query.filter_by(
+        if models.Build.query.filter_by(job=job.name,
+                                        number=job.last_build_number).count():
+            build_db = models.Build.query.filter_by(
                 job=job.name,
                 number=job.last_build_number).first()
             if build_db.failure_name:
@@ -87,8 +87,8 @@ def home_jobs_status(status, dfg):
     results = dict()
     results['data'] = list()
 
-    jobs = Job.query.filter(Job.name.contains('DFG-%s' % dfg),
-                            Job.last_build_result.like(status))
+    jobs = models.Job.query.filter(models.Job.name.contains('DFG-%s' % dfg),
+                                   models.Job.last_build_result.like(status))
     for job in jobs:
         bug_assigned_to = 'No bugs'
         bug_status = 'No bugs'
@@ -96,9 +96,9 @@ def home_jobs_status(status, dfg):
             bug_assigned_to = job.bugs[0].assigned_to
             bug_status = job.bugs[0].status
 
-        if Build.query.filter_by(job=job.name,
-                                 number=job.last_build_number).count():
-            build_db = Build.query.filter_by(
+        if models.Build.query.filter_by(job=job.name,
+                                        number=job.last_build_number).count():
+            build_db = models.Build.query.filter_by(
                 job=job.name,
                 number=job.last_build_number).first()
             if build_db.failure_name:
