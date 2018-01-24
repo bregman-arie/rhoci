@@ -240,6 +240,19 @@ FAILURES = [
      'causes are: slow network while obtaining images, lengthy tests etc.',
      },
 
+    {'category': 'Infrastructure',
+     'name': 'Provisioning failure',
+     'pattern': 'An exception occurred during task execution. To see the ' +
+     'full traceback, use -vvv. The error was: socket.error: [Errno 104] ' +
+     'Connection reset by peer',
+     'upper_bound_pattern':
+        'TASK [Waiting for OpenStack nodes to be SSH-able]',
+     'lower_bound_pattern': '',
+     'action':
+        'See how often it happens, eventually implement a retry mecanism.',
+     'cause': 'Failed to provision. Possible ' +
+     'causes are: slow network while obtaining images, lengthy tests etc.',
+     },
 ]
 
 
