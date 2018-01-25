@@ -149,9 +149,9 @@
       ['Success', {{ storage['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
+      var result = d.id;
       var dfg_name = 'storage';
-      {% include "jobs/show_jobs_datatable.js" -%}
-      $("#jobs_modal").modal({show:true, backdrop: false});
+      show_jobs(dfg_name, result, null, null)
     },
 
     };
@@ -202,9 +202,9 @@
       ['Success', {{ network['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
+      var result = d.id;
       var dfg_name = 'network';
-      {% include "jobs/show_jobs_datatable.js" -%}
-      $("#jobs_modal").modal({show:true, backdrop: false});
+      show_jobs(dfg_name, result, null, null)
     },
     };
 
@@ -251,9 +251,9 @@
       ['Success', {{ compute['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
+      var result = d.id;
       var dfg_name = 'compute';
-      {% include "jobs/show_jobs_datatable.js" -%}
-      $("#jobs_modal").modal({show:true, backdrop: false});
+      show_jobs(dfg_name, result, null, null)
     },
     };
 
@@ -285,7 +285,7 @@
                    </div>
                    <div class="card-pf-body">
                      <div class="progress-description">
-                       Failed
+                       <button type="button" onClick="show_jobs(null, 'FAILURE', '13', null)" class="btn btn-danger btn-sm">Failed</button>
                      </div>
                      <div class="progress progress-label-top-right">
                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ last_release['failed_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['failed_percent'] }}%;"  data-toggle="tooltip">
@@ -296,7 +296,7 @@
                        </div>
                      </div>
                      <div class="progress-description">
-                       Passed
+                       <button type="button" onClick="show_jobs(null, 'SUCCESS', '13', null)" class="btn btn-success btn-sm">Passed</button>
                      </div>
                      <div class="progress progress-label-top-right">
                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ last_release['passed_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['passed_percent'] }}%;"  data-toggle="tooltip">
@@ -307,7 +307,7 @@
                        </div>
                      </div>
                      <div class="progress-description">
-                       Unstable
+                       <button type="button" onClick="show_jobs(null, 'UNSTABLE', '13', null)" class="btn btn-warning btn-sm">Unstable</button>
                      </div>
                      <div class="progress progress-label-top-right">
                        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{ last_release['unstable_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['unstable_percent'] }}%;"  data-toggle="tooltip">
@@ -318,7 +318,7 @@
                        </div>
                      </div>
                      <div class="progress-description">
-                       Never Executed
+                       <button type="button" onClick="show_jobs(null, 'None', '13', null)" class="btn btn-primary btn-sm">Never Executed</button>
                      </div>
                      <div class="progress progress-label-top-right">
                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ last_release['never_executed_percent'] }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ last_release['never_executed_percent'] }}%;"  data-toggle="tooltip">
@@ -391,7 +391,18 @@
         "ajax": "{{ url_for('builds.top_failure_types') }}",
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         $('td', nRow).css('background-color', '#f2dede' );
-    }
+    },
+        columnDefs: [
+            {
+                targets:2,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                        data = '<button type="button" onClick="show_jobs(null, null, null, \'' + row[0] + '\')" class="btn btn-danger btn-sm">' + data + '</button>';
+                    }
+                    return data;
+                }
+            },
+          ],
     });
 </script>
 
@@ -410,6 +421,8 @@
     {% include "bugs/submit_tests_bug.js" -%}
 
     {% include "tests/show_tests.js" -%}
+
+    {% include "jobs/show_jobs.js" -%}
 
     {% include "common/modal_order.js" -%}
   </script>

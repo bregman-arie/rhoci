@@ -1,5 +1,5 @@
     $('#jobs_table').DataTable( {
-      "ajax": "{{ url_for('jobs.home_jobs_status', status='FAILURE', dfg='DFG') }}".replace("FAILURE", d.id).replace("DFG", dfg_name),
+      "ajax": "{{ url_for('jobs.get', result='FAILURE', dfg='DFG', release='RELEASE', failure_name='FL') }}".replace("FAILURE", result).replace("DFG", dfg_name).replace("RELEASE", release).replace("FL", failure_name),
       className: "text-center",
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
           if ( aData[1] == 'None' )

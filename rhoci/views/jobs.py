@@ -51,69 +51,29 @@ def jobs_status(status, dfg, release):
     jobs = models.Job.query.filter(models.Job.name.contains('DFG-%s' % dfg),
                                    models.Job.last_build_result.like(status),
                                    models.Job.release_number.like(release))
-    for job in jobs:
-        bug_assigned_to = 'No bugs'
-        bug_status = 'No bugs'
-        if job.bugs:
-            bug_assigned_to = job.bugs[0].assigned_to
-            bug_status = job.bugs[0].status
+    results = job_lib.construct_jobs_dictionary(jobs)
 
-        if models.Build.query.filter_by(job=job.name,
-                                        number=job.last_build_number).count():
-            build_db = models.Build.query.filter_by(
-                job=job.name,
-                number=job.last_build_number).first()
-            if build_db.failure_name:
-                results['data'].append([job.name, build_db.failure_name,
-                                        job.last_build_number, '',
-                                        bug_assigned_to, bug_status, [
-                                            i.serialize for i in job.bugs]])
-            else:
-                results['data'].append([job.name, job.last_build_result,
-                                        job.last_build_number, '',
-                                        bug_assigned_to, bug_status, [
-                                            i.serialize for i in job.bugs]])
-        else:
-            results['data'].append([job.name, job.last_build_result,
-                                    job.last_build_number, '',
-                                    bug_assigned_to, bug_status, [
-                                        i.serialize for i in job.bugs]])
     return jsonify(results)
 
 
-@jobs.route('/home_jobs_status/<status>_<dfg>')
-def home_jobs_status(status, dfg):
+@jobs.route('/home_jobs_status/<dfg>_<result>_<release>_<failure_name>')
+def get(dfg=None, result=None, release=None, failure_name=None):
     """Get jobs with specific status"""
     results = dict()
     results['data'] = list()
 
-    jobs = models.Job.query.filter(models.Job.name.contains('DFG-%s' % dfg),
-                                   models.Job.last_build_result.like(status))
-    for job in jobs:
-        bug_assigned_to = 'No bugs'
-        bug_status = 'No bugs'
-        if job.bugs:
-            bug_assigned_to = job.bugs[0].assigned_to
-            bug_status = job.bugs[0].status
+    if (dfg != 'null' and result != 'null'):
+        jobs = models.Job.query.filter(
+            models.Job.name.contains('DFG-%s' % dfg),
+            models.Job.last_build_result.like(result))
+    elif (release != 'null' and result != 'null'):
+        jobs = models.Job.query.filter_by(release_number=release,
+                                          last_build_result=result)
+    elif failure_name != 'null':
+        builds = models.Build.query.filter_by(failure_name=failure_name)
+        j = set([i.job for i in builds])
+        jobs = models.Job.query.filter(models.Job.name.in_(j))
 
-        if models.Build.query.filter_by(job=job.name,
-                                        number=job.last_build_number).count():
-            build_db = models.Build.query.filter_by(
-                job=job.name,
-                number=job.last_build_number).first()
-            if build_db.failure_name:
-                results['data'].append([job.name, build_db.failure_name,
-                                        job.last_build_number, '',
-                                        bug_assigned_to, bug_status, [
-                                            i.serialize for i in job.bugs]])
-            else:
-                results['data'].append([job.name, job.last_build_result,
-                                        job.last_build_number, '',
-                                        bug_assigned_to, bug_status, [
-                                            i.serialize for i in job.bugs]])
-        else:
-            results['data'].append([job.name, job.last_build_result,
-                                    job.last_build_number, '',
-                                    bug_assigned_to, bug_status, [
-                                        i.serialize for i in job.bugs]])
+    results = job_lib.construct_jobs_dictionary(jobs)
+
     return jsonify(results)
