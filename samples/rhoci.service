@@ -1,0 +1,15 @@
+# Move this file to /etc/systemd/system/
+
+[Unit]
+Description=RHOCI Web System
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/home/abregman/rhoci
+Environment="PATH=/home/abregman/rhoci/rhocienv/bin"
+ExecStart=/usr/bin/rhoci-server -p 80 --debug
+
+[Install]
+WantedBy=multi-user.target

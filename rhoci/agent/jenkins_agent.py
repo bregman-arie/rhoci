@@ -15,7 +15,6 @@ import datetime
 import jenkins
 import logging
 from multiprocessing import Process
-import re
 import time
 
 from rhoci.agent import agent
@@ -24,7 +23,6 @@ import rhoci.jenkins.build as build_lib
 import rhoci.jenkins.job as job_lib
 import rhoci.models as models
 from rhoci.db.base import db
-from rhoci.rhosp.dfg import get_dfg_name
 
 LOG = logging.getLogger(__name__)
 
@@ -87,40 +85,6 @@ class JenkinsAgent(agent.Agent):
             # builds in DB are still active
             build_lib.check_active_builds(self.conn)
 
-    def remove_jobs_from_db(self, jobs):
-        """Removes jobs from DB that no longer exist on Jenkins."""
-        with self.app.app_context():
-            for job in jobs:
-                if not models.Job.query.filter_by(name=job):
-                    LOG.debug("Removing job: %s from DB" % job)
-
-    def update_job_in_db(self, job):
-        last_build_result = "None"
-        with self.app.app_context():
-            try:
-                job_info = self.conn.get_job_info(job['name'])
-                last_build_number = build_lib.get_last_build_number(
-                    job_info)
-            except Exception as e:
-                LOG.info("Unable to fetch information for %s: %s" % (
-                    job['name'], e.message))
-            if last_build_number:
-                last_build_result = build_lib.get_build_status(
-                    self.conn, job['name'], last_build_number)
-                db_build = models.Build(job=job['name'],
-                                        number=last_build_number,
-                                        status=last_build_result)
-                db.session.add(db_build)
-                db.session.commit()
-
-            # Update entry in database
-            models.Job.query.filter_by(
-                name=job['name']).update(
-                    dict(last_build_number=last_build_number,
-                         last_build_result=last_build_result))
-            db.session.commit()
-            LOG.debug("Updated job from %s: %s" % (self.name, job['name']))
-
     def add_agent_to_db(self):
         """Adds the agent to the database."""
         with self.app.app_context():
@@ -130,24 +94,3 @@ class JenkinsAgent(agent.Agent):
                                         password=self.password)
                 db.session.add(db_agent)
                 db.session.commit()
-
-    def get_job_type(self, name):
-        """Returns job type based on its name."""
-        if 'phase1' in name:
-            return 'phase1'
-        elif 'phase2' in name:
-            return 'phase2'
-        elif 'dfg' in name:
-            dfg = get_dfg_name(name)
-            if (not models.DFG.query.filter_by(name=dfg).count() and
-                    dfg.lower() != 'dfg'):
-                db_dfg = models.DFG(name=dfg)
-                db.session.add(db_dfg)
-                db.session.commit()
-            return 'dfg'
-        else:
-            return 'other'
-
-    def get_job_release(self, name):
-        m = re.search('-\d{1,2}', name)
-        return m.group().split('-')[1] if m else 0

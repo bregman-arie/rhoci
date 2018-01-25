@@ -11,6 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from rhoci.db.base import db
+from rhoci.models import DFG
 
 
 def get_dfg_name(string):
@@ -19,3 +21,16 @@ def get_dfg_name(string):
         return name.upper()
     else:
         return name.capitalize()
+
+
+def dfg_exists(dfg):
+    """Returns True if DFG exists in DB else returns False."""
+    return (DFG.query.filter_by(name=dfg).count() or
+            dfg.lower() == 'dfg')
+
+
+def add_dfg_to_db(dfg):
+    """Inserts DFG into DB."""
+    db_dfg = DFG(name=dfg)
+    db.session.add(db_dfg)
+    db.session.commit()

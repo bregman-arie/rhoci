@@ -13,6 +13,8 @@
 #    under the License.
 import re
 
+import rhoci.rhosp.dfg as dfg_lib
+
 
 def get_job_type(name):
     """Returns job type based on its name."""
@@ -21,6 +23,9 @@ def get_job_type(name):
     elif 'phase2' in name:
         return 'phase2'
     elif 'dfg' in name:
+        dfg = dfg_lib.get_dfg_name(name)
+        if not dfg_lib.dfg_exists(dfg):
+            dfg_lib.add_dfg_to_db(dfg)
         return 'dfg'
     else:
         return 'other'
