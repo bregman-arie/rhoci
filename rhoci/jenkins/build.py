@@ -140,9 +140,10 @@ def update_in_db(data):
                 'build']['parameters']['GERRIT_EVENT_ACCOUNT_NAME']
         else:
             try:
-                conn = jenkins.Jenkins(current_app.config.get('url'),
-                                       current_app.config.get('user'),
-                                       current_app.config.get('password'))
+                conn = jenkins.Jenkins(
+                    current_app.config.get('RHOCI_JENKINS_URL'),
+                    current_app.config.get('RHOCI_JENKINS_USER'),
+                    current_app.config.get('RHOCI_JENKINS_PASSWORD'))
                 build_info = conn.get_build_info(name, number)
                 trigger = build_info[
                     'actions'][1]['causes'][0]['shortDescription']
@@ -171,7 +172,7 @@ def update_in_db(data):
             analyze_failure(name, number)
 
         # Check for tests
-        url = current_app.config.get("url")
+        url = current_app.config.get("RHOCI_JENKINS_URL")
         try:
             tests_raw_data = urllib2.urlopen(
                 url + "/job/" + name + "/" +

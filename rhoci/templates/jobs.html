@@ -32,9 +32,9 @@
             <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Job Name <span class="caret"></span></button>
             <ul class="dropdown-menu">
               <li><a href="#" id="filter1">Job Name</a></li>
-              <li><a href="#" id="filter3">Last build result</a></li>
-              <li><a href="#" id="filter3">Last build number</a></li>
-              <li><a href="#" id="filter4">Test results</a></li>
+              <li><a href="#" id="filter2">Last Build Status</a></li>
+              <li><a href="#" id="filter3">Last Build number</a></li>
+              <li><a href="#" id="filter4">Tests</a></li>
             </ul>
           </div>
           <input type="text" class="form-control" placeholder="Filter By Job Name..." autocomplete="off" id="filterInput">
@@ -96,21 +96,21 @@
   </div>
 </div>
 
-{% include "jobs/show_jobs_table.html" -%}
+{% include "jobs/show_jobs_table_minimal.html" -%}
 
 <form class="content-view-pf-pagination table-view-pf-pagination clearfix" id="pagination1">
   <div class="form-group">
     <select class="selectpicker pagination-pf-pagesize">
       <option value="6">6</option>
       <option value="10" >10</option>
-      <option value="15">15</option>
-      <option value="30" selected="selected">30</option>
+      <option value="15" selected="selected">15</option>
+      <option value="30">30</option>
       <option value="50">50</option>
     </select>
     <span>per page</span>
   </div>
   <div class="form-group">
-    <span><span class="pagination-pf-items-current">1-30</span> of <span class="pagination-pf-items-total">75</span></span>
+    <span><span class="pagination-pf-items-current">1-15</span> of <span class="pagination-pf-items-total">75</span></span>
     <ul class="pagination pagination-pf-back">
       <li class="disabled"><a href="#" title="First Page"><span class="i fa fa-angle-double-left"></span></a></li>
       <li class="disabled"><a href="#" title="Previous Page"><span class="i fa fa-angle-left"></span></a></li>
@@ -154,15 +154,15 @@ $(document).ready(function() {
 $("#jobs_table").DataTable({
   "ajax": "{{ url_for('jobs.all') }}",
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData[1] == "FAILURE" )
+            if ( aData[2] == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData[1] == "SUCCESS" )
+            else if ( aData[2] == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData[1] == "UNSTABLE" )
+            else if ( aData[2] == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }
@@ -171,6 +171,15 @@ $("#jobs_table").DataTable({
             {
                 targets:0,
                 render: function ( data, type, row, meta ) {
+                  var id = "select" + meta.row;
+                  return '<label class="sr-only" for="' + id + '">Select row ' + meta.row +
+                    '</label><input type="checkbox" id="' + id + '" name="' + id + '">';
+                },
+                sortable: false,
+            },
+            {
+                targets:1,
+                render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                         data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
                     }
@@ -178,56 +187,40 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:[2],
+                targets:[3],
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row[2] != 0 ){
+                    if(type === 'display' && row[3] != 0 ){
                         data = '<a href="{{ agent.url }}/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
                     }
                     return data;
                 }
             },
             {
-                targets:[1],
+                targets:[2],
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && (row[1] == 'UNSTABLE' || row[1] == 'SUCCESS' || row[1] == 'ABORTED' || row[1] == null)){
-                        data = '<a href="{{ agent.url }}/job/' + row[0] + '/' + row[1] + '">' + data + '</a>';
+                    if(type === 'display' && (row[2] == 'UNSTABLE' || row[2] == 'SUCCESS' || row[2] == 'ABORTED' || row[2] == null)){
+                        data = '<a href="{{ agent.url }}/job/' + row[1] + '/' + row[2] + '">' + data + '</a>';
                     }
-                    else if (type === 'display' && row[1] == 'FAILURE') {
-                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">Failure - Tell me why!</button>'
+                    else if (type === 'display' && row[2] == 'FAILURE') {
+                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">Failure - Tell me why!</button>'
                     }
-                    else if (type === 'display' && row[1] != 'None' ){
-                    data = '<button type="button" onClick="show_failure(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
+                    else if (type === 'display' && row[2] != 'None' ){
+                    data = '<button type="button" onClick="show_failure(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
                     }
                     return data;
                 }
             },
             {
-                targets:3,
+                targets:4,
                 render: function ( data, type, row, meta ) {
-                    data = '<button type="button" onClick="show_tests(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-info btn-lg">Tests</button>'
-                    return data;
-                }
-            },
-            {
-                targets:6,
-                className: "text-center",
-                render: function ( data, type, row, meta ) {
-                    if(type === 'display'){
-                    data = '<button type="button" id=\'' + row[0] +'\' onClick="add_bug(\'' + row[0] + '\', \'' + row[2] + '\', id)" class="btn btn-primary btn-lg" style="margin-right: 5px;">+</button>'
-                      var arrayLength = row[6].length;
-                      if(arrayLength > 0){
-                        data = data + '<button id="button-'+ row[0] +'" type="button" onClick="show_bugs(\'' + row[0] + '\')" class="btn btn-danger btn-lg">Bugs</button>';
-                      }
-                    }
+                    data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
                     return data;
                 }
             },
         ],
-  dom: "t",
-  language: {
-    zeroRecords: "No records found"
-  },
+  dom: "r",
   order: [[ 1, 'asc' ]],
+  processing: true,
   pfConfig: {
     emptyStateSelector: "#emptyState1",
     filterCaseInsensitive: true,
@@ -239,18 +232,23 @@ $("#jobs_table").DataTable({
         placeholder: "Filter By Job Name..."
       }, {
         optionSelector: "#filter2",
-        placeholder: "Filter By Last Build Number..."
+        placeholder: "Filter By Last Build Status..."
       }, {
         optionSelector: "#filter3",
-        placeholder: "Filter By Last Build Result"
+        placeholder: "Filter By Last Build Number"
       }, {
         optionSelector: "#filter4",
-        placeholder: "Filter By Test Results"
-      }
+        placeholder: "Filter By Tests"
+      },
     ],
     paginationSelector: "#pagination1",
     toolbarSelector: "#toolbar1",
+    selectAllSelector: 'th:first-child input[type="checkbox"]',
     colvisMenuSelector: '.table-view-pf-colvis-menu'
+  },
+  select: {
+    selector: 'td:first-child input[type="checkbox"]',
+    style: 'multi'
   },
 });
 

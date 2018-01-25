@@ -31,6 +31,6 @@ def update_db(data):
             job.update_in_db(data)
         build.update_in_db(data)
         return "Updated DB"
-    except Exception:
-        LOG.error("Was unable to update the DB with the new data")
-        raise
+    except Exception as e:
+        LOG.error(
+            "Was unable to update the DB with the new data: %s" % e.message)

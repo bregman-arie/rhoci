@@ -37,8 +37,13 @@ def index():
 def all():
     """Jenkins Jobs page."""
     jobs = models.Job.query.all()
+    results = dict()
+    results['data'] = list()
 
-    results = job_lib.construct_jobs_dictionary(jobs)
+    for job in jobs:
+        results['data'].append([None, job.name, job.last_build_result,
+                                job.last_build_number, ''])
+
     return jsonify(results)
 
 

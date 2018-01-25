@@ -28,12 +28,14 @@
       Failure: $.pfPaletteColors.red,
       Unstable: $.pfPaletteColors.gold,
       None: '#E8E8E8',
+      Aborted: $.pfPaletteColors.purple,
       Success: $.pfPaletteColors.green
     },
     columns: [
       ['Failure', {{ release['FAILURE'] }}],
       ['Unstable', {{ release['UNSTABLE'] }}],
       ['None', {{ release['None'] }}],
+      ['Aborted', {{ release['ABORTED'] }}],
       ['Success', {{ release['SUCCESS'] }}]
     ],
     onclick: function (d, i) { 
