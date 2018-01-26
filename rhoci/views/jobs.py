@@ -77,7 +77,8 @@ def get(dfg=None, result=None, release=None, failure_name=None):
     elif failure_name != 'null':
         builds = models.Build.query.filter_by(failure_name=failure_name)
         j = set([i.job for i in builds])
-        jobs = models.Job.query.filter(models.Job.name.in_(j))
+        jobs = models.Job.query.filter(models.Job.name.in_(j)).filter(
+            models.Job.last_build_result.like("FAILURE"))
 
     results = job_lib.construct_jobs_dictionary(jobs)
 

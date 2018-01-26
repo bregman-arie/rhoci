@@ -121,12 +121,13 @@ def top_failure_types():
 
     # db_failures = models.Failure.query.order_by(
     #    models.Failure.count.desc()).limit(7).all()
-    failed_builds = models.Build.query.filter(models.Build.status.like(
-        "FAILURE")).filter(models.Build.failure_name.isnot(None)).distinct(
-            models.Build.job)
+    failed_builds = models.Build.query.distinct(
+        models.Build.job).filter(models.Build.status.like(
+            "FAILURE")).filter(models.Build.failure_name.isnot(None))
     failures = {}
     for build in failed_builds:
         if not failures.get(build.failure_name):
+            print build.failure_name
             fail_db = models.Failure.query.filter_by(
                 name=build.failure_name).first()
             failures[build.failure_name] = {'count': 1,

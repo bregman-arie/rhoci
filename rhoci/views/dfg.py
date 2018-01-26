@@ -54,6 +54,10 @@ def stats(dfg_name):
                 Job.name.contains(
                     'DFG-%s' % dfg_name), Job.last_build_result.like(
                         'UNSTABLE'), Job.release == item).count(),
+            'ABORTED': Job.query.filter(
+                Job.name.contains(
+                    'DFG-%s' % dfg_name), Job.last_build_result.like(
+                        'ABORTED'), Job.release == item).count(),
             'None': Job.query.filter(
                 Job.name.contains(
                     'DFG-%s' % dfg_name), Job.last_build_result.like(
