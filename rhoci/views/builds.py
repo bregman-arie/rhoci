@@ -119,13 +119,23 @@ def top_failure_types():
     results = dict()
     results['data'] = list()
 
-    db_failures = models.Failure.query.order_by(
-        models.Failure.count.desc()).limit(7).all()
+    # db_failures = models.Failure.query.order_by(
+    #    models.Failure.count.desc()).limit(7).all()
+    failed_builds = models.Build.query.filter(models.Build.status.like(
+        "FAILURE")).filter(models.Build.failure_name.isnot(None)).distinct(
+            models.Build.job)
+    failures = {}
+    for build in failed_builds:
+        if not failures.get(build.failure_name):
+            fail_db = models.Failure.query.filter_by(
+                name=build.failure_name).first()
+            failures[build.failure_name] = {'count': 1,
+                                            'category': fail_db.category}
+        else:
+            failures[build.failure_name]['count'] += 1
 
-    for failure in db_failures:
-        if failure.count:
-            results['data'].append(
-                [failure.name, failure.category, failure.count])
+    for failure, data in failures.iteritems():
+        results['data'].append([failure, data['category'], data['count']])
 
     return jsonify(results)
 

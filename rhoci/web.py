@@ -169,8 +169,7 @@ class Server(object):
                                                 lower_bound_pattern=f[
                                                     'lower_bound_pattern'],
                                                 action=f['action'],
-                                                cause=f['cause'],
-                                                count=0)
+                                                cause=f['cause'])
                     db.session.add(failure_db)
                     db.session.commit()
                     logging.info("Loaded a new failure: %s" % f['name'])

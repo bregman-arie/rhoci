@@ -267,7 +267,6 @@ class Failure(db.Model):
     category = db.Column(db.String(128))
     action = db.Column(db.String(128))
     cause = db.Column(db.String(128))
-    count = db.Column(db.Integer)
 
     @property
     def serialize(self):
@@ -280,7 +279,6 @@ class Failure(db.Model):
             'category': self.category,
             'action': self.action,
             'cause': self.cause,
-            'count': self.count,
         }
 
 

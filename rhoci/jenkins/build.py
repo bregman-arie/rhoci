@@ -237,9 +237,6 @@ def check_match(data):
         if line:
             for failure in models.Failure.query.all():
                 if failure.pattern in line.decode('utf-8').strip():
-                    models.Failure.query.filter_by(name=failure.name).update(
-                        {'count': models.Failure.count + 1})
-                    db.session.commit()
                     return True, line, failure.name
     return False, '', ''
 
@@ -358,10 +355,6 @@ def find_failure_in_logs(logs, job, build):
                     failure_line = line
                     failure_name = failure.name
                     update_failure(job, build, failure_name, failure_line)
-                    models.Failure.query.filter_by(
-                        name=failure.name).update(
-                            {'count': models.Failure.count + 1})
-                    db.session.commit()
                     break
     return failure_name
 
@@ -387,9 +380,5 @@ def find_failure_in_console_output(job, build):
                 failure_line = line
                 failure_name = failure.name
                 update_failure(job, build, failure_name, failure_line)
-                models.Failure.query.filter_by(
-                    name=failure.name).update(
-                        {'count': models.Failure.count + 1})
-                db.session.commit()
                 break
     return failure_name

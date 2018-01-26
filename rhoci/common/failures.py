@@ -248,11 +248,40 @@ FAILURES = [
      'upper_bound_pattern':
         'TASK [Waiting for OpenStack nodes to be SSH-able]',
      'lower_bound_pattern': '',
-     'action':
-        'See how often it happens, eventually implement a retry mecanism.',
+     'action': 'Open a ticket to infra team',
      'cause': 'Failed to provision. Possible ' +
      'causes are: slow network while obtaining images, lengthy tests etc.',
      },
+
+    {'category': 'Infrastructure',
+     'name': 'Unable to connect',
+     'pattern': 'Unable to establish connection',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Open a ticket to infra team',
+     'cause': 'No enough information.',
+     },
+
+    {'category': 'Packages',
+     'name': 'Missing Package',
+     'pattern': 'No package matching',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'Make sure package is present in the repository or you have ' +
+     'the right repository that should include the missing package',
+     'cause': 'You are trying to install a package that is missing from the ' +
+     'repo',
+     },
+
+    {'category': 'SCM',
+     'name': 'Merge Conflict',
+     'pattern': 'Merge conflict',
+     'upper_bound_pattern': 'TASK [',
+     'lower_bound_pattern': '',
+     'action': 'fix conflicts and then commit the result',
+     'cause': 'You have some conflict(s) in the repository you are using',
+     },
+
 ]
 
 
