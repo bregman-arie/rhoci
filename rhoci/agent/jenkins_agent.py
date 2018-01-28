@@ -21,6 +21,8 @@ from rhoci.agent import agent
 from rhoci.agent import update
 import rhoci.jenkins.build as build_lib
 import rhoci.jenkins.job as job_lib
+import rhoci.jenkins.plugin as plugin_lib
+import rhoci.jenkins.node as node_lib
 import rhoci.models as models
 from rhoci.db.base import db
 
@@ -78,8 +80,10 @@ class JenkinsAgent(agent.Agent):
                         update_time=datetime.datetime.utcnow()))
                 LOG.debug("Updated agent timestamp")
 
-                # Populate db with jobs
+                # Populate db with different entities from Jenkins
                 job_lib.populate_db_with_jobs(agent)
+                plugin_lib.populate_db_with_plugins(agent)
+                node_lib.populate_db_with_nodes(agent)
 
             # In case application was restarted or crushed, check if active
             # builds in DB are still active
@@ -90,6 +94,7 @@ class JenkinsAgent(agent.Agent):
         with self.app.app_context():
             if not models.Agent.query.filter_by(name=self.name).count():
                 db_agent = models.Agent(name=self.name,
+                                        user=self.user,
                                         url=self.url,
                                         password=self.password)
                 db.session.add(db_agent)

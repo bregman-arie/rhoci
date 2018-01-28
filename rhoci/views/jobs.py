@@ -83,3 +83,18 @@ def get(dfg=None, result=None, release=None, failure_name=None):
     results = job_lib.construct_jobs_dictionary(jobs)
 
     return jsonify(results)
+
+
+@jobs.route('/home_jobs_status/<dfg>')
+def get_failed(dfg=None):
+    """Get failed and aborted jobs of a given DFG"""
+    results = dict()
+    results['data'] = list()
+
+    jobs = models.Job.query.filter(
+        models.Job.name.contains('DFG-%s' % dfg),
+        (models.Job.last_build_result.like("FAILURE") |
+         models.Job.last_build_result.like("ABORTED")))
+    results = job_lib.construct_jobs_dictionary(jobs)
+
+    return jsonify(results)

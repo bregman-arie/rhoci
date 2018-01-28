@@ -33,12 +33,8 @@ class Agent(db.Model):
     update_time = db.Column(db.DateTime)
 
     def __repr__(self):
-        return "<Agent %r\nNumber of jobs: %s\nNumber of \
-nodes: %s\nNumber of plugins: %s\nLast update: %s" % (self.name,
-                                                      self.number_of_jobs,
-                                                      self.number_of_nodes,
-                                                      self.number_of_plugins,
-                                                      self.update_time)
+        return "<Agent {} url: {} user: {}>".format(self.name, self.url,
+                                                    self.user)
 
 
 class Build(db.Model):

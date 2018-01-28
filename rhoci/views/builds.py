@@ -127,11 +127,14 @@ def top_failure_types():
     failures = {}
     for build in failed_builds:
         if not failures.get(build.failure_name):
-            print build.failure_name
             fail_db = models.Failure.query.filter_by(
                 name=build.failure_name).first()
-            failures[build.failure_name] = {'count': 1,
-                                            'category': fail_db.category}
+            if build.failure_name != "Unknown":
+                failures[build.failure_name] = {'count': 1,
+                                                'category': fail_db.category}
+            else:
+                failures[build.failure_name] = {'count': 1,
+                                                'category': 'None'}
         else:
             failures[build.failure_name]['count'] += 1
 
@@ -164,7 +167,7 @@ def get_failure():
 def analyze_failure():
     """Try to find out why a given build failed."""
     # Set build and job according to passed parameters
-    failure_name = "unknown"
+    failure_name = "Unknown"
     job = request.args.get('job')
     build = request.args.get('build')
 
@@ -175,7 +178,7 @@ def analyze_failure():
         LOG.debug("Looking for failure in logs for job %s build %s" % (
             job, build))
         failure_name = build_lib.find_failure_in_logs(logs, job, build)
-    if failure_name == "unknown":
+    if failure_name == "Unknown":
         LOG.debug("Looking for failure in console output for "
                   "job {} build {} since "
                   "I couldn't find anything in the logs".format(job, build))

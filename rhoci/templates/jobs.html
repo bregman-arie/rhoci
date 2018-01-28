@@ -213,7 +213,13 @@ $("#jobs_table").DataTable({
             {
                 targets:4,
                 render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[2] != 0 && (row[2] == 'SUCCESS' || row[2] == 'UNSTABLE')){
                     data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
+                    }
+                    else {
+                      data = 'No Tests';
+                    }
+
                     return data;
                 }
             },

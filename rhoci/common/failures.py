@@ -289,6 +289,7 @@ class UNKNOWN_FAILURE(object):
     """Represents the case whenever the cause for a given build is unknown."""
     name = "Unknown"
     failure_text = "No idea :("
+    category = "None"
     action = ("Fix me! https://github.com/bregman-arie/"
               "rhoci/blob/master/rhoci/common/failures.py")
     cause = "my developer did an awful job"

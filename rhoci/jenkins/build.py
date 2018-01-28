@@ -338,7 +338,7 @@ def find_failure_in_logs(logs, job, build):
 
     Returns the failure name
     """
-    failure_name = "unknown"
+    failure_name = "Unknown"
     found = False
     agent = models.Agent.query.one()
 
@@ -364,7 +364,7 @@ def find_failure_in_console_output(job, build):
 
     Returns the failure name
     """
-    failure_name = "unknown"
+    failure_name = "Unknown"
     found = False
     agent = models.Agent.query.one()
 
@@ -381,4 +381,8 @@ def find_failure_in_console_output(job, build):
                 failure_name = failure.name
                 update_failure(job, build, failure_name, failure_line)
                 break
+    if not found:
+        LOG.debug(
+            "Couldn't figure out why build failed. Marking it as unknown.")
+        update_failure(job, build, 'Unknown', '')
     return failure_name

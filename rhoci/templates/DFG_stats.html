@@ -36,6 +36,17 @@
 {% include "tests/failing_tests_datatable.html" -%}
 
 
+<div class="container-fluid">
+  <div class="row">
+          <h3>
+            <strong>Failing Jobs</strong>
+          </h3>
+
+{% include "jobs/show_failed_jobs_table.html" -%}
+
+      </div>
+  </div>
+
 <script>
 
 {% include "failures/show_failure.js" -%}
@@ -52,6 +63,8 @@
 {% include "bugs/submit_tests_bug.js" -%}
 
 {% include "tests/show_tests.js" -%}
+
+{% include "jobs/show_failed_jobs_datatable.js" -%}
 
 {% include "common/modal_order.js" -%}
 $("#jobs_table").addClass('hidden');

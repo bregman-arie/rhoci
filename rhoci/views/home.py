@@ -288,7 +288,7 @@ def bug_exists():
 
     except OverflowError:
         LOG.warning("User provided bug number that is too big")
-        err_msg = ("...and server crashed again. Not sure why people provide"
+        err_msg = ("...and server crashed again. Not sure why people provide "
                    "these long numbers.")
         exists = False
 

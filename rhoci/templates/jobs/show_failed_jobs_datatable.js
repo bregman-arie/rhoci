@@ -1,5 +1,5 @@
-    $('#jobs_table').DataTable( {
-      "ajax": "{{ url_for('jobs.get', result='FAILURE', dfg='DFG', release='RELEASE', failure_name='FL') }}".replace("FAILURE", result).replace("DFG", dfg_name).replace("RELEASE", release).replace("FL", failure_name),
+    $('#failed_jobs_table').DataTable( {
+      "ajax": "{{ url_for('jobs.get_failed',dfg=dfg) }}",
       className: "text-center",
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
           if ( aData[1] == 'None' )
@@ -57,12 +57,7 @@
                 targets:3,
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row[2] != 0 && (row[1] == 'SUCCESS' || row[1] == 'UNSTABLE')){
-                    data = '<button type="button" onClick="show_tests(\'' + row[0] + '\', \'' + row[2] + '\')" class="btn btn-info btn-lg">Tests</button>'
-                    }
-                    else {
-                      data = 'No Tests';
-                    }
+                    data = 'No Tests';
                     return data;
                 }
             },
