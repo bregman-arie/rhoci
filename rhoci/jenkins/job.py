@@ -108,9 +108,11 @@ def construct_jobs_dictionary(jobs):
 
         bug_assigned_to = 'No bugs'
         bug_status = 'No bugs'
+        bug_number = 'No bugs'
         if job.bugs:
             bug_assigned_to = job.bugs[0].assigned_to
             bug_status = job.bugs[0].status
+            bug_number = job.bugs[0].number
 
         if models.Build.query.filter_by(job=job.name,
                                         number=job.last_build_number).count():
@@ -121,15 +123,18 @@ def construct_jobs_dictionary(jobs):
                 results['data'].append([job.name, build_db.failure_name,
                                         job.last_build_number, '',
                                         bug_assigned_to, bug_status, [
-                                            i.serialize for i in job.bugs]])
+                                            i.serialize for i in job.bugs],
+                                        bug_number])
             else:
                 results['data'].append([job.name, job.last_build_result,
                                         job.last_build_number, '',
                                         bug_assigned_to, bug_status, [
-                                            i.serialize for i in job.bugs]])
+                                            i.serialize for i in job.bugs],
+                                        bug_number])
         else:
             results['data'].append([job.name, job.last_build_result,
                                     job.last_build_number, '',
                                     bug_assigned_to, bug_status, [
-                                        i.serialize for i in job.bugs]])
+                                        i.serialize for i in job.bugs],
+                                    bug_number])
     return results

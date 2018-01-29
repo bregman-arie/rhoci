@@ -62,6 +62,16 @@
                 }
             },
             {
+                targets:[4, 5],
+                className: "text-center",
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && data != 'No bugs'){
+                        data = '<a href="http://bugzilla.redhat.com/' + row[7] + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
                 targets:6,
                 className: "text-center",
                 render: function ( data, type, row, meta ) {
