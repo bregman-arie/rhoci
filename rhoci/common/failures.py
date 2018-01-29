@@ -281,6 +281,18 @@ FAILURES = [
      'action': 'fix conflicts and then commit the result',
      'cause': 'You have some conflict(s) in the repository you are using',
      },
+    {'category': 'Product',
+     'name': 'BZ-1517977',
+     'pattern':
+        'Error: ceilometer-upgrade --skip-metering-database returned 1 ' +
+        'instead of one of ',
+     'upper_bound_pattern':
+        'TASK [Print stack failures]',
+     'lower_bound_pattern': '',
+     'action':
+        'Fix product bug.',
+     'cause': 'https://bugzilla.redhat.com/show_bug.cgi?id=1517977',
+     },
 
 ]
 
