@@ -16,8 +16,30 @@ from datetime import datetime
 from rhoci.db.base import db
 
 
+# Association tables
+# bugs <-> jobs
+bugs = db.Table('bugs',
+                db.Column('bug_id', db.Integer, db.ForeignKey('bug.id'),
+                          primary_key=True),
+                db.Column('job_id', db.Integer, db.ForeignKey('job.id'),
+                          primary_key=True))
+
+# jobs <-> builds
+builds = db.Table('builds',
+                  db.Column('build_id', db.Integer, db.ForeignKey('build.id'),
+                            primary_key=True),
+                  db.Column('job_id', db.Integer, db.ForeignKey('job.id'),
+                            primary_key=True))
+
+bugs_tests = db.Table('bugs_tests',
+                      db.Column('bug_id', db.Integer, db.ForeignKey('bug.id'),
+                                primary_key=True),
+                      db.Column('test_id', db.Integer,
+                                db.ForeignKey('test.id'), primary_key=True))
+
+
 class Agent(db.Model):
-    """Represents Jenkins agent/connection."""
+    """Represents agent of an external system."""
 
     __tablename__ = 'agent'
 
@@ -26,19 +48,24 @@ class Agent(db.Model):
     url = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(64))
     user = db.Column(db.String(64))
-    number_of_jobs = db.Column(db.Integer)
-    number_of_nodes = db.Column(db.Integer)
-    number_of_plugins = db.Column(db.Integer)
     active = db.Column(db.Boolean)
     update_time = db.Column(db.DateTime)
 
-    def __repr__(self):
-        return "<Agent {} url: {} user: {}>".format(self.name, self.url,
-                                                    self.user)
+    @property
+    def serialize(self):
+        """Return serialized agent object."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'url': self.url,
+            'user': self.user,
+            'active': self.active,
+            'update_time': self.update_time,
+        }
 
 
 class Build(db.Model):
-    """Represents Jenkins build."""
+    """Represents build."""
 
     __tablename__ = 'build'
 
@@ -71,13 +98,6 @@ class Build(db.Model):
         }
 
 
-bugs = db.Table('bugs',
-                db.Column('bug_id', db.Integer, db.ForeignKey('bug.id'),
-                          primary_key=True),
-                db.Column('job_id', db.Integer, db.ForeignKey('job.id'),
-                          primary_key=True))
-
-
 class Job(db.Model):
     """Represents Jenkins job."""
 
@@ -85,19 +105,20 @@ class Job(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    jenkins_server = db.Column(db.String(64))
     last_build_number = db.Column(db.Integer)
     last_build_result = db.Column(db.String(64))
     job_type = db.Column(db.String(64))
     release_number = db.Column(db.Integer, db.ForeignKey('release.number'))
     release = db.relationship("Release", uselist=False, backref="release")
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    builds = db.relationship('Build', secondary=builds, lazy='subquery',
+                             backref=db.backref('jobs', lazy=True))
     bugs = db.relationship('Bug', secondary=bugs, lazy='subquery',
                            backref=db.backref('jobs', lazy=True))
 
     @property
     def serialize(self):
-        """Return job object data in serializeable format"""
+        """Return serialized Job."""
         return {
             'id': self.id,
             'name': self.name,
@@ -106,21 +127,19 @@ class Job(db.Model):
             'job_type': self.job_type,
             'timestamp': self.timestamp,
             'bugs': self.serialize_bugs,
+            'builds': self.serialize_builds,
         }
 
     @property
     def serialize_bugs(self):
         return [item.serialize for item in self.bugs]
 
+    @property
+    def serialize_builds(self):
+        return [item.serialize for item in self.builds]
+
     def __repr__(self):
         return self.serialize()
-
-
-bugs_tests = db.Table('bugs_tests',
-                      db.Column('bug_id', db.Integer, db.ForeignKey('bug.id'),
-                                primary_key=True),
-                      db.Column('test_id', db.Integer,
-                                db.ForeignKey('test.id'), primary_key=True))
 
 
 class Test(db.Model):
@@ -172,7 +191,7 @@ class TestBuild(db.Model):
 
     @property
     def serialize(self):
-        """Return test build object data in serializeable format"""
+        """Return serialized test build object."""
         return {
             'class_name': self.class_name,
             'job': self.job,
@@ -186,15 +205,17 @@ class TestBuild(db.Model):
 
 
 class Node(db.Model):
-    """Represents Jenkins node."""
+    """Represents node."""
 
     __tablename__ = 'node'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
 
-    def __repr__(self):
-        return "<Node %r" % (self.name)
+    @property
+    def serialize(self):
+        """Return serialized Node object."""
+        return {'number': self.name}
 
 
 class Release(db.Model):
@@ -220,8 +241,10 @@ class Plugin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
 
-    def __repr__(self):
-        return "<Plugin %r" % (self.name)
+    @property
+    def serialize(self):
+        """Return serialized Plugin object"""
+        return {'name': self.name}
 
 
 class DFG(db.Model):
