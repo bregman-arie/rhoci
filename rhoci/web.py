@@ -193,6 +193,5 @@ class Server(object):
                              password=app.config.get('RHOCI_JENKINS_PASSWORD'),
                              url=app.config.get('RHOCI_JENKINS_URL'),
                              app=app)
-        logging.debug("Starting connection to RHOSP Jenkins")
         agent.pre_run_process.start()
         agent.run_process.start()

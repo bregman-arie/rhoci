@@ -15,6 +15,11 @@ from rhoci.db.base import db
 from rhoci.models import DFG
 
 
+dfg_squads = {'network': {'octavia': ['octavia', 'neutron-lbaas'],
+                          'ovn': ['networking-ovn']}
+              }
+
+
 def get_dfg_name(string):
     name = string.split('-')[1]
     if len(name) < 4:
