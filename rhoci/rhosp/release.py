@@ -13,9 +13,6 @@
 #    under the License.
 import re
 
-from rhoci.db.base import db
-from rhoci.models import Release
-
 
 RELEASE_MAP = {'6': 'juno',
                '7': 'kilo',

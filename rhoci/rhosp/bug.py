@@ -11,11 +11,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from rhoci.models import Bug
-from rhoci.models import Job
-from rhoci.models import Test
-from rhoci.db.base import db
-
 import logging
 
 LOG = logging.getLogger(__name__)

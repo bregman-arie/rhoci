@@ -19,7 +19,6 @@ from flask import request
 import logging
 import urllib2
 
-import rhoci.models as models
 import rhoci.jenkins.build as jenkins_build
 
 

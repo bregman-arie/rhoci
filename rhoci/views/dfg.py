@@ -15,11 +15,6 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
-from rhoci.models import Agent
-from rhoci.models import DFG
-from rhoci.models import Job
-from rhoci.models import Release
-
 
 logger = logging.getLogger(__name__)
 

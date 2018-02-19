@@ -16,23 +16,20 @@ from flask import Flask
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from flask_pymongo import PyMongo
 
 from rhoci.views.doc import auto
-from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
 from rhoci.common import exceptions
 from rhoci.filters import configure_template_filters
-import rhoci.models as models
 import rhoci.views
 from rhoci.rhosp.release import RELEASE_MAP
 from rhoci.server.config import Config
 
 LOG = logging.getLogger(__name__)
-app = Flask(__name__)
+app = Flask('rhoci')
 configure_template_filters(app)
-db.init_app(app)
-with app.app_context():
-    db.create_all()
+mongo = PyMongo(app)
 
 from rhoci.agent.jenkins_agent import JenkinsAgent  # noqa
 
@@ -67,7 +64,6 @@ class Server(object):
         auto.init_app(app)
 
         self._register_blueprints()
-        self._setup_database()
         self._setup_releases()
         self._load_failures()
         self._setup_jenkins()
@@ -92,8 +88,6 @@ class Server(object):
         self.load_config_from_file()
         self.load_config_from_parser(args)
 
-        # Load DB configuration
-        app.config.from_object('rhoci.db.config')
         LOG.info("Loaded configuration:\n + {" + "\n".join("{}: {}".format(
             k, v) for k, v in sorted(app.config.items())) + "}")
 
@@ -125,15 +119,6 @@ class Server(object):
         for k, v in vars(args).items():
             if v:
                 app.config[k] = v
-
-    def _setup_database(self):
-        """Sets up the database by setting versioning and creating
-
-        all the tables.
-        """
-        # setup_versioning(app.config)
-        with app.app_context():
-            db.create_all()
 
     def setup_logging(self):
         """Setup logging level and format."""
@@ -178,13 +163,12 @@ class Server(object):
         """Create DB entry for each release."""
         for release in app.config['RHOCI_RELEASES'].split(','):
             with app.app_context():
-                if not models.Release.query.filter_by(
-                        number=release).count():
+                if not models.Release.query.filter_by(number=release).count():
                     release_db = models.Release(
                         number=release, name=RELEASE_MAP[release])
                     db.session.add(release_db)
                     db.session.commit()
-                    logging.info("Added release %s to the DB" % release)
+                    logging.info("Loaded release: %s" % release)
 
     def _setup_jenkins(self):
         """Create Jenkins agent to pull information from RHOSP Jenkins."""

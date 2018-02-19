@@ -21,7 +21,6 @@ import sys
 
 import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
-import rhoci.models as models
 from rhoci.views.doc import auto
 import rhoci.rhosp.bug as rhosp_bug
 import rhoci.jenkins.job as jenkins_job
@@ -41,8 +40,10 @@ home = Blueprint('home', __name__)
 
 def dfg_summary(dfg):
     """Returns a dictionary which represents the summary of a given DFG."""
+    import pdb
+    pdb.set_trace()
     return {'FAILURE': models.Job.query.filter(models.Job.name.contains(
-        'DFG-%s' % dfg), models.Job.last_build_result.like('FAILURE')).count(),
+        'DFG-%s' % dfg), models.Job.builds.status.like('FAILURE')).count(),
         'SUCCESS': models.Job.query.filter(
             models.Job.name.contains(
                 'DFG-%s' % dfg), models.Job.last_build_result.like(

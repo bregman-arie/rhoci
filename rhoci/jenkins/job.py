@@ -16,8 +16,6 @@ import logging
 import urllib2
 
 import rhoci.jenkins.build as build_lib
-from rhoci.db.base import db
-import rhoci.models as models
 import rhoci.rhosp.jenkins as rhosp_jenkins
 from rhoci.rhosp import release
 
@@ -27,26 +25,21 @@ LOG = logging.getLogger(__name__)
 def insert_job_data_into_db(job):
     """Add job data into DB."""
     job_name = job['name']
-    last_build_number = 'None'
-    last_build_result = 'None'
 
+    # Make sure job is not already in DB
     if not models.Job.query.filter_by(name=job_name).count():
         # Get job type and release
         job_type = rhosp_jenkins.get_job_type(job_name.lower())
         rel = rhosp_jenkins.get_job_release(job_name)
 
-        # If there is build data, update DB accordingly
+        # If build dtat included, add the build to the DB
         if job.get('lastBuild'):
             build_lib.insert_build_data_into_db(job_name, job['lastBuild'])
-            last_build_number = job['lastBuild'].get('number')
-            last_build_result = job['lastBuild'].get('result')
 
         # Create a Job DB object
         db_job = models.Job(name=job_name,
                             job_type=job_type,
-                            release_number=int(rel),
-                            last_build_number=last_build_number,
-                            last_build_result=last_build_result)
+                            release_number=int(rel))
 
         # Add to DB and commit the change
         db.session.add(db_job)
@@ -96,6 +89,7 @@ def populate_db_with_jobs(agent):
         urllib2.urlopen(request).read())
 
     for job in jobs_json['jobs']:
+        # Jobs API call returns also folders
         if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':
             insert_job_data_into_db(job)
 

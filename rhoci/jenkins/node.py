@@ -14,8 +14,6 @@
 import jenkins
 import logging
 
-from rhoci.db.base import db
-import rhoci.models as models
 
 LOG = logging.getLogger(__name__)
 

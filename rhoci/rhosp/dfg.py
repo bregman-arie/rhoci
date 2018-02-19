@@ -11,10 +11,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from rhoci.db.base import db
-from rhoci.models import DFG
-
-
 dfg_squads = {'network': {'octavia': ['octavia', 'neutron-lbaas'],
                           'ovn': ['networking-ovn']}
               }

@@ -20,7 +20,6 @@ import logging
 
 import rhoci.jenkins.build as build_lib
 import rhoci.jenkins.job as jenkins_job
-from rhoci import models
 from rhoci.common.failures import UNKNOWN_FAILURE
 
 

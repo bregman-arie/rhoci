@@ -16,7 +16,6 @@ from flask import Blueprint
 from flask import jsonify
 import logging
 
-from rhoci import models
 import rhoci.jenkins.job as job_lib
 
 

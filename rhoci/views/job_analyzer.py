@@ -18,8 +18,6 @@ from flask import request
 import jenkins
 import logging
 
-from rhoci.models import Agent
-
 
 logger = logging.getLogger(__name__)
 

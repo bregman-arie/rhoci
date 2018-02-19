@@ -19,7 +19,6 @@ import logging
 import re
 
 from rhoci.jenkins.jjb import generate_job_definition
-from rhoci.models import Job
 
 
 logger = logging.getLogger(__name__)

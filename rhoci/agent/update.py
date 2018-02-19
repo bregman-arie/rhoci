@@ -15,9 +15,7 @@ import datetime
 import jenkins
 import logging
 
-from rhoci.db.base import db
 import rhoci.jenkins.server as jenkins_server
-import rhoci.models as models
 import rhoci.rhosp.jenkins as rhosp_jenkins
 import rhoci.rhosp.dfg as rhosp_dfg
 

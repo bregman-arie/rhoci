@@ -13,10 +13,8 @@
 #    under the License.
 import logging
 
-from rhoci.db.base import db
 from rhoci.jenkins import build
 from rhoci.jenkins import job
-from rhoci.models import Job
 
 LOG = logging.getLogger(__name__)
 

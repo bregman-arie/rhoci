@@ -15,8 +15,6 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
-from rhoci.models import Plugin
-
 
 logger = logging.getLogger(__name__)
 

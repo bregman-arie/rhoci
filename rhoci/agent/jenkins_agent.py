@@ -23,8 +23,6 @@ import rhoci.jenkins.build as build_lib
 import rhoci.jenkins.job as job_lib
 import rhoci.jenkins.plugin as plugin_lib
 import rhoci.jenkins.node as node_lib
-import rhoci.models as models
-from rhoci.db.base import db
 
 LOG = logging.getLogger(__name__)
 
@@ -58,18 +56,19 @@ class JenkinsAgent(agent.Agent):
             LOG.info("Update complete")
 
     def pre_start(self):
-        """Populate the database with information from Jenkins
+        """Populates the database with information from Jenkins
 
-        Jobs - name, last build status, last build_number
+        Jobs - name, last build status, last build number, DFG(optional)
         Builds - Job name, Status, Number
+        Plugins - Name, Version
+        Nodes - Name
         """
         with self.app.app_context():
 
-            # If there is no update time, it means the application never
-            # contacted Jenkins so run update without additional
-            # If there was an update, check if one hour passed since
-            # last update
             agent = models.Agent.query.filter_by(name=self.name).first()
+            # Since a user can stop and start the application whenever
+            # he wants a check was added to make sure one hour passed
+            # between updates to not over-communicate with Jenkins
             if not agent.update_time or (agent.update_time -
                                          datetime.datetime.utcnow() >
                                          datetime.timedelta(minutes=59)):

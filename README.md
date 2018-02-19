@@ -13,6 +13,11 @@ A web service with a goal of enhancing Jenkins user experience for Red Hat OpenS
 
 Read more [HERE](https://github.com/bregman-arie/rhoci/wiki)
 
+## Quick Start
+ 
+scripts/initial_setup.sh
+scripts/quick_run.sh
+
 ## Screenshots
 
 ### Home page
