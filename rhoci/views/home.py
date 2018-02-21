@@ -229,6 +229,22 @@ def dfgs():
     return jsonify(dfgs=dfg)
 
 
+@auto.doc(groups=['rhosp', 'public'])
+@home.route('/v2.0/squads', methods=['GET', 'POST'])
+def squads():
+    """Returns all squads"""
+    squads = [i.serialize for i in models.Squad.query.all()]
+    return jsonify(squads=squads)
+
+
+@auto.doc(groups=['rhosp', 'public'])
+@home.route('/v2.0/components', methods=['GET', 'POST'])
+def components():
+    """Returns all components"""
+    components = [i.serialize for i in models.Component.query.all()]
+    return jsonify(components=components)
+
+
 @auto.doc(groups=['failures', 'public'])
 @home.route('/v2.0/failures', methods=['GET', 'POST'])
 def failures():

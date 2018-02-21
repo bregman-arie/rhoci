@@ -91,6 +91,7 @@ class Build(db.Model):
             'active': self.active,
             'status': self.status,
             'url': self.url,
+            'timestamp': self.timestamp,
             'trigger': self.trigger,
             'parameters': eval(self.parameters) if self.parameters else {},
             'failure_text': self.failure_text,
@@ -254,11 +255,54 @@ class DFG(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
+    squads = db.relationship('Squad', backref='DFG', lazy=True)
 
     @property
     def serialize(self):
         """Return serialized DFG object"""
-        return {'name': self.name}
+        return {'name': self.name,
+                'squads': self.serialize_squads}
+
+    @property
+    def serialize_squads(self):
+        return [item.serialize for item in self.squads]
+
+
+class Squad(db.Model):
+    """Represents Squad."""
+
+    __tablename__ = 'squad'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    DFG_name = db.Column(db.String(64), db.ForeignKey('DFG.name'),
+                         nullable=False)
+    components = db.relationship('Component', backref="squad", lazy='dynamic')
+
+    @property
+    def serialize(self):
+        """Return serialized squad object"""
+        return {self.name: self.serialize_components}
+
+    @property
+    def serialize_components(self):
+        return [item.serialize for item in self.components]
+
+
+class Component(db.Model):
+    """Represents OpenStack Component."""
+
+    __tablename__ = 'component'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    squad_name = db.Column(db.String(64), db.ForeignKey('squad.name'),
+                           nullable=False)
+
+    @property
+    def serialize(self):
+        """Return serialized component object"""
+        return {'component': self.name}
 
 
 class Artifact(db.Model):

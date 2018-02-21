@@ -20,6 +20,8 @@ import os
 from rhoci.views.doc import auto
 from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
+import rhoci.rhosp.dfg as dfg_lib
+from rhoci.rhosp.dfg import DFGs
 from rhoci.common import exceptions
 from rhoci.filters import configure_template_filters
 import rhoci.models as models
@@ -70,6 +72,7 @@ class Server(object):
         self._setup_database()
         self._setup_releases()
         self._load_failures()
+        self._load_dfgs()
         self._setup_jenkins()
 
     def _register_blueprints(self):
@@ -155,6 +158,29 @@ class Server(object):
 
         app.run(threaded=True, host='0.0.0.0', port=int(
             app.config['RHOCI_SERVER_PORT']))
+
+    def _load_dfgs(self):
+        """Loads RHOSP DFGs.
+
+        Note: it doesn't load full list as the app discovers them when parsing
+              data from Jenkins. The reason it loads some of them is because
+              we associate some of them with squads and components which
+              can't be done by Jenkins
+        """
+        for dfg, dfg_data in DFGs.iteritems():
+            with app.app_context():
+                if not models.DFG.query.filter_by(name=dfg).count():
+                    dfg_lib.add_dfg_to_db(dfg)
+                for squad, components in dfg_data.iteritems():
+                    dfg_lib.add_squad_to_db(squad, dfg)
+                    dfg_lib.add_components_to_db(components, squad)
+                squad = models.Squad.query.filter_by(name=squad).first()
+                for component in components:
+                    component = models.Component.query.filter_by(
+                        name=component).first()
+                    squad.components.append(component)
+                db.session.commit()
+            LOG.debug("Loaded DFGs, squads and components")
 
     def _load_failures(self):
         """Loads RHOCI built-in failure to DB."""
