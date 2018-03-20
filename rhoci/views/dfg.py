@@ -15,10 +15,7 @@ from flask import render_template
 from flask import Blueprint
 import logging
 
-from rhoci.models import Agent
-from rhoci.models import DFG
-from rhoci.models import Job
-from rhoci.models import Release
+from rhoci import models
 
 
 logger = logging.getLogger(__name__)
@@ -29,41 +26,61 @@ dfg = Blueprint('dfg', __name__)
 @dfg.route('/', methods=['GET'])
 def index():
 
-    db_dfg = DFG.query.all()
+    db_dfg = models.DFG.query.all()
     all_dfgs = [dfg.serialize for dfg in db_dfg]
 
     return render_template('DFGs.html', all_dfgs=all_dfgs)
 
 
+@dfg.route('/squads', methods=['GET'])
+def squads():
+
+    db_squads = models.Squad.query.all()
+    all_squads = [squad.serialize for squad in db_squads]
+
+    return render_template('DFGs.html', all_dfgs=all_squads)
+
+
+@dfg.route('/squad/<squad_name>', methods=['GET'])
+def squad_summary(squad_name):
+    pass
+
+
+@dfg.route('/component/<comp_name>', methods=['GET'])
+def component_summary(comp_name):
+    pass
+
+
 @dfg.route('/<dfg_name>', methods=['GET'])
 def stats(dfg_name):
 
-    agent = Agent.query.one()
-    rls = Release.query.all()
+    agent = models.Agent.query.one()
+    rls = models.Release.query.all()
+    dfg = models.DFG.query.filter_by(name=dfg_name).first()
     data = []
     for item in rls:
-        data.append({'FAILURE': Job.query.filter(
-            Job.name.contains(
-                'DFG-%s' % dfg_name), Job.last_build_result.like(
-                    'FAILURE'), Job.release == item).count(),
-            'SUCCESS': Job.query.filter(
-                Job.name.contains(
-                    'DFG-%s' % dfg_name), Job.last_build_result.like(
-                        'SUCCESS'), Job.release == item).count(),
-            'UNSTABLE': Job.query.filter(
-                Job.name.contains(
-                    'DFG-%s' % dfg_name), Job.last_build_result.like(
-                        'UNSTABLE'), Job.release == item).count(),
-            'ABORTED': Job.query.filter(
-                Job.name.contains(
-                    'DFG-%s' % dfg_name), Job.last_build_result.like(
-                        'ABORTED'), Job.release == item).count(),
-            'None': Job.query.filter(
-                Job.name.contains(
-                    'DFG-%s' % dfg_name), Job.last_build_result.like(
-                        'None'), Job.release == item).count(),
+        data.append({'FAILURE': models.Job.query.filter(
+            models.Job.name.contains(
+                'DFG-%s' % dfg_name), models.Job.last_build_result.like(
+                    'FAILURE'), models.Job.release == item).count(),
+            'SUCCESS': models.Job.query.filter(
+                models.Job.name.contains(
+                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
+                        'SUCCESS'), models.Job.release == item).count(),
+            'UNSTABLE': models.Job.query.filter(
+                models.Job.name.contains(
+                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
+                        'UNSTABLE'), models.Job.release == item).count(),
+            'ABORTED': models.Job.query.filter(
+                models.Job.name.contains(
+                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
+                        'ABORTED'), models.Job.release == item).count(),
+            'None': models.Job.query.filter(
+                models.Job.name.contains(
+                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
+                        'None'), models.Job.release == item).count(),
             'number': item.number,
             'dfg': dfg_name})
 
     return render_template('DFG_stats.html', releases=data, agent=agent,
-                           dfg=dfg_name)
+                           dfg=dfg)

@@ -12,12 +12,13 @@
   <link href="{{ url_for('static', filename='css/patternfly-additions.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}"></script>
   <link href="{{ url_for('static', filename='css/c3.css') }}"></script>
+  <link href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css" rel="stylesheet">
   <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
   {% endblock %}
 
   {% block scripts %}
   <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/jquery.dataTables.js') }}"></script>
+  <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
   <script src="{{ url_for('static', filename='js/jquery.matchHeight-min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.matchHeight-min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfPagination.js') }}"></script>
@@ -28,6 +29,13 @@
   <script src="{{ url_for('static', filename='js/bootstrap-select.js') }}"></script>
   <script src="{{ url_for('static', filename='js/patternfly.js') }}"></script>
   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
   {% endblock %}
 
 

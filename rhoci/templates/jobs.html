@@ -224,9 +224,10 @@ $("#jobs_table").DataTable({
                 }
             },
         ],
-  dom: "r",
+  dom: 'Br',
   order: [[ 1, 'asc' ]],
   processing: true,
+  buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
   pfConfig: {
     emptyStateSelector: "#emptyState1",
     filterCaseInsensitive: true,

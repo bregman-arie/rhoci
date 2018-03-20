@@ -25,11 +25,50 @@
 
 <div class="container-fluid">
 <!-- Pie chart for each release -->
+         <div class="col-lg-10">
 {% for release in releases %}
 
 {% include "DFG_pie_chart.html" -%}
 
 {% endfor %}
+</div>
+
+
+<div class="col-lg-2">
+<div class="card-pf">
+ <div class="card-pf-heading">
+   <h2 class="card-pf-title">
+     Squads
+   </h2>
+ </div>
+<div class="card-pf-body">
+  {% for squad in dfg.squads %}
+    <a href="{{ url_for('dfg.squad_summary', squad_name=squad.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ squad.name }}</button></a>
+    <br>
+  {% endfor %}
+</div>
+</div>
+</div>
+
+<div class="col-lg-2">
+<div class="card-pf">
+ <div class="card-pf-heading">
+   <h2 class="card-pf-title">
+     Components
+   </h2>
+ </div>
+<div class="card-pf-body">
+  {% for squad in dfg.squads %}
+    {% for component in squad.components %}
+      <a href="{{ url_for('dfg.component_summary', comp_name=component.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
+      <br>
+    {% endfor %}
+  {% endfor %}
+</div>
+</div>
+</div>
+
+
 </div>
 <!-- -->
 
