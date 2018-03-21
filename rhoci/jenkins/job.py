@@ -20,6 +20,7 @@ from rhoci.db.base import db
 import rhoci.models as models
 import rhoci.rhosp.jenkins as rhosp_jenkins
 from rhoci.rhosp import release
+from rhoci.common.utils import convert_unixtime_to_datetime
 
 LOG = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ def insert_job_data_into_db(job):
     job_name = job['name']
     last_build_number = 'None'
     last_build_result = 'None'
+    timestamp = None
 
     if not models.Job.query.filter_by(name=job_name).count():
         # Get job type and release
@@ -40,13 +42,16 @@ def insert_job_data_into_db(job):
             build_lib.insert_build_data_into_db(job_name, job['lastBuild'])
             last_build_number = job['lastBuild'].get('number')
             last_build_result = job['lastBuild'].get('result')
+            timestamp_unix = job['lastBuild'].get('timestamp')
+            timestamp = convert_unixtime_to_datetime(timestamp_unix)
 
         # Create a Job DB object
         db_job = models.Job(name=job_name,
                             job_type=job_type,
                             release_number=int(rel),
                             last_build_number=last_build_number,
-                            last_build_result=last_build_result)
+                            last_build_result=last_build_result,
+                            timestamp=timestamp)
 
         # Add to DB and commit the change
         db.session.add(db_job)
@@ -89,7 +94,7 @@ def add_bug(job, bug_num):
 def populate_db_with_jobs(agent):
 
     ALL_JOBS_API = ("/api/json/?tree=jobs"
-                    "[name,lastBuild[result,number]]")
+                    "[name,lastBuild[result,number,timestamp]]")
 
     request = urllib2.Request(agent.url + ALL_JOBS_API)
     jobs_json = json.loads(

@@ -111,7 +111,7 @@ class Job(db.Model):
     job_type = db.Column(db.String(64))
     release_number = db.Column(db.Integer, db.ForeignKey('release.number'))
     release = db.relationship("Release", uselist=False, backref="release")
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime)
     builds = db.relationship('Build', secondary=builds, lazy='subquery',
                              backref=db.backref('jobs', lazy=True))
     bugs = db.relationship('Bug', secondary=bugs, lazy='subquery',

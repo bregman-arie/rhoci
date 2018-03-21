@@ -17,7 +17,8 @@ from rhoci import models
 
 DFGs = {'network': {
     'vNES': ['neutron', 'python-neutronclient'],
-    'Octavia': ['octavia', 'neutron-lbaas']}}
+    'Octavia': ['octavia', 'neutron-lbaas'],
+    'OVN': ['networking-ovn']}}
 
 
 def get_dfg_name(string):

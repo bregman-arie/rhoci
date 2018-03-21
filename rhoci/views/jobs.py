@@ -42,7 +42,8 @@ def all():
 
     for job in jobs:
         results['data'].append([None, job.name, job.last_build_result,
-                                job.last_build_number, ''])
+                                job.last_build_number,
+                                job.timestamp, ''])
 
     return jsonify(results)
 

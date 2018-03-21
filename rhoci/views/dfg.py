@@ -41,14 +41,14 @@ def squads():
     return render_template('DFGs.html', all_dfgs=all_squads)
 
 
-@dfg.route('/squad/<squad_name>', methods=['GET'])
-def squad_summary(squad_name):
-    pass
+@dfg.route('/<dfg_name>/squad/<squad_name>', methods=['GET'])
+def squad_summary(squad_name, dfg_name):
+    return {'yay': 'nope'}
 
 
-@dfg.route('/component/<comp_name>', methods=['GET'])
-def component_summary(comp_name):
-    pass
+@dfg.route('/<dfg_name>/component/<comp_name>', methods=['GET'])
+def component_summary(comp_name, dfg_name):
+    return {'yay': 'nope'}
 
 
 @dfg.route('/<dfg_name>', methods=['GET'])
@@ -79,6 +79,9 @@ def stats(dfg_name):
                 models.Job.name.contains(
                     'DFG-%s' % dfg_name), models.Job.last_build_result.like(
                         'None'), models.Job.release == item).count(),
+            'num_of_jobs': models.Job.query.filter(
+                models.Job.name.contains('DFG-%s' % dfg_name),
+                models.Job.release == item).count(),
             'number': item.number,
             'dfg': dfg_name})
 

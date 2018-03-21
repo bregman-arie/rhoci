@@ -33,8 +33,9 @@
             <ul class="dropdown-menu">
               <li><a href="#" id="filter1">Job Name</a></li>
               <li><a href="#" id="filter2">Last Build Status</a></li>
-              <li><a href="#" id="filter3">Last Build number</a></li>
-              <li><a href="#" id="filter4">Tests</a></li>
+              <li><a href="#" id="filter3">Last Build Number</a></li>
+              <li><a href="#" id="filter4">Last Build Date</a></li>
+              <li><a href="#" id="filter5">Tests</a></li>
             </ul>
           </div>
           <input type="text" class="form-control" placeholder="Filter By Job Name..." autocomplete="off" id="filterInput">
@@ -211,7 +212,7 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:4,
+                targets:5,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[2] != 0 && (row[2] == 'SUCCESS' || row[2] == 'UNSTABLE')){
                     data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
@@ -245,6 +246,9 @@ $("#jobs_table").DataTable({
         placeholder: "Filter By Last Build Number"
       }, {
         optionSelector: "#filter4",
+        placeholder: "Filter By Last Build Date"
+      }, {
+        optionSelector: "#filter5",
         placeholder: "Filter By Tests"
       },
     ],
