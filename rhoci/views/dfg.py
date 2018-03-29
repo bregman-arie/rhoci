@@ -29,7 +29,7 @@ def index():
     db_dfg = models.DFG.query.all()
     all_dfgs = [dfg.serialize for dfg in db_dfg]
 
-    return render_template('DFGs.html', all_dfgs=all_dfgs)
+    return render_template('DFG/all_cards.html', all_dfgs=all_dfgs)
 
 
 @dfg.route('/squads', methods=['GET'])
@@ -38,17 +38,48 @@ def squads():
     db_squads = models.Squad.query.all()
     all_squads = [squad.serialize for squad in db_squads]
 
-    return render_template('DFGs.html', all_dfgs=all_squads)
+    return render_template('squad/all_cards.html', all_squads=all_squads)
+
+
+@dfg.route('/components', methods=['GET'])
+def components():
+
+    db_components = models.Squad.query.all()
+    all_components = [component.serialize for component in db_components]
+
+    return render_template('component/all_cards.html',
+                           components=all_components)
 
 
 @dfg.route('/<dfg_name>/squad/<squad_name>', methods=['GET'])
 def squad_summary(squad_name, dfg_name):
-    return {'yay': 'nope'}
+    agent = models.Agent.query.one()
+    squad = models.Squad.query.filter_by(name=squad_name).first()
+    components = squad.components
+    data = []
+    releases = models.Release.query.all()
+    for rls in releases:
+        data.append({'FAILURE': 0,
+                     'SUCCESS': 0,
+                     'ABORTED': 0,
+                     'None': 0,
+                     'number': rls.number})
+
+    for rls in data:
+        for component in components:
+            for status in ['FAILURE', 'SUCCESS', 'ABORTED', 'None']:
+                count = models.Job.query.filter(models.Job.name.contains(
+                    'DFG-%s-%s' % (dfg_name, component.name)),
+                    models.Job.last_build_result.like(status),
+                    models.Job.release_number == rls['number']).count()
+                rls[status] = rls[status] + count
+    return render_template('squad_summary.html', releases=data,
+                           agent=agent, dfg=dfg)
 
 
 @dfg.route('/<dfg_name>/component/<comp_name>', methods=['GET'])
 def component_summary(comp_name, dfg_name):
-    return {'yay': 'nope'}
+    pass
 
 
 @dfg.route('/<dfg_name>', methods=['GET'])

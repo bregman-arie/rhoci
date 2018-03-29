@@ -1,12 +1,12 @@
-<a href="{{ url_for('dfg.stats', dfg_name=dfg.name) }}">
+<a href="{{ url_for('dfg.squad_summary', squad_name=squad.name, dfg_name=squad.DFG_name) }}">
 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
 <div class="card-pf card-pf-view">
   <div class="card-pf-body">
-    <div class="{{ dfg.name }} card-pf-top-element text-center">
-      <img id="{{ dfg.name }}" src="{{ url_for('static', filename='images/{0}.png'.format(dfg.name)) }}" onerror="no_image(this)" width=70 height=70>
+    <div class="{{ squad.name }} card-pf-top-element text-center">
+      <img id="{{ squad.name }}" src="{{ url_for('static', filename='images/{0}.png'.format(squad.name)) }}" onerror="no_image(this)" width=70 height=70>
     </div>
     <h2 class="card-pf-title text-center">
-      {{ dfg.name }}
+      {{ squad.name }}
     </h2>
     <div class="card-pf-items text-center">
       <div class="card-pf-item">

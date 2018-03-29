@@ -129,6 +129,7 @@ class Job(db.Model):
             'timestamp': self.timestamp,
             'bugs': self.serialize_bugs,
             'builds': self.serialize_builds,
+            'release_number': self.release_number,
         }
 
     @property
@@ -282,7 +283,9 @@ class Squad(db.Model):
     @property
     def serialize(self):
         """Return serialized squad object"""
-        return {self.name: self.serialize_components}
+        return {'name': self.name,
+                'DFG_name': self.DFG_name,
+                'components': self.serialize_components}
 
     @property
     def serialize_components(self):
