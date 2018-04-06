@@ -22,11 +22,14 @@ DFGs = {'network': {
 
 
 def get_dfg_name(string):
-    name = string.split('-')[1]
-    if len(name) < 4:
-        return name.upper()
-    else:
-        return name.capitalize()
+    """
+    Gets string like 'DFG-network-neutron-12'
+
+    Returns DFG name. In the example above: Network.
+    """
+    name = string.split('-')[1] if '-' in string else string
+    print name
+    return name.upper() if len(name) < 4 else name.capitalize()
 
 
 def dfg_exists(dfg):

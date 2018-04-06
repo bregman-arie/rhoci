@@ -22,6 +22,7 @@ from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
 import rhoci.rhosp.dfg as dfg_lib
 from rhoci.rhosp.dfg import DFGs
+from rhoci.rhosp.dfg import get_dfg_name
 from rhoci.common import exceptions
 from rhoci.filters import configure_template_filters
 import rhoci.models as models
@@ -168,11 +169,12 @@ class Server(object):
               can't be done by Jenkins
         """
         for dfg, dfg_data in DFGs.iteritems():
+            name = get_dfg_name(dfg)
             with app.app_context():
-                if not models.DFG.query.filter_by(name=dfg).count():
-                    dfg_lib.add_dfg_to_db(dfg)
+                if not models.DFG.query.filter_by(name=name).count():
+                    dfg_lib.add_dfg_to_db(name)
                 for squad, components in dfg_data.iteritems():
-                    dfg_lib.add_squad_to_db(squad, dfg)
+                    dfg_lib.add_squad_to_db(squad, name)
                     dfg_lib.add_components_to_db(components, squad)
                 squad = models.Squad.query.filter_by(name=squad).first()
                 for component in components:

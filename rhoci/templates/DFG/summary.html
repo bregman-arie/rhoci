@@ -1,14 +1,12 @@
 {% extends "layout.html" %}
-
 {% block content %}
 
+<!-- Load d3 and c3 for displaying pie charts -->
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
 
 <br>
 <div class="container-fluid col-md-custom col-md-offset-custom">
-  <div class="row text-center">
-  </div>
 
 {% include "bugs/add_bug_modal.html" -%}
 {% include "bugs/add_tests_bug_modal.html" -%}
@@ -17,20 +15,17 @@
 {% include "bugs/show_bugs_modal_datatable.html" -%}
 
 {% include "failures/show_failure_modal.html" -%}
-
 {% include "tests/show_tests_modal_datatable.html" -%}
-
 {% include "jobs/show_jobs_table.html" -%}
 
 
 <div class="container-fluid">
+     <div class="col-lg-10">
+
 <!-- Pie chart for each release -->
-         <div class="col-lg-10">
 {% for release in releases %}
 
-{% if release.num_of_jobs != 0 %}
-  {% include "DFG_pie_chart.html" -%}
-{% endif %}
+  {% include "DFG/single_pie_chart.html" -%}
 
 {% endfor %}
 </div>

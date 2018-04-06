@@ -38,7 +38,7 @@ def squads():
     db_squads = models.Squad.query.all()
     all_squads = [squad.serialize for squad in db_squads]
 
-    return render_template('squad/all_cards.html', all_squads=all_squads)
+    return render_template('DFG/squad/all_cards.html', all_squads=all_squads)
 
 
 @dfg.route('/components', methods=['GET'])
@@ -58,22 +58,24 @@ def squad_summary(squad_name, dfg_name):
     components = squad.components
     data = []
     releases = models.Release.query.all()
-    for rls in releases:
-        data.append({'FAILURE': 0,
-                     'SUCCESS': 0,
-                     'ABORTED': 0,
-                     'None': 0,
-                     'number': rls.number})
+    total_number = 0
 
-    for rls in data:
-        for component in components:
-            for status in ['FAILURE', 'SUCCESS', 'ABORTED', 'None']:
+    for rel in releases:
+        data.append({'number': rel.number, 'dfg': dfg_name})
+
+        for status in ['FAILURE', 'SUCCESS', 'ABORTED', 'UNSTABLE', 'None']:
+            num_of_jobs = 0
+            for component in components:
                 count = models.Job.query.filter(models.Job.name.contains(
                     'DFG-%s-%s' % (dfg_name, component.name)),
                     models.Job.last_build_result.like(status),
-                    models.Job.release_number == rls['number']).count()
-                rls[status] = rls[status] + count
-    return render_template('squad_summary.html', releases=data,
+                    models.Job.release_number == rel.number).count()
+                num_of_jobs = num_of_jobs + count
+            data[-1][status] = num_of_jobs
+            total_number = total_number + num_of_jobs
+        data[-1]['num_of_jobs'] = total_number
+
+    return render_template('DFG/squad/summary.html', releases=data,
                            agent=agent, dfg=dfg)
 
 
@@ -84,37 +86,27 @@ def component_summary(comp_name, dfg_name):
 
 @dfg.route('/<dfg_name>', methods=['GET'])
 def stats(dfg_name):
+    """
+    data = [{'number': 10, FAILURE: 200, ... }, {'number': 11}]
+    """
 
     agent = models.Agent.query.one()
-    rls = models.Release.query.all()
+    releases = models.Release.query.all()
     dfg = models.DFG.query.filter_by(name=dfg_name).first()
     data = []
-    for item in rls:
-        data.append({'FAILURE': models.Job.query.filter(
-            models.Job.name.contains(
-                'DFG-%s' % dfg_name), models.Job.last_build_result.like(
-                    'FAILURE'), models.Job.release == item).count(),
-            'SUCCESS': models.Job.query.filter(
-                models.Job.name.contains(
-                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
-                        'SUCCESS'), models.Job.release == item).count(),
-            'UNSTABLE': models.Job.query.filter(
-                models.Job.name.contains(
-                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
-                        'UNSTABLE'), models.Job.release == item).count(),
-            'ABORTED': models.Job.query.filter(
-                models.Job.name.contains(
-                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
-                        'ABORTED'), models.Job.release == item).count(),
-            'None': models.Job.query.filter(
-                models.Job.name.contains(
-                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
-                        'None'), models.Job.release == item).count(),
-            'num_of_jobs': models.Job.query.filter(
-                models.Job.name.contains('DFG-%s' % dfg_name),
-                models.Job.release == item).count(),
-            'number': item.number,
-            'dfg': dfg_name})
 
-    return render_template('DFG_stats.html', releases=data, agent=agent,
+    for rel in releases:
+        data.append({'number': rel.number, 'dfg': dfg_name,
+                     'num_of_jobs': models.Job.query.filter(
+                         models.Job.name.contains('DFG-%s' % dfg_name),
+                         models.Job.release == rel).count()})
+        for status in ['FAILURE', 'SUCCESS', 'ABORTED', 'UNSTABLE', 'None']:
+            data[-1][status] = models.Job.query.filter(
+                models.Job.name.contains(
+                    'DFG-%s' % dfg_name), models.Job.last_build_result.like(
+                        status), models.Job.release == rel).count()
+
+    print data
+
+    return render_template('DFG/summary.html', releases=data, agent=agent,
                            dfg=dfg)
