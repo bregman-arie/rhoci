@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Main container -->
+<br>
+<div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
+
+{% for component in components %}
+
+  {% include "DFG/component/single_card.html" -%}
+
+{% endfor %}
+<!-- -->
+{% endblock %}

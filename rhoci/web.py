@@ -39,7 +39,7 @@ with app.app_context():
 
 from rhoci.agent.jenkins_agent import JenkinsAgent  # noqa
 
-views = (
+VIEWS = (
     (rhoci.views.home, ''),
     (rhoci.views.jobs, '/jobs'),
     (rhoci.views.doc, '/doc'),
@@ -79,7 +79,7 @@ class Server(object):
     def _register_blueprints(self):
         """Registers Flask blueprints."""
 
-        for view, prefix in views:
+        for view, prefix in VIEWS:
             app.register_blueprint(view, url_prefix=prefix)
 
     def load_config(self, args):

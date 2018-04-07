@@ -45,7 +45,7 @@
 <div class="card-pf-body">
   {% for squad in dfg.squads %}
     {% for component in squad.components %}
-      <a href="{{ url_for('dfg.component_summary', comp_name=component.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
+      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
       <br>
     {% endfor %}
   {% endfor %}

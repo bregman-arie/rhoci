@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block content %}
 
 <!-- Load d3 and c3 for displaying pie charts -->
@@ -7,6 +8,8 @@
 
 <br>
 <div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
 
 {% include "bugs/add_bug_modal.html" -%}
 {% include "bugs/add_tests_bug_modal.html" -%}
@@ -15,37 +18,22 @@
 {% include "bugs/show_bugs_modal_datatable.html" -%}
 
 {% include "failures/show_failure_modal.html" -%}
+
 {% include "tests/show_tests_modal_datatable.html" -%}
+
 {% include "jobs/show_jobs_table.html" -%}
 
 
 <div class="container-fluid">
-     <div class="col-lg-10">
-
 <!-- Pie chart for each release -->
+         <div class="col-lg-10">
 {% for release in releases %}
 
-  {% include "DFG/single_pie_chart.html" -%}
+  {% include "DFG/component/single_pie_chart.html" -%}
 
 {% endfor %}
 </div>
 
-
-<div class="col-lg-2">
-<div class="card-pf">
- <div class="card-pf-heading">
-   <h2 class="card-pf-title">
-     Squads
-   </h2>
- </div>
-<div class="card-pf-body">
-  {% for squad in dfg.squads %}
-    <a href="{{ url_for('dfg.squad_summary', squad_name=squad.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ squad.name }}</button></a>
-    <br>
-  {% endfor %}
-</div>
-</div>
-</div>
 
 <div class="col-lg-2">
 <div class="card-pf">

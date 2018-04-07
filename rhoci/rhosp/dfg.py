@@ -28,7 +28,6 @@ def get_dfg_name(string):
     Returns DFG name. In the example above: Network.
     """
     name = string.split('-')[1] if '-' in string else string
-    print name
     return name.upper() if len(name) < 4 else name.capitalize()
 
 
