@@ -24,8 +24,10 @@
 
 <!-- Pie chart for each release -->
 {% for release in releases %}
-
-  {% include "DFG/single_pie_chart.html" -%}
+  
+  {% if release.num_of_jobs != 0 %}
+    {% include "DFG/single_pie_chart.html" -%}
+  {% endif %}
 
 {% endfor %}
 </div>

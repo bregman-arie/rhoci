@@ -29,7 +29,9 @@
          <div class="col-lg-10">
 {% for release in releases %}
 
-  {% include "DFG/squad/single_pie_chart.html" -%}
+  {% if release.num_of_jobs != 0 %}
+    {% include "DFG/squad/single_pie_chart.html" -%}
+  {% endif %}
 
 {% endfor %}
 </div>
@@ -43,12 +45,10 @@
    </h2>
  </div>
 <div class="card-pf-body">
-  {% for squad in dfg.squads %}
-    {% for component in squad.components %}
-      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
+    {% for component in components %}
+      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
       <br>
     {% endfor %}
-  {% endfor %}
 </div>
 </div>
 </div>

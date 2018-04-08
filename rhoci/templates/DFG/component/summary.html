@@ -29,7 +29,9 @@
          <div class="col-lg-10">
 {% for release in releases %}
 
-  {% include "DFG/component/single_pie_chart.html" -%}
+  {% if release.num_of_jobs != 0 %}
+    {% include "DFG/component/single_pie_chart.html" -%}
+  {% endif %}
 
 {% endfor %}
 </div>

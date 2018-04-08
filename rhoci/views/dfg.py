@@ -76,7 +76,7 @@ def squad_summary(squad_name, dfg_name):
         data[-1]['num_of_jobs'] = total_number
 
     return render_template('DFG/squad/summary.html', releases=data,
-                           agent=agent, dfg=dfg)
+                           agent=agent, dfg=dfg_name, components=components)
 
 
 @dfg.route('/<dfg_name>/component/<component_name>', methods=['GET'])

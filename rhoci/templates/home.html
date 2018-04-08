@@ -142,12 +142,15 @@
       Success: $.pfPaletteColors.green
     },
     columns: [
-      ['Failure', {{ storage['FAILURE'] }}],
-      ['Unstable', {{ storage['UNSTABLE'] }}],
-      ['None', {{ storage['None'] }}],
-      ['Aborted', {{ storage['ABORTED'] }}],
-      ['Success', {{ storage['SUCCESS'] }}]
+      {% if storage['count'] != 0 %}
+        ['Failure', {{ storage['FAILURE'] }}],
+        ['Unstable', {{ storage['UNSTABLE'] }}],
+        ['None', {{ storage['None'] }}],
+        ['Aborted', {{ storage['ABORTED'] }}],
+        ['Success', {{ storage['SUCCESS'] }}]
+      {% endif %}
     ],
+    empty: { label: { text: "No Jobs" }   },
     onclick: function (d, i) { 
       var result = d.id;
       var dfg_name = 'storage';
@@ -195,12 +198,15 @@
       Success: $.pfPaletteColors.green
     },
     columns: [
-      ['Failure', {{ network['FAILURE'] }}],
-      ['Unstable', {{ network['UNSTABLE'] }}],
-      ['None', {{ network['None'] }}],
-      ['Aborted', {{ network['ABORTED'] }}],
-      ['Success', {{ network['SUCCESS'] }}]
+      {% if network['count'] != 0 %}
+        ['Failure', {{ network['FAILURE'] }}],
+        ['Unstable', {{ network['UNSTABLE'] }}],
+        ['None', {{ network['None'] }}],
+        ['Aborted', {{ network['ABORTED'] }}],
+        ['Success', {{ network['SUCCESS'] }}]
+      {% endif %}
     ],
+    empty: { label: { text: "No Jobs" }   },
     onclick: function (d, i) { 
       var result = d.id;
       var dfg_name = 'network';
@@ -244,12 +250,15 @@
       Success: $.pfPaletteColors.green
     },
     columns: [
-      ['Failure', {{ compute['FAILURE'] }}],
-      ['Unstable', {{ compute['UNSTABLE'] }}],
-      ['None', {{ compute['None'] }}],
-      ['Aborted', {{ compute['ABORTED'] }}],
-      ['Success', {{ compute['SUCCESS'] }}]
+      {% if compute['count'] != 0 %}
+        ['Failure', {{ compute['FAILURE'] }}],
+        ['Unstable', {{ compute['UNSTABLE'] }}],
+        ['None', {{ compute['None'] }}],
+        ['Aborted', {{ compute['ABORTED'] }}],
+        ['Success', {{ compute['SUCCESS'] }}]
+      {% endif %}
     ],
+    empty: { label: { text: "No Jobs" }   },
     onclick: function (d, i) { 
       var result = d.id;
       var dfg_name = 'compute';
