@@ -1,7 +1,7 @@
 configparser
 flask
 flask-autodoc
-Flask-SQLAlchemy
+flask-sqlalchemy
 futures
 python-bugzilla
 python-jenkins

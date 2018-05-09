@@ -17,7 +17,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
-from rhoci.views.doc import auto
 from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
 import rhoci.rhosp.dfg as dfg_lib
@@ -65,9 +64,6 @@ class Server(object):
         # If user turned on debug, update logging level
         if app.config['RHOCI_DEBUG']:
             self._update_logging_level(logging.DEBUG)
-
-        # Initialize API documentation
-        auto.init_app(app)
 
         self._register_blueprints()
         self._setup_database()
