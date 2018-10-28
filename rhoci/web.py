@@ -69,7 +69,7 @@ class Server(object):
         self._setup_database()
         self._setup_releases()
         self._load_failures()
-        self._load_dfgs()
+        self._load_DFGs()
         self._setup_jenkins()
 
     def _register_blueprints(self):
@@ -156,7 +156,7 @@ class Server(object):
         app.run(threaded=True, host='0.0.0.0', port=int(
             app.config['RHOCI_SERVER_PORT']))
 
-    def _load_dfgs(self):
+    def _load_DFGs(self):
         """Loads RHOSP DFGs.
 
         Note: it doesn't load full list as the app discovers them when parsing
@@ -170,7 +170,8 @@ class Server(object):
                 if not models.DFG.query.filter_by(name=name).count():
                     dfg_lib.add_dfg_to_db(name)
                 for squad, components in dfg_data.iteritems():
-                    dfg_lib.add_squad_to_db(squad, name)
+                    if not models.Squad.query.filter_by(name=squad).count():
+                        dfg_lib.add_squad_to_db(squad, name)
                     dfg_lib.add_components_to_db(components, squad)
                 squad = models.Squad.query.filter_by(name=squad).first()
                 for component in components:

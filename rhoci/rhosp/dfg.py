@@ -73,9 +73,10 @@ def add_components_to_db(components, squad):
     """Inserts components into DB."""
     squad_db = models.Squad.query.filter_by(name=squad).first()
     for component in components:
-        db_component = models.Component(name=component,
-                                        squad_name=squad_db.name)
-        db.session.add(db_component)
+        if not models.Component.query.filter_by(name=component).count():
+            db_component = models.Component(name=component,
+                                            squad_name=squad_db.name)
+            db.session.add(db_component)
     db.session.commit()
 
 
