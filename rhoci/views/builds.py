@@ -54,7 +54,7 @@ def active():
 
 
 @builds.route('/builds', methods=['GET'])
-def all_builds():
+def all():
 
     db_builds = models.Build.query.all()
     all_builds = [build.serialize for build in db_builds]

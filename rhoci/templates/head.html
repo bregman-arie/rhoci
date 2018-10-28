@@ -8,8 +8,6 @@
   {% block stylesheets %}
   <link href="{{ url_for('static', filename='css/bootstrap-theme.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='css/patternfly.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='css/patternfly-additions.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/bootstrap-treeview.min.css') }}"></script>
   <link href="{{ url_for('static', filename='css/c3.css') }}"></script>
   <link href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css" rel="stylesheet">
@@ -21,13 +19,9 @@
   <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
   <script src="{{ url_for('static', filename='js/jquery.matchHeight-min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.matchHeight-min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfPagination.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfPagination.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/patternfly.dataTables.pfFilter.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap-treeview.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap-select.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/patternfly.js') }}"></script>
   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
@@ -39,6 +33,6 @@
   {% endblock %}
 
 
-  <title>{% block title %}RHOCI - RHOSP CI Management System{% endblock %}</title>
+  <title>{% block title %}RHOCI - Red Hat OSP CI Dashboard{% endblock %}</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>

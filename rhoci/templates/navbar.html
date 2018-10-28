@@ -1,139 +1,72 @@
-<nav class="navbar navbar-default navbar-pf" role="navigation">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark" role="navigation">
+
+        <!-- Logo -->
         <a class="navbar-brand" href="{{ url_for('home.index') }}">
            <img src="{{ url_for('static', filename='images/rhoci-logo.png') }}" alt="RHOCI"/>
         </a>
-    </div>
-    <div class="collapse navbar-collapse navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-utility">
-            <li><a href="{{ url_for('home.changelog') }}"><strong>Changelog</strong></a></li>
-            <li><a href="{{ url_for('doc.public_doc') }}"><strong>API</strong></a></li>
-            <li><a href="https://github.com/bregman-arie/RHOCI" target="_blank"><strong>Source Code</strong></a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-primary">
-          
+        
+        <ul class="navbar-nav"> 
+
           <!-- Home page button -->
-            <li>
-                <a href="{{ url_for('home.index') }}">Home</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('home.index') }}">Home</a>
             </li>
 
-          <!-- Views page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Views<b class="caret"></b></a>
-               <ul class="dropdown-menu">
+          <!-- Views dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Views
+              </a>
 
-               <li>
-                 <a href="{{ url_for('dfg.index') }}">DFGs</a>
-               </li>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('dfg.index') }}">DFGs</a>
+                <a class="dropdown-item" href="{{ url_for('dfg.squads') }}">Squads</a>
+                <a class="dropdown-item" href="{{ url_for('dfg.components') }}">Components</a>
+                <a class="dropdown-item" href="{{ url_for('home.releases') }}">Releases</a>
+              </div>
+          </li>
 
-               <li>
-                 <a href="{{ url_for('dfg.squads') }}">Squads</a>
-               </li>
+          <!-- Jobs dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Jobs
+              </a>
 
-               <li>
-                 <a href="{{ url_for('dfg.components') }}">Components</a>
-               </li>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('jobs.index') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('add_job.index') }}">Add a job</a>
+                <a class="dropdown-item" href="{{ url_for('job_analyzer.index') }}">Trigger</a>
+              </div>
+          </li>
 
-               <li>
-                 <a href="{{ url_for('home.releases') }}">Release</a>
-               </li>
+          <!-- Builds dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Builds
+              </a>
 
-               </ul>
-            </li>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('builds.all') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('builds.active') }}">Active</a>
+                <a class="dropdown-item" href="{{ url_for('builds.tests_compare') }}">Compare Test Results</a>
+              </div>
+          </li>
 
-          <!-- Jobs dropdown-->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Jobs<b class="caret"></b></a>
-               <ul class="dropdown-menu">
+          <!-- Tests dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+               Tests
+              </a>
 
-               <li>
-                 <a href="{{ url_for('jobs.index') }}">All jobs</a>
-               </li>
-
-               <li class="divider"></li>
-
-               <li>
-                 <a href="{{ url_for('add_job.index') }}">Add job</a>
-               </li>
-
-               <li>
-                 <a href="{{ url_for('job_analyzer.index') }}">Trigger jobs</a>
-               </li>
-
-               </ul>
-            </li>
-
-          <!-- Builds page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Builds<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-               <li>
-                 <a href="{{ url_for('builds.active') }}">Active builds</a>
-               </li>
-
-               <li>
-                 <a href="{{ url_for('builds.all_builds') }}">All builds</a>
-               </li>
-
-               <li class="divider"></li>
-
-               <li>
-                 <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
-               </li>
-
-               </ul>
-            </li>
-
-          <!-- Tests page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tests<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-               <li>
-                 <a href="{{ url_for('tests.unique_tests') }}">Unique tests</a>
-               </li>
-
-               <li class="divider"></li>
-
-               <li>
-                 <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
-               </li>
-
-               </ul>
-            </li>
-
-
-          <!-- Jenkins page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Jenkins<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-            <!-- Nodes page button -->
-              <li>
-                  <a href="{{ url_for('nodes.index') }}">Nodes</a>
-              </li>
-
-            <!-- Plugins page button -->
-              <li>
-                  <a href="{{ url_for('plugins.index') }}">Plugins</a>
-              </li>
-
-               </ul>
-            </li>
-
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('builds.all') }}">Unique Tests</a>
+              </div>
+          </li>
 
           <!-- Bugs page button -->
-            <li>
-                <a href="{{ url_for('home.bugs') }}">Bugs</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('home.bugs') }}">Bugs</a>
             </li>
 
         </ul>
-    </div>
 </nav>
