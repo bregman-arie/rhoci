@@ -22,7 +22,6 @@ import sys
 import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
 import rhoci.models as models
-from rhoci.views.doc import auto
 import rhoci.rhosp.bug as rhosp_bug
 import rhoci.jenkins.job as jenkins_job
 import rhoci.jenkins.test as jenkins_test
@@ -139,7 +138,6 @@ def ajax_jobs(job_type, release):
     return jsonify(results)
 
 
-@auto.doc(groups=['jobs', 'public'])
 @home.route('/v2.0/jobs', methods=['GET', 'POST'])
 def list_jobs():
     """Returns all jobs in the DB."""
@@ -153,7 +151,6 @@ def list_jobs():
     return jsonify(output=jobs)
 
 
-@auto.doc(groups=['jobs', 'public'])
 @home.route('/v2.0/jobs/<string:job_name>', methods=['GET', 'DELETE'])
 def get_job(job_name):
     """Returns data on a specific job."""
@@ -169,7 +166,6 @@ def get_job(job_name):
         return jsonify({'exist': False})
 
 
-@auto.doc(groups=['tests', 'public'])
 @home.route('/v2.0/tests', methods=['GET', 'POST'])
 def list_tests():
     """Returns all unique tests in the DB."""
@@ -178,7 +174,6 @@ def list_tests():
     return jsonify(tests=tests)
 
 
-@auto.doc(groups=['release', 'public'])
 @home.route('/v2.0/releases', methods=['GET'])
 def list_releases():
     """Returns all the releases in the DB."""
@@ -187,7 +182,6 @@ def list_releases():
     return jsonify(releases=releases)
 
 
-@auto.doc(groups=['bugs', 'public'])
 @home.route('/v2.0/bugs', methods=['GET'])
 def list_bugs():
     """Returns all the bugs in the DB."""
@@ -196,7 +190,6 @@ def list_bugs():
     return jsonify(bugs=bugs)
 
 
-@auto.doc(groups=['update', 'public'])
 @home.route('/v2.0/update_jobs', methods=['GET', 'POST'])
 def update_jobs():
     """Shallow update of all jobs."""
@@ -213,7 +206,6 @@ def jenkins_notifications():
     return jsonify({'notification': status})
 
 
-@auto.doc(groups=['builds', 'public'])
 @home.route('/v2.0/builds', methods=['GET', 'POST'])
 def builds():
     """Returns information on Jenkins builds."""
@@ -221,7 +213,6 @@ def builds():
     return jsonify(builds=builds)
 
 
-@auto.doc(groups=['rhosp', 'public'])
 @home.route('/v2.0/dfg', methods=['GET', 'POST'])
 def dfgs():
     """Returns all DFGs"""
@@ -229,7 +220,6 @@ def dfgs():
     return jsonify(dfgs=dfg)
 
 
-@auto.doc(groups=['rhosp', 'public'])
 @home.route('/v2.0/squads', methods=['GET', 'POST'])
 def squads():
     """Returns all squads"""
@@ -237,7 +227,6 @@ def squads():
     return jsonify(squads=squads)
 
 
-@auto.doc(groups=['rhosp', 'public'])
 @home.route('/v2.0/components', methods=['GET', 'POST'])
 def components():
     """Returns all components"""
@@ -245,7 +234,6 @@ def components():
     return jsonify(components=components)
 
 
-@auto.doc(groups=['failures', 'public'])
 @home.route('/v2.0/failures', methods=['GET', 'POST'])
 def failures():
     """Returns all failures"""

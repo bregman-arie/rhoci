@@ -46,7 +46,7 @@
  </div>
 <div class="card-pf-body">
     {% for component in components %}
-      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
+      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg, squad_name=squad) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
       <br>
     {% endfor %}
 </div>
@@ -63,7 +63,7 @@
 <div class="container-fluid">
   <div class="row">
           <h3>
-            <strong>Failing Jobs</strong>
+            <strong>All Failing Jobs</strong>
           </h3>
 
 {% include "jobs/show_failed_jobs_table.html" -%}
@@ -88,7 +88,7 @@
 
 {% include "tests/show_tests.js" -%}
 
-{% include "jobs/show_failed_jobs_datatable.js" -%}
+{% include "jobs/show_failed_jobs_per_squad_datatable.js" -%}
 
 {% include "common/modal_order.js" -%}
 $("#jobs_table").addClass('hidden');

@@ -76,15 +76,18 @@ def squad_summary(squad_name, dfg_name):
         data[-1]['num_of_jobs'] = total_number
 
     return render_template('DFG/squad/summary.html', releases=data,
+                           squad=squad_name,
                            agent=agent, dfg=dfg_name, components=components)
 
 
-@dfg.route('/<dfg_name>/component/<component_name>', methods=['GET'])
-def component_summary(component_name, dfg_name):
+@dfg.route('/<dfg_name>/<squad_name>/<component_name>', methods=['GET'])
+def component_summary(component_name, dfg_name, squad_name):
 
     agent = models.Agent.query.one()
     releases = models.Release.query.all()
     dfg = models.DFG.query.filter_by(name=dfg_name).first()
+    squad = models.Squad.query.filter_by(name=squad_name).first()
+    components = squad.components
     data = []
 
     for rel in releases:
@@ -101,7 +104,9 @@ def component_summary(component_name, dfg_name):
                     status), models.Job.release == rel).count()
 
     return render_template('DFG/component/summary.html', releases=data,
-                           agent=agent, dfg=dfg)
+                           agent=agent, dfg=dfg, squad=squad,
+                           components=components,
+                           curr_component=component_name)
 
 
 @dfg.route('/<dfg_name>', methods=['GET'])

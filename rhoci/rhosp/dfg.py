@@ -21,14 +21,31 @@ DFGs = {'network': {
     'OVN': ['networking-ovn']}}
 
 
-def get_dfg_name(string):
+def get_DFG_name(string):
     """
-    Gets string like 'DFG-network-neutron-12'
+    Receives string like 'DFG-network-neutron-12'
 
     Returns DFG name. In the example above: Network.
     """
     name = string.split('-')[1] if '-' in string else string
     return name.upper() if len(name) < 4 else name.capitalize()
+
+
+def get_squad_name(string):
+    """
+    Receives string like 'DFG-network-neutron-12'
+
+    Returns squad name. In the example above: neutron.
+    """
+    DFG = get_DFG_name(string)
+    component = string.split('-')[2] if '-' in string else string
+    if DFG.lower() in DFGs:
+        for dfg, squads in DFGs.iteritems():
+            for squad, components in squads.iteritems():
+                for component in components:
+                    if "dfg-%s-%s" % (DFG.lower(), component) in string:
+                        return squad
+    return
 
 
 def dfg_exists(dfg):
@@ -60,3 +77,15 @@ def add_components_to_db(components, squad):
                                         squad_name=squad_db.name)
         db.session.add(db_component)
     db.session.commit()
+
+
+def get_DFG_db_object(job):
+    DFG = get_DFG_name(job)
+    DFG_db = db.DFG.query.filter_by(name=DFG).first()
+    return DFG_db
+
+
+def get_squad_db_object(job):
+    squad = get_squad_name(job)
+    squad_db = models.Squad.query.filter_by(name=squad).first()
+    return squad_db

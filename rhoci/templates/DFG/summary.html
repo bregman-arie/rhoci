@@ -59,7 +59,7 @@
 <div class="card-pf-body">
   {% for squad in dfg.squads %}
     {% for component in squad.components %}
-      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
+      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name, squad_name=squad.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
       <br>
     {% endfor %}
   {% endfor %}
@@ -77,7 +77,7 @@
 <div class="container-fluid">
   <div class="row">
           <h3>
-            <strong>Failing Jobs</strong>
+            <strong>All Failing Jobs</strong>
           </h3>
 
 {% include "jobs/show_failed_jobs_table.html" -%}

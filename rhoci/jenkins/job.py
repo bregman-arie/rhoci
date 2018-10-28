@@ -19,6 +19,7 @@ import rhoci.jenkins.build as build_lib
 from rhoci.db.base import db
 import rhoci.models as models
 import rhoci.rhosp.jenkins as rhosp_jenkins
+import rhoci.rhosp.dfg as rhosp_dfg
 from rhoci.rhosp import release
 from rhoci.common.utils import convert_unixtime_to_datetime
 
@@ -31,10 +32,15 @@ def insert_job_data_into_db(job):
     last_build_number = 'None'
     last_build_result = 'None'
     timestamp = None
+    DFG = None
+    squad = None
 
     if not models.Job.query.filter_by(name=job_name).count():
         # Get job type and release
         job_type = rhosp_jenkins.get_job_type(job_name.lower())
+        if job_type.lower() == 'dfg':
+            DFG = rhosp_dfg.get_DFG_name(job_name.lower())
+            squad = rhosp_dfg.get_squad_name(job_name.lower())
         rel = rhosp_jenkins.get_job_release(job_name)
 
         # If there is build data, update DB accordingly
@@ -51,6 +57,8 @@ def insert_job_data_into_db(job):
                             release_number=int(rel),
                             last_build_number=last_build_number,
                             last_build_result=last_build_result,
+                            DFG_name=DFG,
+                            squad_name=squad,
                             timestamp=timestamp)
 
         # Add to DB and commit the change

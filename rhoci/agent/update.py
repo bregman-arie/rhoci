@@ -79,7 +79,7 @@ def job_db_delete(job):
     db.session.commit()
 
     if rhosp_jenkins.get_job_type(job) == 'dfg':
-        dfg = rhosp_dfg.get_dfg_name(job)
+        dfg = rhosp_dfg.get_DFG_name(job)
         if models.Job.query.filter(models.Job.name.contains(
                 'DFG-%s' % dfg)).count() == 1:
             models.dfg.filter_by(name=dfg).delete()

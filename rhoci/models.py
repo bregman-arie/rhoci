@@ -110,8 +110,10 @@ class Job(db.Model):
     last_build_result = db.Column(db.String(64))
     job_type = db.Column(db.String(64))
     release_number = db.Column(db.Integer, db.ForeignKey('release.number'))
-    release = db.relationship("Release", uselist=False, backref="release")
     timestamp = db.Column(db.DateTime)
+    release = db.relationship("Release", uselist=False, backref="job")
+    DFG_name = db.Column(db.String(64), db.ForeignKey('DFG.name'))
+    squad_name = db.Column(db.String(64), db.ForeignKey('squad.name'))
     builds = db.relationship('Build', secondary=builds, lazy='subquery',
                              backref=db.backref('jobs', lazy=True))
     bugs = db.relationship('Bug', secondary=bugs, lazy='subquery',
@@ -126,6 +128,8 @@ class Job(db.Model):
             'last_build_number': self.last_build_number,
             'last_build_result': self.last_build_result,
             'job_type': self.job_type,
+            'DFG': self.DFG_name,
+            'Squad': self.squad_name,
             'timestamp': self.timestamp,
             'bugs': self.serialize_bugs,
             'builds': self.serialize_builds,
@@ -279,6 +283,7 @@ class Squad(db.Model):
     DFG_name = db.Column(db.String(64), db.ForeignKey('DFG.name'),
                          nullable=False)
     components = db.relationship('Component', backref="squad", lazy='dynamic')
+    jobs = db.relationship('Job', backref="squad", lazy='dynamic')
 
     @property
     def serialize(self):

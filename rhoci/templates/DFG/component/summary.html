@@ -36,25 +36,28 @@
 {% endfor %}
 </div>
 
+{% if squad.components.count() > 1 %}
 
 <div class="col-lg-2">
 <div class="card-pf">
  <div class="card-pf-heading">
    <h2 class="card-pf-title">
-     Components
+     Other Components
    </h2>
  </div>
 <div class="card-pf-body">
-  {% for squad in dfg.squads %}
     {% for component in squad.components %}
-      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
-      <br>
-    {% endfor %}
+      {% if component.name != curr_component %}
+        <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name, squad_name=squad.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
+
+        <br>
+      {% endif %}
   {% endfor %}
 </div>
 </div>
 </div>
 
+{% endif %}
 
 </div>
 <!-- -->
@@ -65,7 +68,7 @@
 <div class="container-fluid">
   <div class="row">
           <h3>
-            <strong>Failing Jobs</strong>
+            <strong>All Failing Jobs</strong>
           </h3>
 
 {% include "jobs/show_failed_jobs_table.html" -%}
@@ -90,7 +93,7 @@
 
 {% include "tests/show_tests.js" -%}
 
-{% include "jobs/show_failed_jobs_datatable.js" -%}
+{% include "jobs/show_failed_jobs_per_component_datatable.js" -%}
 
 {% include "common/modal_order.js" -%}
 $("#jobs_table").addClass('hidden');

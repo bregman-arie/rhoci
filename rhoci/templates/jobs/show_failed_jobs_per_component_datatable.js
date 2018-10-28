@@ -1,5 +1,5 @@
     $('#failed_jobs_table').DataTable( {
-      "ajax": "{{ url_for('jobs.get_failed',dfg=dfg.name) }}",
+      "ajax": "{{ url_for('jobs.get_failed_per_component',dfg=dfg.name, component=curr_component) }}",
       className: "text-center",
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
           if ( aData[1] == 'None' )

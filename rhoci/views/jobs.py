@@ -99,3 +99,35 @@ def get_failed(dfg=None):
     results = job_lib.construct_jobs_dictionary(jobs)
 
     return jsonify(results)
+
+
+@jobs.route('/failed_jobs/<dfg>/<squad>')
+def get_failed_per_squad(dfg=None, squad=None):
+    """Get failed and aborted jobs of a given DFG and squad"""
+    results = dict()
+    results['data'] = list()
+
+    jobs = models.Job.query.filter(
+        models.Job.squad_name.like(squad),
+        (models.Job.last_build_result.like("FAILURE") |
+         models.Job.last_build_result.like("ABORTED")))
+
+    results = job_lib.construct_jobs_dictionary(jobs)
+
+    return jsonify(results)
+
+
+@jobs.route('/failed_component_jobs/<dfg>/<component>')
+def get_failed_per_component(dfg=None, component=None):
+    """Get failed and aborted jobs of a given DFG and component"""
+    results = dict()
+    results['data'] = list()
+
+    jobs = models.Job.query.filter(
+        models.Job.name.contains('DFG-%s-%s' % (dfg, component)),
+        (models.Job.last_build_result.like("FAILURE") |
+         models.Job.last_build_result.like("ABORTED")))
+
+    results = job_lib.construct_jobs_dictionary(jobs)
+
+    return jsonify(results)
