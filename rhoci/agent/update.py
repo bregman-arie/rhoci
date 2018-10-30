@@ -19,7 +19,7 @@ from rhoci.db.base import db
 import rhoci.jenkins.server as jenkins_server
 import rhoci.models as models
 import rhoci.rhosp.jenkins as rhosp_jenkins
-import rhoci.rhosp.dfg as rhosp_dfg
+import rhoci.rhosp.DFG as DFG_lib
 
 LOG = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ def job_db_delete(job):
     db.session.commit()
 
     if rhosp_jenkins.get_job_type(job) == 'dfg':
-        dfg = rhosp_dfg.get_DFG_name(job)
+        dfg = DFG_lib.get_DFG_name(job)
         if models.Job.query.filter(models.Job.name.contains(
                 'DFG-%s' % dfg)).count() == 1:
             models.dfg.filter_by(name=dfg).delete()

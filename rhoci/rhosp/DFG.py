@@ -90,3 +90,19 @@ def get_squad_db_object(job):
     squad = get_squad_name(job)
     squad_db = models.Squad.query.filter_by(name=squad).first()
     return squad_db
+
+
+def get_number_of_jobs(DFG, status=None):
+    """Returns the number of jobs of a given DFG."""
+
+
+def get_DFG_jobs_summary():
+    """Returns dictionary of DFGs and their jobs count by status.
+
+    {'network': [<failure_num>, <unstable_num>, <success_num>]}
+    """
+    summary = {}
+    DFGs = [DFG.name for DFG in models.DFG.query.all()]
+    for DFG in DFGs:
+        print(DFG)
+    return summary

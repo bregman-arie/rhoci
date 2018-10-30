@@ -23,9 +23,9 @@ import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
 import rhoci.models as models
 import rhoci.rhosp.bug as rhosp_bug
+import rhoci.rhosp.DFG as DFG_lib
 import rhoci.jenkins.job as jenkins_job
 import rhoci.jenkins.test as jenkins_test
-import rhoci.rhosp.release as release
 
 if sys.version_info[0] >= 3:
     from xmlrpc.client import Fault
@@ -69,57 +69,9 @@ def get_percentage(num1, num2):
 @home.route('/')
 def index():
     """Home page."""
-    releases = models.Release.query.all()
-    jobs = {}
-    jobs['phase1'] = models.Job.query.filter_by(job_type='phase1')
-    jobs['phase2'] = models.Job.query.filter_by(job_type='phase2')
-    jobs['dfg'] = models.Job.query.filter_by(job_type='dfg')
-    jobs_num = models.Job.query.count()
-    builds_num = models.Build.query.count()
-    tests_num = models.Test.query.count()
-    bugs_num = models.Bug.query.count()
-    nodes_num = models.Node.query.count()
-    plugins_num = models.Plugin.query.count()
-    agent = models.Agent.query.one()
 
-    storage = dfg_summary('storage')
-    network = dfg_summary('network')
-    compute = dfg_summary('compute')
-
-    last_rel_num = release.get_last_release()
-    last_release = {'number': last_rel_num,
-                    'total_jobs': models.Job.query.filter_by(
-                        release_number=last_rel_num).count(),
-                    'failed_jobs': models.Job.query.filter_by(
-                        release_number=last_rel_num,
-                        last_build_result='FAILURE').count(),
-                    'passed_jobs': models.Job.query.filter_by(
-                        release_number=last_rel_num,
-                        last_build_result='SUCCESS').count(),
-                    'unstable_jobs': models.Job.query.filter_by(
-                        release_number=last_rel_num,
-                        last_build_result='UNSTABLE').count(),
-                    'never_executed_jobs': models.Job.query.filter_by(
-                        release_number=last_rel_num,
-                        last_build_result='None').count()}
-
-    last_release['failed_percent'] = get_percentage(
-        last_release['failed_jobs'], last_release['total_jobs'])
-    last_release['passed_percent'] = get_percentage(
-        last_release['passed_jobs'], last_release['total_jobs'])
-    last_release['unstable_percent'] = get_percentage(
-        last_release['unstable_jobs'], last_release['total_jobs'])
-    last_release['never_executed_percent'] = get_percentage(
-        last_release['never_executed_jobs'], last_release['total_jobs'])
-
-    return render_template('home.html',
-                           releases=releases, phase1=jobs['phase1'],
-                           phase2=jobs['phase2'], dfg=jobs['dfg'],
-                           jobs_num=jobs_num, nodes_num=nodes_num,
-                           plugins_num=plugins_num, builds_num=builds_num,
-                           tests_num=tests_num, bugs_num=bugs_num,
-                           network=network, compute=compute, storage=storage,
-                           last_release=last_release, agent=agent)
+    DFGs = DFG_lib.get_DFG_jobs_summary()
+    return render_template('home.html', DFGs=DFGs)
 
 
 @home.route('/releases/ajax/jobs/<job_type>_<release>')
