@@ -1,4 +1,4 @@
-# Copyright 2017 Arie Bregman
+# Copyright 2019 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -14,9 +14,9 @@
 from configparser import ConfigParser
 from flask import Flask
 import logging
-from logging.handlers import RotatingFileHandler
 import os
 
+import rhoci.common.log as log_lib
 from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
 import rhoci.rhosp.DFG as DFG_lib
@@ -52,23 +52,30 @@ VIEWS = (
 
 
 class Server(object):
-    """RHOCI Server"""
+    """Application Server"""
 
-    def __init__(self, args=None):
+    def __init__(self, name, args=None):
 
-        self.setup_logging()
+        self.name = name
+        self._setup(args)
+        self._load_predefined_data()
+        self._run_jenkins_agent()
+
+    def _setup(self, args):
+        """Run all pre-running methods."""
+        log_lib.setup_logging(self.name)
         self.load_config(args)
-
         # If user turned on debug, update logging level
         if app.config['RHOCI_DEBUG']:
-            self._update_logging_level(logging.DEBUG)
-
+            log_lib._update_logging_level(logging.DEBUG)
         self._register_blueprints()
         self._setup_database()
         self._setup_releases()
+
+    def _load_predefined_data(self):
+        """Load predefined data the app was installed with."""
         self._load_failures()
         self._load_DFGs()
-        self._setup_jenkins()
 
     def _register_blueprints(self):
         """Registers Flask blueprints."""
@@ -133,20 +140,6 @@ class Server(object):
         with app.app_context():
             db.create_all()
 
-    def setup_logging(self):
-        """Setup logging level and format."""
-        format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
-        level = logging.INFO
-        logging.basicConfig(level=level, format=format)
-        handler = RotatingFileHandler('rhoci.log', maxBytes=2000000,
-                                      backupCount=10)
-        logging.getLogger().addHandler(handler)
-
-    def _update_logging_level(self, logging_level):
-        """Update logging based on passed level."""
-
-        logging.getLogger().setLevel(logging.DEBUG)
-
     def run(self):
         """Runs the web server."""
         LOG.info("Running rhoci web server")
@@ -209,7 +202,7 @@ class Server(object):
                     db.session.commit()
                     logging.info("Added release %s to the DB" % release)
 
-    def _setup_jenkins(self):
+    def _run_jenkins_agent(self):
         """Create Jenkins agent to pull information from RHOSP Jenkins."""
         agent = JenkinsAgent(name="RHOSP",
                              user=app.config.get('RHOCI_JENKINS_USER'),

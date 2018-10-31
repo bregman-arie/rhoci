@@ -15,6 +15,8 @@ import argparse
 
 import rhoci.web
 
+APP_NAME = "RHOCI"
+
 
 def create_parser():
     """Returns argparse parser."""
@@ -22,18 +24,18 @@ def create_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--debug', action='store_true',
-                        dest="RHOCI_DEBUG", help='Turn DEBUG on')
-    parser.add_argument('--conf', '-c', dest="RHOCI_CONFIG_FILE",
-                        help='RHOCI configuration file')
-    parser.add_argument('--port', '-p', dest="RHOCI_SERVER_PORT",
-                        help='RHOCI server port')
+                        dest="%s_DEBUG" % APP_NAME, help='Turn DEBUG on')
+    parser.add_argument('--conf', '-c', dest="%s_CONFIG_FILE" % APP_NAME,
+                        help='Configuration file')
+    parser.add_argument('--port', '-p', dest="%s_SERVER_PORT" % APP_NAME,
+                        help='Server port')
 
     return parser
 
 
 def launch_app(args=None):
     """Runs Web application."""
-    web_server = rhoci.web.Server(args)
+    web_server = rhoci.web.Server(APP_NAME.lower(), args)
     web_server.run()
 
 

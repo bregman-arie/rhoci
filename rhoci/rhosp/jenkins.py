@@ -23,10 +23,10 @@ def get_job_type(name):
     elif 'phase2' in name:
         return 'phase2'
     elif 'dfg' in name:
-        dfg = DFG_lib.get_DFG_name(name)
-        if not DFG_lib.dfg_exists(dfg):
-            DFG_lib.add_dfg_to_db(dfg)
-        return 'dfg'
+        DFG = DFG_lib.get_DFG_name(name)
+        if not DFG_lib.dfg_exists(DFG):
+            DFG_lib.add_dfg_to_db(DFG)
+        return 'DFG'
     else:
         return 'other'
 

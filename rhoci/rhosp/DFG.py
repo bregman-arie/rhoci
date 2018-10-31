@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from rhoci.db.base import db
+# from rhoci.jenkins.job import get_count
 from rhoci import models
 
 
@@ -104,5 +105,7 @@ def get_DFG_jobs_summary():
     summary = {}
     DFGs = [DFG.name for DFG in models.DFG.query.all()]
     for DFG in DFGs:
-        print(DFG)
+        pass
+        # summary[DFG] = [get_count(DFG=DFG, status=status) for
+        #                status in ['failure', 'unstable', 'success']]
     return summary

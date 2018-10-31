@@ -1,25 +1,31 @@
 # Red Hat OpenStack CI Dashboard
 
-[![Build Status](https://travis-ci.org/bregman-arie/rhoci.svg?branch=master)](https://travis-ci.org/bregman-arie/rhoci)
+[![Build Status](https://travis-ci.org/bregman-arie/rhoci.svg?branch=refactor)](https://travis-ci.org/bregman-arie/rhoci)
 
-RHOCI is Red Hat OpenStack CI Dashboard. It includes:
+RHOCI is Red Hat OpenStack CI Dashboard.
 
-* Global view of jobs, builds and tests with filtering across Jenkins
-* Failure analyzing for builds that failed
-* job definitions generation
-* CI status summary per DFG, squad and component
+Among its features, you will find:
+
+* Modern dashboard that summarizes the status of your jobs
+* Deep dive into each one of the available levels: Team, Squad, Job, Build & Test
+
+## Quick Start
+
+Want to run a production instance of RHOCI? Follow this[https://github.com/bregman-arie/rhoci/wiki/quickstart_prod]
+
+Want to run a demo instance of RHOCI? Follow this[https://github.com/bregman-arie/rhoci/wiki/quickstart_demo]
 
 ## User guide
 
-If you would like to use RHOCI click [here](https://github.com/bregman-arie/rhoci/wiki/User_guide)
+A user? start [here](https://github.com/bregman-arie/rhoci/wiki/User_guide)
 
 ## Developer guide
 
-If you would like to contribute to RHOCI click [here](https://github.com/bregman-arie/rhoci/wiki/Developer_guide)
+A developer? start [here](https://github.com/bregman-arie/rhoci/wiki/Developer_guide)
 
-## Technologies
+## The Tech Behind RHOCI
 
-RHOCI is using the following list of projects:
+RHOCI is using several cool projects which allows it to do what it does:
 
 * Flask
 * Bootstrap

@@ -151,3 +151,12 @@ def construct_jobs_dictionary(jobs):
                                         i.serialize for i in job.bugs],
                                     bug_number])
     return results
+
+
+def get_count(DFG, status=None):
+    """Returns number of jobs based on given parameters."""
+    if status:
+        return models.Job.query.filter_by(DFG_name=DFG,
+                                          last_build_result=status.lower())
+    else:
+        return models.Job.query.filter_by(DFG_name=DFG)
