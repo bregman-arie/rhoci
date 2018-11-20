@@ -16,7 +16,7 @@ from flask import Flask
 import logging
 import os
 
-import rhoci.common.log as log_lib
+import rhoci.server.log as log
 from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
 import rhoci.rhosp.DFG as DFG_lib
@@ -57,17 +57,21 @@ class Server(object):
     def __init__(self, name, args=None):
 
         self.name = name
-        self._setup(args)
+        self.setup_logging()
+        self.load_configuration(args)
         self._load_predefined_data()
         self._run_jenkins_agent()
 
-    def _setup(self, args):
+    def setup_logging(self):
+        """Sets up logging level and format."""
+        log.setup_logging(self.name)
+
+    def load_configuration(self, args):
         """Run all pre-running methods."""
-        log_lib.setup_logging(self.name)
         self.load_config(args)
         # If user turned on debug, update logging level
         if app.config['RHOCI_DEBUG']:
-            log_lib._update_logging_level(logging.DEBUG)
+            log._update_logging_level(logging.DEBUG)
         self._register_blueprints()
         self._setup_database()
         self._setup_releases()
@@ -75,7 +79,8 @@ class Server(object):
     def _load_predefined_data(self):
         """Load predefined data the app was installed with."""
         self._load_failures()
-        self._load_DFGs()
+        with app.app_context():
+            DFG_lib.load_DFGs()
 
     def _register_blueprints(self):
         """Registers Flask blueprints."""
@@ -146,31 +151,6 @@ class Server(object):
 
         app.run(threaded=True, host='0.0.0.0', port=int(
             app.config['RHOCI_SERVER_PORT']))
-
-    def _load_DFGs(self):
-        """Loads RHOSP DFGs.
-
-        Note: it doesn't load full list as the app discovers them when parsing
-              data from Jenkins. The reason it loads some of them is because
-              we associate some of them with squads and components which
-              can't be done by Jenkins
-        """
-        for dfg, dfg_data in DFG_lib.DFGs.iteritems():
-            name = DFG_lib.get_DFG_name(dfg)
-            with app.app_context():
-                if not models.DFG.query.filter_by(name=name).count():
-                    DFG_lib.add_dfg_to_db(name)
-                for squad, components in dfg_data.iteritems():
-                    if not models.Squad.query.filter_by(name=squad).count():
-                        DFG_lib.add_squad_to_db(squad, name)
-                    DFG_lib.add_components_to_db(components, squad)
-                squad = models.Squad.query.filter_by(name=squad).first()
-                for component in components:
-                    component = models.Component.query.filter_by(
-                        name=component).first()
-                    squad.components.append(component)
-                db.session.commit()
-            LOG.debug("Loaded DFGs, squads and components")
 
     def _load_failures(self):
         """Loads RHOCI built-in failure to DB."""

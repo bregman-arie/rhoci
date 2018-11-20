@@ -1,5 +1,8 @@
 #!/bin/bash
+
+# This will remove existing installation and server
+
 rm -rf .venv
 virtualenv .venv && source .venv/bin/activate
 pip install .
-rhoci-server --conf /etc/rhoci/staging_server.conf --debug -p 5000
+rhoci-server --debug -p 5000

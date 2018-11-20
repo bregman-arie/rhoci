@@ -109,3 +109,21 @@ def get_DFG_jobs_summary():
         # summary[DFG] = [get_count(DFG=DFG, status=status) for
         #                status in ['failure', 'unstable', 'success']]
     return summary
+
+
+def load_DFGs():
+    """Loads predefined DFGs from file"""
+    for DFG, DFG_content in DFGs.iteritems():
+        name = get_DFG_name(DFG)
+        if not models.DFG.query.filter_by(name=name).count():
+            add_dfg_to_db(name)
+        for squad, components in DFG_content.iteritems():
+            if not models.Squad.query.filter_by(name=squad).count():
+                add_squad_to_db(squad, name)
+            add_components_to_db(components, squad)
+        squad = models.Squad.query.filter_by(name=squad).first()
+        for component in components:
+            component = models.Component.query.filter_by(
+                name=component).first()
+            squad.components.append(component)
+        db.session.commit()

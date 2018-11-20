@@ -1,4 +1,4 @@
-# Copyright 2017 Arie Bregman
+# Copyright 2018 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -15,22 +15,15 @@ import argparse
 
 import rhoci.web
 
-APP_NAME = "RHOCI"
-
 
 def create_parser():
     """Returns argparse parser."""
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--debug', action='store_true',
-                        dest="%s_DEBUG" % APP_NAME, help='Turn DEBUG on')
-    parser.add_argument('--conf', '-c', dest="%s_CONFIG_FILE" % APP_NAME,
-                        help='Configuration file')
-    parser.add_argument('--port', '-p', dest="%s_SERVER_PORT" % APP_NAME,
-                        help='Server port')
-    parser.add_argument('--demo', dest="demo", help='Run in demo mode',
-                        action='store_true')
+    parser.add_argument('--conf', '-c', dest="config_file", help='Configuration file')
+    parser.add_argument('--port', '-p', dest="server_port", help='Server port')
+    parser.add_argument('--demo', dest="demo_mode", help='Runs in demo mode')
 
     return parser
 
@@ -38,9 +31,11 @@ def create_parser():
 def launch_app(args=None):
     """Runs Web application."""
     if args.demo:
-        web_server = rhoci.demo
-    web_server = rhoci.web.Server(APP_NAME.lower(), args)
-    web_server.run()
+        web_server = rhoci.demo.server.DemoServer()
+    else:
+        print(args)
+        web_server = rhoci.web.Server(args)
+        web_server.run()
 
 
 def main():

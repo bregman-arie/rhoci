@@ -23,7 +23,6 @@ import rhoci.agent.update as agent_update
 from rhoci.jenkins import manager
 import rhoci.models as models
 import rhoci.rhosp.bug as rhosp_bug
-import rhoci.rhosp.DFG as DFG_lib
 import rhoci.jenkins.job as jenkins_job
 import rhoci.jenkins.test as jenkins_test
 
@@ -70,8 +69,9 @@ def get_percentage(num1, num2):
 def index():
     """Home page."""
 
-    DFGs = DFG_lib.get_DFG_jobs_summary()
-    return render_template('home.html', DFGs=DFGs)
+    # DFGs = DFG_lib.get_DFG_jobs_summary()
+    DFGs = ['Netwrok', 'Storage', 'Compute', 'OpenDaylight']
+    return render_template('home.html', DFGs_to_display=DFGs)
 
 
 @home.route('/releases/ajax/jobs/<job_type>_<release>')

@@ -5,18 +5,15 @@
 
 <div class="container-fluid">
 
-   <!-- Breadcrumbs-->
-   <ol class="breadcrumb">
-     <li class="breadcrumb-item">
-       Dashboard
-     </li>
-     <li class="breadcrumb-item active">Overview</li>
-   </ol>
+  <!-- Breadcrumbs-->
+  {% with breadcrumb_section='Overview' %}
+     {% include "breadcrumb.html" %}
+  {% endwith %}
 
    <!-- First row of cards -->
    <div class="row"> 
 
-   {% for DFG in ['Netwrok', 'Storage', 'Compute', 'OpenDaylight'] %}
+   {% for DFG in DFGs_to_display %}
      {% with DFG=DFG %}
        {% include "cards/pie_chart.html" %}
      {% endwith %}
@@ -24,7 +21,7 @@
 
    </div> <!-- /First cards row -->
 
-
 </div> <!-- /container-fluid -->
+        
 
 {% endblock %}

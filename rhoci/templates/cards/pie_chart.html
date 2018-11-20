@@ -17,7 +17,7 @@ var myChart = new Chart(ctx, {
         labels: ["Failure", "Unstable", "Success"],
         datasets: [{
             label: '# of Votes',
-            data: [12, 19, 3],
+            data: [{{ url_for('DFG.get_num_of_jobs, status=FAILED') }}, 19, 3],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(255, 206, 86, 0.2)',
