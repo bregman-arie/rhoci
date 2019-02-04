@@ -16,10 +16,11 @@ from rhoci.db.base import db
 from rhoci import models
 
 
-DFGs = {'network': {
-    'vNES': ['neutron', 'python-neutronclient'],
-    'Octavia': ['octavia', 'neutron-lbaas'],
-    'OVN': ['networking-ovn']}}
+DFGs = {
+    'network': {
+        'vNES': ['neutron', 'python-neutronclient'],
+        'Octavia': ['octavia', 'neutron-lbaas'],
+        'OVN': ['networking-ovn']}}
 
 
 def get_DFG_name(string):
@@ -113,11 +114,11 @@ def get_DFG_jobs_summary():
 
 def load_DFGs():
     """Loads predefined DFGs from file"""
-    for DFG, DFG_content in DFGs.iteritems():
+    for DFG, DFG_content in DFGs.items():
         name = get_DFG_name(DFG)
         if not models.DFG.query.filter_by(name=name).count():
             add_dfg_to_db(name)
-        for squad, components in DFG_content.iteritems():
+        for squad, components in DFG_content.items():
             if not models.Squad.query.filter_by(name=squad).count():
                 add_squad_to_db(squad, name)
             add_components_to_db(components, squad)

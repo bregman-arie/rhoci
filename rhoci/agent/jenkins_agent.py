@@ -16,6 +16,7 @@ import jenkins
 import logging
 from multiprocessing import Process
 import time
+import sys
 
 from rhoci.agent import agent
 from rhoci.agent import update
@@ -42,10 +43,9 @@ class JenkinsAgent(agent.Agent):
         try:
             self.conn = jenkins.Jenkins(self.url, self.user, self.password)
             self.active = True
-        except Exception as e:
-            LOG.info("Something went terribly wrong when " +
-                     "starting Jenkins agent: %s" % e.message)
-            self.active = False
+        except TypeError:
+            LOG.error("Please specify jenkins address, user and token")
+            sys.exit(2)
         self.add_agent_to_db()
 
     def start(self):

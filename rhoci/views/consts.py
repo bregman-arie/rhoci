@@ -1,4 +1,4 @@
-# Copyright 2017 Arie Bregman
+# Copyright 2019 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,4 +11,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-__version__ = '0.0.1'
+import rhoci.views
+
+VIEWS = (
+    (rhoci.views.home, ''),
+    (rhoci.views.jobs, '/jobs'),
+    (rhoci.views.doc, '/doc'),
+    (rhoci.views.builds, '/builds'),
+    (rhoci.views.tests, '/tests'),
+    (rhoci.views.nodes, '/nodes'),
+    (rhoci.views.plugins, '/plugins'),
+    (rhoci.views.dfg, '/dfg'),
+    (rhoci.views.add_job, '/add_job'),
+    (rhoci.views.job_analyzer, '/job_analyzer'),
+    (rhoci.views.review_statistics, '/review_statistics'),
+)

@@ -13,6 +13,7 @@
 #    under the License.
 from flask import render_template
 from flask import Blueprint
+from flask import jsonify
 import logging
 
 from rhoci import models
@@ -133,3 +134,9 @@ def stats(dfg_name):
 
     return render_template('DFG/summary.html', releases=data, agent=agent,
                            dfg=dfg)
+
+
+@dfg.route('/get_num_of_jobs/<name>/<status>', methods=['GET'])
+def get_num_of_jobs(name, status=None):
+    print(jsonify({'a': 20}))
+    return jsonify(20)

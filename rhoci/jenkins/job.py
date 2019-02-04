@@ -13,7 +13,7 @@
 #    under the License.
 import json
 import logging
-import urllib2
+import urllib
 
 import rhoci.jenkins.build as build_lib
 from rhoci.db.base import db
@@ -104,9 +104,9 @@ def populate_db_with_jobs(agent):
     ALL_JOBS_API = ("/api/json/?tree=jobs"
                     "[name,lastBuild[result,number,timestamp]]")
 
-    request = urllib2.Request(agent.url + ALL_JOBS_API)
+    request = urllib.request.Request(agent.url + ALL_JOBS_API)
     jobs_json = json.loads(
-        urllib2.urlopen(request).read())
+        urllib.request.urlopen(request).read())
 
     for job in jobs_json['jobs']:
         if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':

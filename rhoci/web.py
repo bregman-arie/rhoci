@@ -16,15 +16,13 @@ from flask import Flask
 import logging
 import os
 
-import rhoci.server.log as log
+from rhoci import log
 from rhoci.db.base import db
 from rhoci.common.failures import FAILURES
 import rhoci.rhosp.DFG as DFG_lib
-from rhoci.common import exceptions
 from rhoci.filters import configure_template_filters
 import rhoci.models as models
-import rhoci.views
-from rhoci.rhosp.release import RELEASE_MAP
+from rhoci.views.consts import VIEWS
 from rhoci.server.config import Config
 
 LOG = logging.getLogger(__name__)
@@ -36,27 +34,12 @@ with app.app_context():
 
 from rhoci.agent.jenkins_agent import JenkinsAgent  # noqa
 
-VIEWS = (
-    (rhoci.views.home, ''),
-    (rhoci.views.jobs, '/jobs'),
-    (rhoci.views.doc, '/doc'),
-    (rhoci.views.builds, '/builds'),
-    (rhoci.views.tests, '/tests'),
-    (rhoci.views.nodes, '/nodes'),
-    (rhoci.views.plugins, '/plugins'),
-    (rhoci.views.dfg, '/dfg'),
-    (rhoci.views.add_job, '/add_job'),
-    (rhoci.views.job_analyzer, '/job_analyzer'),
-    (rhoci.views.review_statistics, '/review_statistics'),
-)
-
 
 class Server(object):
     """Application Server"""
 
-    def __init__(self, name, args=None):
+    def __init__(self, args=None):
 
-        self.name = name
         self.setup_logging()
         self.load_configuration(args)
         self._load_predefined_data()
@@ -64,17 +47,16 @@ class Server(object):
 
     def setup_logging(self):
         """Sets up logging level and format."""
-        log.setup_logging(self.name)
+        log.setup_logging()
 
     def load_configuration(self, args):
         """Run all pre-running methods."""
         self.load_config(args)
         # If user turned on debug, update logging level
-        if app.config['RHOCI_DEBUG']:
+        if args.debug:
             log._update_logging_level(logging.DEBUG)
         self._register_blueprints()
         self._setup_database()
-        self._setup_releases()
 
     def _load_predefined_data(self):
         """Load predefined data the app was installed with."""
@@ -90,13 +72,13 @@ class Server(object):
 
     def load_config(self, args):
         """Load configuration from different sources"""
+        # Load built-in default configuration
         app.config.from_object(Config)
-
-        # Check if user pointed to a different config file from CLI or ENV vars
-        if vars(args)['RHOCI_CONFIG_FILE']:
-            app.config['RHOCI_CONFIG_FILE'] = vars(args)['RHOCI_CONFIG_FILE']
+        # Check if user pointed to non-default configuration file
+        if vars(args)['config_file']:
+            app.config['config_file'] = vars(args)['config_file']
         elif 'RHOCI_CONFIG_FILE' in os.environ:
-            app.config['RHOCI_CONFIG_FILE'] = os.environ['RHOCI_CONFIG_FILE']
+            app.config['config_file'] = os.environ['RHOCI_CONFIG_FILE']
 
         self.load_config_from_env()
         self.load_config_from_file()
@@ -106,11 +88,6 @@ class Server(object):
         app.config.from_object('rhoci.db.config')
         LOG.info("Loaded configuration:\n + {" + "\n".join("{}: {}".format(
             k, v) for k, v in sorted(app.config.items())) + "}")
-
-        # Make sure critical configuration is provided
-        for k in ['JENKINS_URL', 'JENKINS_USER', 'JENKINS_PASSWORD']:
-            if not app.config.get('RHOCI_' + k):
-                raise exceptions.MissingInputException(parameter='RHOCI_' + k)
 
     def load_config_from_env(self):
         """Loads configuration from environment variables."""
@@ -123,12 +100,7 @@ class Server(object):
     def load_config_from_file(self):
         """Loads configuration from a file."""
         cfg_parser = ConfigParser()
-        cfg_parser.read(app.config['RHOCI_CONFIG_FILE'])
-
-        for section in cfg_parser.sections():
-            for key in cfg_parser.options(section):
-                k = "RHOCI_%s_%s" % (section.upper(), key.upper())
-                app.config[k] = cfg_parser.get(section, key)
+        cfg_parser.read(app.config['config_file'])
 
     def load_config_from_parser(self, args):
         """Loads configuration based on provided arguments by the user."""
@@ -169,18 +141,6 @@ class Server(object):
                     db.session.add(failure_db)
                     db.session.commit()
                     logging.info("Loaded a new failure: %s" % f['name'])
-
-    def _setup_releases(self):
-        """Create DB entry for each release."""
-        for release in app.config['RHOCI_RELEASES'].split(','):
-            with app.app_context():
-                if not models.Release.query.filter_by(
-                        number=release).count():
-                    release_db = models.Release(
-                        number=release, name=RELEASE_MAP[release])
-                    db.session.add(release_db)
-                    db.session.commit()
-                    logging.info("Added release %s to the DB" % release)
 
     def _run_jenkins_agent(self):
         """Create Jenkins agent to pull information from RHOSP Jenkins."""

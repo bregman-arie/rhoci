@@ -15,7 +15,7 @@ from flask import current_app
 import json
 import jenkins
 import logging
-import urllib2
+import urllib
 
 from rhoci.db.base import db
 import rhoci.models as models
@@ -174,12 +174,12 @@ def update_in_db(data):
         # Check for tests
         url = current_app.config.get("RHOCI_JENKINS_URL")
         try:
-            tests_raw_data = urllib2.urlopen(
+            tests_raw_data = urllib.urlopen(
                 url + "/job/" + name + "/" +
                 str(number) + "/testReport/api/json").read()
             if 'Not found' not in tests_raw_data:
                 update_tests(tests_raw_data, name, number)
-        except urllib2.HTTPError:
+        except urllib.HTTPError:
             LOG.warning("Couldn't get tests for %s" % name)
 
 
@@ -262,19 +262,19 @@ def analyze_failure(job, build):
             log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
                                                         str(log.relativePath))
             try:
-                log_data = urllib2.urlopen(log_url)
+                log_data = urllib.urlopen(log_url)
                 match, failure_text, failure_name = check_match(log_data)
                 if match:
                     update_failure(job, build, failure_name, failure_text)
                     break
-            except urllib2.HTTPError:
+            except urllib.HTTPError:
                 LOG.debug("Couldnt read logs for job %s build %s." % (
                     job, build))
         if not match:
             console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
                                                             str(job),
                                                             str(build))
-            console_data = urllib2.urlopen(console_url)
+            console_data = urllib.urlopen(console_url)
             match, failure_text, failure_name = check_match(console_data)
             if match:
                 update_failure(job, build, failure_name, failure_text)
@@ -290,9 +290,9 @@ def analyze_failure(job, build):
             console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
                                                             str(job),
                                                             str(build))
-            console_data = urllib2.urlopen(console_url)
+            console_data = urllib.urlopen(console_url)
             match, failure_text, failure_name = check_match(console_data)
-        except urllib2.HTTPError:
+        except urllib.HTTPError:
             LOG.debug("Couldnt read console output for job %s build %s." % (
                 job, build))
         if match:
@@ -347,7 +347,7 @@ def find_failure_in_logs(logs, job, build):
             break
         log_url = "{}/job/{}/{}/artifact/{}".format(agent.url, job, build,
                                                     str(log.relativePath))
-        log_data = urllib2.urlopen(log_url)
+        log_data = urllib.urlopen(log_url)
         for line in log_data:
             for failure in models.Failure.query.all():
                 if failure.pattern in line.decode('utf-8').strip():
@@ -370,7 +370,7 @@ def find_failure_in_console_output(job, build):
 
     console_url = "{}/job/{}/{}/consoleText".format(str(agent.url),
                                                     str(job), str(build))
-    console_data = urllib2.urlopen(console_url)
+    console_data = urllib.urlopen(console_url)
     for line in console_data:
         if found:
             break

@@ -17,7 +17,7 @@ from flask import jsonify
 from flask import redirect
 from flask import request
 import logging
-import urllib2
+import urllib
 
 import rhoci.models as models
 import rhoci.jenkins.build as jenkins_build
@@ -75,8 +75,8 @@ def get_tests(job=None, build=None):
 
     else:
 
-        tests_raw_data = urllib2.urlopen(agent.url + "/job/" + job + "/" +
-                                         build + "/testReport/api/json").read()
+        tests_raw_data = urllib.urlopen(agent.url + "/job/" + job + "/" +
+                                        build + "/testReport/api/json").read()
         if 'Not found' not in tests_raw_data:
             jenkins_build.update_tests(tests_raw_data, job, build)
 
@@ -116,9 +116,9 @@ def get_tests_datatable(job=None, build=None):
             LOG.debug(
                 "Didn't find tests in DB for %s build %s. Retrieving" % (
                     job, build))
-            tests_raw_data = urllib2.urlopen(agent.url + "/job/" + job + "/" +
-                                             build +
-                                             "/testReport/api/json").read()
+            tests_raw_data = urllib.urlopen(agent.url + "/job/" + job + "/" +
+                                            build +
+                                            "/testReport/api/json").read()
             if 'Not found' not in tests_raw_data:
                 jenkins_build.update_tests(tests_raw_data, job, build)
             tests = models.TestBuild.query.filter_by(
@@ -136,7 +136,7 @@ def get_tests_datatable(job=None, build=None):
                                         test.status, bug_assigned_to,
                                         bug_status,
                                         [i.serialize for i in unq_test.bugs]])
-        except urllib2.HTTPError:
+        except urllib.HTTPError:
                 results['data'].append(["No tests", "No tests", "No tests",
                                         "No tests", "No tests", "No tests"])
 

@@ -14,17 +14,18 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
+APP_NAME = "rhoci"
 LOG = logging.getLogger(__name__)
 MAX_LOG_SIZE = 2000000
 LOG_ROTATION_COUNT = 10
 
 
-def setup_logging(app_name):
+def setup_logging():
     """Setup logging level and format."""
     format = '[%(asctime)s] %(levelname)s %(module)s: %(message)s'
     level = logging.INFO
     logging.basicConfig(level=level, format=format)
-    handler = RotatingFileHandler("%s.log" % app_name.lower(),
+    handler = RotatingFileHandler("%s.log" % APP_NAME.lower(),
                                   maxBytes=MAX_LOG_SIZE,
                                   backupCount=LOG_ROTATION_COUNT)
     logging.getLogger().addHandler(handler)

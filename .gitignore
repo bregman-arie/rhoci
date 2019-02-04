@@ -8,6 +8,7 @@
 .testrepository
 .tox
 .venv
+.eggs
 AUTHORS
 build/*
 ChangeLog

@@ -68,9 +68,7 @@ def get_percentage(num1, num2):
 @home.route('/')
 def index():
     """Home page."""
-
-    # DFGs = DFG_lib.get_DFG_jobs_summary()
-    DFGs = ['Netwrok', 'Storage', 'Compute', 'OpenDaylight']
+    DFGs = ['Netwrok', 'Storage', 'Compute', 'Upgrades']
     return render_template('home.html', DFGs_to_display=DFGs)
 
 
