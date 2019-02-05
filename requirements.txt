@@ -6,3 +6,4 @@ futures
 python-bugzilla
 python-jenkins
 sqlalchemy-migrate
+PyYAML

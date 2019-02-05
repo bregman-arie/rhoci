@@ -11,10 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from configparser import ConfigParser
 from flask import Flask
 import logging
 import os
+import yaml
 
 from rhoci import log
 from rhoci.db.base import db
@@ -32,7 +32,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-from rhoci.agent.jenkins_agent import JenkinsAgent  # noqa
+from rhoci.jenkins import agent  # noqa
 
 
 class Server(object):
@@ -80,7 +80,6 @@ class Server(object):
         elif 'RHOCI_CONFIG_FILE' in os.environ:
             app.config['config_file'] = os.environ['RHOCI_CONFIG_FILE']
 
-        self.load_config_from_env()
         self.load_config_from_file()
         self.load_config_from_parser(args)
 
@@ -89,18 +88,12 @@ class Server(object):
         LOG.info("Loaded configuration:\n + {" + "\n".join("{}: {}".format(
             k, v) for k, v in sorted(app.config.items())) + "}")
 
-    def load_config_from_env(self):
-        """Loads configuration from environment variables."""
-        rhoci_envs = filter(
-            lambda s: s.startswith('RHOCI_'), os.environ.keys())
-        for env_key in rhoci_envs:
-            if os.environ[env_key]:
-                app.config[env_key] = os.environ[env_key]
-
     def load_config_from_file(self):
         """Loads configuration from a file."""
-        cfg_parser = ConfigParser()
-        cfg_parser.read(app.config['config_file'])
+        with open(app.config['config_file'], 'r') as f:
+            data = yaml.load(f)
+            for k, v in data.items():
+                app.config[k] = v
 
     def load_config_from_parser(self, args):
         """Loads configuration based on provided arguments by the user."""
@@ -143,12 +136,11 @@ class Server(object):
                     logging.info("Loaded a new failure: %s" % f['name'])
 
     def _run_jenkins_agent(self):
-        """Create Jenkins agent to pull information from RHOSP Jenkins."""
-        agent = JenkinsAgent(name="RHOSP",
-                             user=app.config.get('RHOCI_JENKINS_USER'),
-                             password=app.config.get('RHOCI_JENKINS_PASSWORD'),
-                             url=app.config.get('RHOCI_JENKINS_URL'),
-                             app=app)
-        logging.debug("Starting connection to RHOSP Jenkins")
-        agent.pre_run_process.start()
-        agent.run_process.start()
+        """Create and execute Jenkins agent."""
+        jenkins_agent = agent.Jenkins(user=app.config.get('jenkins')['user'],
+                                      password=app.config.get('jenkins')['password'],
+                                      url=app.config.get('jenkins')['url'],
+                                      app=app)
+        logging.debug("Starting connection to Jenkins")
+        jenkins_agent.pre_run_process.start()
+        jenkins_agent.run_process.start()

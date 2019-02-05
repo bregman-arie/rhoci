@@ -30,11 +30,11 @@ from rhoci.db.base import db
 LOG = logging.getLogger(__name__)
 
 
-class JenkinsAgent(agent.Agent):
+class Jenkins(agent.Agent):
 
-    def __init__(self, name, user, password, url, app):
+    def __init__(self, user, password, url, app, name="jenkins"):
 
-        super(JenkinsAgent, self).__init__(name)
+        super(Jenkins, self).__init__(name)
         self.user = user
         self.password = password
         self.url = url
