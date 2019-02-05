@@ -42,8 +42,8 @@ def get_squad_name(string):
     DFG = get_DFG_name(string)
     component = string.split('-')[2] if '-' in string else string
     if DFG.lower() in DFGs:
-        for dfg, squads in DFGs.iteritems():
-            for squad, components in squads.iteritems():
+        for dfg, squads in DFGs.items():
+            for squad, components in squads.items():
                 for component in components:
                     if "dfg-%s-%s" % (DFG.lower(), component) in string:
                         return squad

@@ -11,8 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import os
+from os.path import expanduser
+from os.path import join
 
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'jino.db')
-SQLALCHEMY_MIGRATE_REPO = os.path.join(BASEDIR, 'db_repository')
+HOME_DIR = expanduser("~")
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + join(HOME_DIR, 'rhoci.db')

@@ -21,7 +21,7 @@ from rhoci.db.base import db
 import rhoci.rhosp.DFG as DFG_lib
 from rhoci.filters import configure_template_filters
 from rhoci.views.consts import VIEWS
-from rhoci.server.config import Config
+from rhoci.config import Config
 
 LOG = logging.getLogger(__name__)
 
@@ -31,11 +31,11 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-from rhoci.jenkins import agent  # noqa
-
 
 class Server(object):
-    """Application Server"""
+    """Demo Server.
+    No connection to other systems. Using only predefined local data.
+    """
 
     def __init__(self, args=None):
 
@@ -46,7 +46,6 @@ class Server(object):
         self._register_blueprints()
         self._setup_database()
         self._load_predefined_data()
-        self._run_jenkins_agent()
 
     def _load_predefined_data(self):
         """Load predefined data the app was installed with."""
@@ -95,7 +94,6 @@ class Server(object):
 
         all the tables.
         """
-        # setup_versioning(app.config)
         with app.app_context():
             db.create_all()
 
@@ -104,13 +102,3 @@ class Server(object):
         LOG.info("Running rhoci web server")
 
         app.run(threaded=True, host='0.0.0.0', port=int(app.config['RHOCI_SERVER_PORT']))
-
-    def _run_jenkins_agent(self):
-        """Create and execute Jenkins agent."""
-        jenkins_agent = agent.Jenkins(user=app.config.get('jenkins')['user'],
-                                      password=app.config.get('jenkins')['password'],
-                                      url=app.config.get('jenkins')['url'],
-                                      app=app)
-        LOG.debug("Starting connection to Jenkins")
-        jenkins_agent.pre_run_process.start()
-        jenkins_agent.run_process.start()

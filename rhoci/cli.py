@@ -13,7 +13,8 @@
 #    under the License.
 import argparse
 
-import rhoci.web
+import rhoci.prod
+import rhoci.demo
 
 APP_NAME = "RHOCI"
 CONF_FILE = "/etc/{0}/{0}.conf".format(APP_NAME.lower())
@@ -38,9 +39,12 @@ def create_parser():
 
 
 def launch_app(args=None):
-    """Runs Web application."""
-    web_server = rhoci.web.Server(args)
-    web_server.run()
+    """Runs the web application."""
+    if args.demo:
+        server = rhoci.demo.Server(args)
+    else:
+        server = rhoci.prod.Server(args)
+    server.run()
 
 
 def main():

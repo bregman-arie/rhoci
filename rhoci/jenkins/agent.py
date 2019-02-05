@@ -35,6 +35,7 @@ class Jenkins(agent.Agent):
     def __init__(self, user, password, url, app, name="jenkins"):
 
         super(Jenkins, self).__init__(name)
+        self.name = name
         self.user = user
         self.password = password
         self.url = url
@@ -58,15 +59,11 @@ class Jenkins(agent.Agent):
             LOG.info("Update complete")
 
     def pre_start(self):
-        """Populate the database with information from Jenkins
-
-        Jobs - name, last build status, last build_number
-        Builds - Job name, Status, Number
-        """
+        """Populate the database with information from Jenkins"""
         with self.app.app_context():
 
             # If there is no update time, it means the application never
-            # contacted Jenkins so run update without additional
+            # contacted Jenkins so run update immediately
             # If there was an update, check if one hour passed since
             # last update
             agent = models.Agent.query.filter_by(name=self.name).first()
@@ -74,17 +71,20 @@ class Jenkins(agent.Agent):
                                          datetime.datetime.utcnow() >
                                          datetime.timedelta(minutes=59)):
 
+                # Populate db with different entities from Jenkins
+                job_lib.populate_db_with_jobs(agent)
+                plugin_lib.populate_db_with_plugins(agent)
+                node_lib.populate_db_with_nodes(agent)
+
                 # Update timestamp for last Jenkins update
                 models.Agent.query.filter_by(
                     name=self.name).update(dict(
                         update_time=datetime.datetime.utcnow()))
                 LOG.debug("Updated agent timestamp")
 
-                # Populate db with different entities from Jenkins
-                job_lib.populate_db_with_jobs(agent)
-                plugin_lib.populate_db_with_plugins(agent)
-                node_lib.populate_db_with_nodes(agent)
-
+            else:
+                LOG.debug("Last update was less than one hour." +
+                          " Skipping Jenkins agent update.")
             # In case application was restarted or crushed, check if active
             # builds in DB are still active
             build_lib.check_active_builds(self.conn)
