@@ -8,162 +8,23 @@
   <div class="row text-center">
   </div>
 
-<!-- Includes -->
-{% include "failures/show_failure_modal.html" -%}
-{% include "bugs/add_bug_modal.html" -%}
-{% include "bugs/add_tests_bug_modal.html" -%}
-{% include "bugs/remove_tests_bug_modal.html" -%}
-{% include "bugs/remove_bug_modal.html" -%}
-{% include "bugs/show_bugs_modal_datatable.html" -%}
-
-{% include "failures/show_failure_modal.html" -%}
-
-{% include "tests/show_tests_modal_datatable.html" -%}
-
-
-<!-- Toolbar -->
-<div class="row toolbar-pf table-view-pf-toolbar" id="toolbar1">
-  <div class="col-sm-12">
-    <form class="toolbar-pf-actions">
-      <div class="form-group toolbar-pf-filter">
-        <label class="sr-only" for="filter">Job Name</label>
-        <div class="input-group">
-          <div class="input-group-btn">
-            <button type="button" class="btn btn-default dropdown-toggle" id="filter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Job Name <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-              <li><a href="#" id="filter1">Job Name</a></li>
-              <li><a href="#" id="filter2">Last Build Status</a></li>
-              <li><a href="#" id="filter3">Last Build Number</a></li>
-              <li><a href="#" id="filter4">Last Build Date</a></li>
-              <li><a href="#" id="filter5">Tests</a></li>
-            </ul>
-          </div>
-          <input type="text" class="form-control" placeholder="Filter By Job Name..." autocomplete="off" id="filterInput">
-        </div>
-      </div>
-      <div class="form-group">
-        <button class="btn btn-default" type="button" id="deleteRows1">Delete Rows</button>
-        <button class="btn btn-default" type="button" id="restoreRows1" disabled>Restore Rows</button>
-        <div class="dropdown btn-group  dropdown-kebab-pf">
-  <button class="btn btn-link dropdown-toggle" type="button" id="dropdownKebab" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    <span class="fa fa-ellipsis-v"></span>
-  </button>
-  <ul class="dropdown-menu " aria-labelledby="dropdownKebab">
-    <li><a href="#">Action</a></li>
-    <li><a href="#">Another action</a></li>
-    <li><a href="#">Something else here</a></li>
-    <li role="separator" class="divider"></li>
-    <li><a href="#">Separated link</a></li>
-  </ul>
-</div>
-
-      </div>
-      <div class="toolbar-pf-action-right">
-        <div class="form-group toolbar-pf-find">
-          <button class="btn btn-link btn-find" type="button">
-            <span class="fa fa-search"></span>
-          </button>
-          <div class="find-pf-dropdown-container">
-            <input type="text" class="form-control" id="find" placeholder="Find By Keyword...">
-            <div class="find-pf-buttons">
-              <span class="find-pf-nums">1 of 3</span>
-              <button class="btn btn-link" type="button">
-                <span class="fa fa-angle-up"></span>
-              </button>
-              <button class="btn btn-link" type="button">
-                <span class="fa fa-angle-down"></span>
-              </button>
-              <button class="btn btn-link btn-find-close" type="button">
-                <span class="pficon pficon-close"></span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-    <div class="row toolbar-pf-results">
-      <div class="col-sm-9">
-        <div class="hidden">
-          <h5>0 Results</h5>
-          <p>Active filters:</p>
-          <ul class="list-inline"></ul>
-          <p><a href="#">Clear All Filters</a></p>
-        </div>
-      </div>
-      <div class="col-sm-3 table-view-pf-select-results">
-        <strong>0</strong> of <strong>0</strong> selected
-      </div>
-    </div>
-  </div>
-</div>
-
-{% include "jobs/show_jobs_table_minimal.html" -%}
-
-<form class="content-view-pf-pagination table-view-pf-pagination clearfix" id="pagination1">
-  <div class="form-group">
-    <select class="selectpicker pagination-pf-pagesize">
-      <option value="6">6</option>
-      <option value="10" >10</option>
-      <option value="15" selected="selected">15</option>
-      <option value="30">30</option>
-      <option value="50">50</option>
-    </select>
-    <span>per page</span>
-  </div>
-  <div class="form-group">
-    <span><span class="pagination-pf-items-current">1-15</span> of <span class="pagination-pf-items-total">75</span></span>
-    <ul class="pagination pagination-pf-back">
-      <li class="disabled"><a href="#" title="First Page"><span class="i fa fa-angle-double-left"></span></a></li>
-      <li class="disabled"><a href="#" title="Previous Page"><span class="i fa fa-angle-left"></span></a></li>
-    </ul>
-    <label for="pagination1-page" class="sr-only">Current Page</label>
-    <input class="pagination-pf-page" type="text" value="1" id="pagination1-page"/>
-    <span>of <span class="pagination-pf-pages">5</span></span>
-    <ul class="pagination pagination-pf-forward">
-      <li><a href="#" title="Next Page"><span class="i fa fa-angle-right"></span></a></li>
-      <li><a href="#" title="Last Page"><span class="i fa fa-angle-double-right"></span></a></li>
-    </ul>
-  </div>
-</form>
-
-<!-- Blank Slate HTML -->
-<div class="blank-slate-pf table-view-pf-empty hidden" id="emptyState1">
-  <div class="blank-slate-pf-icon">
-    <span class="pficon pficon pficon-add-circle-o"></span>
-  </div>
-  <h1>
-    Empty State Title
-  </h1>
-  <p>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-  </p>
-  <p>
-    Learn more about this <a href="#">on the documentation</a>.
-  </p>
-  <div class="blank-slate-pf-main-action">
-    <button class="btn btn-primary btn-lg"> Main Action </button>
-  </div>
-  <div class="blank-slate-pf-secondary-action">
-    <button class="btn btn-default"> Secondary Action </button> <button class="btn btn-default"> Secondary Action </button> <button class="btn btn-default"> Secondary Action </button>
-  </div>
-</div>
+{% include "jobs/table.html" -%}
 
 <script>
 $(document).ready(function() {
 
-// DataTable Config
 $("#jobs_table").DataTable({
-  "ajax": "{{ url_for('jobs.all') }}",
+  "ajax": "{{ url_for('jobs.get_all_jobs') }}",
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData[2] == "FAILURE" )
+            if ( aData[1] == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData[2] == "SUCCESS" )
+            else if ( aData[1] == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData[2] == "UNSTABLE" )
+            else if ( aData[1] == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }
@@ -172,15 +33,6 @@ $("#jobs_table").DataTable({
             {
                 targets:0,
                 render: function ( data, type, row, meta ) {
-                  var id = "select" + meta.row;
-                  return '<label class="sr-only" for="' + id + '">Select row ' + meta.row +
-                    '</label><input type="checkbox" id="' + id + '" name="' + id + '">';
-                },
-                sortable: false,
-            },
-            {
-                targets:1,
-                render: function ( data, type, row, meta ) {
                     if(type === 'display'){
                         data = '<a href="{{ agent.url }}/job/' + data + '">' + data + '</a>';
                     }
@@ -188,7 +40,7 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:[3],
+                targets:[2],
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[3] != 0 ){
                         data = '<a href="{{ agent.url }}/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
@@ -197,13 +49,13 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:[2],
+                targets:[1],
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && (row[2] == 'UNSTABLE' || row[2] == 'SUCCESS' || row[2] == 'ABORTED' || row[2] == null)){
                         data = '<a href="{{ agent.url }}/job/' + row[1] + '/' + row[2] + '">' + data + '</a>';
                     }
                     else if (type === 'display' && row[2] == 'FAILURE') {
-                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">Failure - Tell me why!</button>'
+                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">Failure</button>'
                     }
                     else if (type === 'display' && row[2] != 'None' ){
                     data = '<button type="button" onClick="show_failure(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
@@ -212,7 +64,7 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:5,
+                targets:4,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[2] != 0 && (row[2] == 'SUCCESS' || row[2] == 'UNSTABLE')){
                     data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
@@ -225,102 +77,9 @@ $("#jobs_table").DataTable({
                 }
             },
         ],
-  dom: 'Br',
-  order: [[ 1, 'asc' ]],
   processing: true,
-  buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-  pfConfig: {
-    emptyStateSelector: "#emptyState1",
-    filterCaseInsensitive: true,
-    filterCols: [
-      null,
-      {
-        default: true,
-        optionSelector: "#filter1",
-        placeholder: "Filter By Job Name..."
-      }, {
-        optionSelector: "#filter2",
-        placeholder: "Filter By Last Build Status..."
-      }, {
-        optionSelector: "#filter3",
-        placeholder: "Filter By Last Build Number"
-      }, {
-        optionSelector: "#filter4",
-        placeholder: "Filter By Last Build Date"
-      }, {
-        optionSelector: "#filter5",
-        placeholder: "Filter By Tests"
-      },
-    ],
-    paginationSelector: "#pagination1",
-    toolbarSelector: "#toolbar1",
-    selectAllSelector: 'th:first-child input[type="checkbox"]',
-    colvisMenuSelector: '.table-view-pf-colvis-menu'
-  },
-  select: {
-    selector: 'td:first-child input[type="checkbox"]',
-    style: 'multi'
-  },
+  search: { "regex": true },
 });
-
-/**
- * Utility to show empty Table View
- *
- * @param {object} config - Config properties associated with a Table View
- * @param {object} config.data - Data set for DataTable
- * @param {string} config.deleteRowsSelector - Selector for delete rows control
- * @param {string} config.restoreRowsSelector - Selector for restore rows control
- * @param {string} config.tableSelector - Selector for the HTML table
- */
-var emptyTableViewUtil = function (config) {
-  var self = this;
-
-  this.dt = $(config.tableSelector).DataTable(); // DataTable
-  this.deleteRows = $(config.deleteRowsSelector); // Delete rows control
-  this.restoreRows = $(config.restoreRowsSelector); // Restore rows control
-
-  // Handle click on delete rows control
-  this.deleteRows.on('click', function() {
-    self.dt.clear().draw();
-    $(self.restoreRows).prop("disabled", false);
-  });
-
-  // Handle click on restore rows control
-  this.restoreRows.on('click', function() {
-    self.dt.rows.add(config.data).draw();
-    $(this).prop("disabled", true);
-  });
-
-  // Initialize restore rows
-  if (this.dt.data().length === 0) {
-    $(this.restoreRows).prop("disabled", false);
-  }
-};
-
-// Initialize empty Table View util
-new emptyTableViewUtil({
-  deleteRowsSelector: "#deleteRows1",
-  restoreRowsSelector: "#restoreRows1",
-  tableSelector: "#jobs_table"
-});
-
-/**
- * Utility to find items in Table View
- */
-var findTableViewUtil = function (config) {
-  // Upon clicking the find button, show the find dropdown content
-  $(".btn-find").click(function () {
-    $(this).parent().find(".find-pf-dropdown-container").toggle();
-  });
-
-  // Upon clicking the find close button, hide the find dropdown content
-  $(".btn-find-close").click(function () {
-    $(".find-pf-dropdown-container").hide();
-  });
-};
-
-// Initialize find util
-new findTableViewUtil();
 
 });
 </script>
@@ -331,24 +90,6 @@ new findTableViewUtil();
 $(document).ready(function() {
 $('.datatable').dataTable();
 });
-
-    {% include "failures/analyze_failure.js" -%}
-    {% include "failures/show_failure.js" -%}
-
-    {% include "bugs/show_bugs.js" -%}
-    {% include "bugs/remove_tests_bug_from_db.js" -%}
-    {% include "bugs/remove_tests_bug.js" -%}
-    {% include "bugs/remove_bug_from_db.js" -%}
-    {% include "bugs/remove_bug.js" -%}
-    {% include "bugs/add_bug.js" -%}
-    {% include "bugs/add_tests_bug.js" -%}
-    {% include "bugs/submit_bug.js" -%}
-    {% include "bugs/submit_tests_bug.js" -%}
-
-    {% include "tests/show_tests.js" -%}
-
-    {% include "common/modal_order.js" -%}
-
 </script>
   
 

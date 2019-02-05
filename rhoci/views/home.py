@@ -61,7 +61,7 @@ def get_DFG_summary(dfg):
 def index():
     """Home page."""
     DFGs_data = dict()
-    DFGs = ['Netwrok', 'Storage', 'Compute', 'Upgrades']
+    DFGs = ['Network', 'Storage', 'Compute', 'Upgrades']
     for DFG in DFGs:
         DFGs_data[DFG] = get_DFG_summary(DFG)
     return render_template('home.html', DFGs_to_display=DFGs, DFGs=DFGs_data)

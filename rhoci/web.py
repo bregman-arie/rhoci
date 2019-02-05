@@ -74,7 +74,7 @@ class Server(object):
 
         # Load DB configuration
         app.config.from_object('rhoci.db.config')
-        LOG.info("Loaded configuration:\n + {" + "\n".join("{}: {}".format(
+        LOG.debug("Loaded configuration:\n + {" + "\n".join("{}: {}".format(
             k, v) for k, v in sorted(app.config.items())) + "}")
 
     def load_config_from_file(self):

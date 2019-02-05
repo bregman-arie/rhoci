@@ -34,14 +34,14 @@ def index():
 
 
 @jobs.route('/all')
-def all():
+def get_all_jobs():
     """Jenkins Jobs page."""
     jobs = models.Job.query.all()
     results = dict()
     results['data'] = list()
 
     for job in jobs:
-        results['data'].append([None, job.name, job.last_build_result,
+        results['data'].append([job.name, job.last_build_result,
                                 job.last_build_number,
                                 job.timestamp, ''])
 
