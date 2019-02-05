@@ -18,14 +18,13 @@ import yaml
 
 from rhoci import log
 from rhoci.db.base import db
-from rhoci.common.failures import FAILURES
 import rhoci.rhosp.DFG as DFG_lib
 from rhoci.filters import configure_template_filters
-import rhoci.models as models
 from rhoci.views.consts import VIEWS
 from rhoci.server.config import Config
 
 LOG = logging.getLogger(__name__)
+
 app = Flask(__name__)
 configure_template_filters(app)
 db.init_app(app)
@@ -40,27 +39,17 @@ class Server(object):
 
     def __init__(self, args=None):
 
-        self.setup_logging()
-        self.load_configuration(args)
-        self._load_predefined_data()
-        self._run_jenkins_agent()
-
-    def setup_logging(self):
-        """Sets up logging level and format."""
         log.setup_logging()
-
-    def load_configuration(self, args):
-        """Run all pre-running methods."""
         self.load_config(args)
-        # If user turned on debug, update logging level
         if args.debug:
             log._update_logging_level(logging.DEBUG)
         self._register_blueprints()
         self._setup_database()
+        self._load_predefined_data()
+        self._run_jenkins_agent()
 
     def _load_predefined_data(self):
         """Load predefined data the app was installed with."""
-        self._load_failures()
         with app.app_context():
             DFG_lib.load_DFGs()
 
@@ -114,26 +103,7 @@ class Server(object):
         """Runs the web server."""
         LOG.info("Running rhoci web server")
 
-        app.run(threaded=True, host='0.0.0.0', port=int(
-            app.config['RHOCI_SERVER_PORT']))
-
-    def _load_failures(self):
-        """Loads RHOCI built-in failure to DB."""
-        for f in FAILURES:
-            with app.app_context():
-                if not models.Failure.query.filter_by(name=f['name']).count():
-                    failure_db = models.Failure(category=f['category'],
-                                                pattern=f['pattern'],
-                                                name=f['name'],
-                                                upper_bound_pattern=f[
-                                                    'upper_bound_pattern'],
-                                                lower_bound_pattern=f[
-                                                    'lower_bound_pattern'],
-                                                action=f['action'],
-                                                cause=f['cause'])
-                    db.session.add(failure_db)
-                    db.session.commit()
-                    logging.info("Loaded a new failure: %s" % f['name'])
+        app.run(threaded=True, host='0.0.0.0', port=int(app.config['RHOCI_SERVER_PORT']))
 
     def _run_jenkins_agent(self):
         """Create and execute Jenkins agent."""
@@ -141,6 +111,6 @@ class Server(object):
                                       password=app.config.get('jenkins')['password'],
                                       url=app.config.get('jenkins')['url'],
                                       app=app)
-        logging.debug("Starting connection to Jenkins")
+        LOG.debug("Starting connection to Jenkins")
         jenkins_agent.pre_run_process.start()
         jenkins_agent.run_process.start()

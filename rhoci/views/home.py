@@ -37,7 +37,7 @@ LOG = logging.getLogger(__name__)
 home = Blueprint('home', __name__)
 
 
-def dfg_summary(dfg):
+def get_DFG_summary(dfg):
     """Returns a dictionary which represents the summary of a given DFG."""
     return {'FAILURE': models.Job.query.filter(models.Job.name.contains(
         'DFG-%s' % dfg), models.Job.last_build_result.like('FAILURE')).count(),
@@ -57,19 +57,14 @@ def dfg_summary(dfg):
             models.Job.name.contains('DFG-%s' % dfg)).count()}
 
 
-def get_percentage(num1, num2):
-    """Returns the percentage of two given numbers."""
-    if num1 and num2:
-        return int(100 * (float(num1) / float(num2)))
-    else:
-        return 0
-
-
 @home.route('/')
 def index():
     """Home page."""
+    DFGs_data = dict()
     DFGs = ['Netwrok', 'Storage', 'Compute', 'Upgrades']
-    return render_template('home.html', DFGs_to_display=DFGs)
+    for DFG in DFGs:
+        DFGs_data[DFG] = get_DFG_summary(DFG)
+    return render_template('home.html', DFGs_to_display=DFGs, DFGs=DFGs_data)
 
 
 @home.route('/releases/ajax/jobs/<job_type>_<release>')
