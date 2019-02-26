@@ -11,21 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from rhoci.database import Database
+from flask import Blueprint
 
-from flask import Flask
+bp = Blueprint('main', __name__)
 
-
-def create_app():
-    app = Flask(__name__)
-    Database.initialize()
-
-    register_blueprints(app)
-
-    return app
-
-
-def register_blueprints(app):
-
-    from rhoci.main import bp as main_bp
-    app.register_blueprint(main_bp)
+from rhoci.main import routes  # noqa

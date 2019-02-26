@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2017 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,21 +11,3 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from rhoci.database import Database
-
-from flask import Flask
-
-
-def create_app():
-    app = Flask(__name__)
-    Database.initialize()
-
-    register_blueprints(app)
-
-    return app
-
-
-def register_blueprints(app):
-
-    from rhoci.main import bp as main_bp
-    app.register_blueprint(main_bp)

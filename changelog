@@ -1,3 +1,5 @@
 RHOCI V2.0
 
+* Moved from SQLite to MongoDB
+* Dropped Patternfly
 * Datatable search uses regular expressions mode

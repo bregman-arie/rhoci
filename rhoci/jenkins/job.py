@@ -13,6 +13,7 @@
 #    under the License.
 import json
 import logging
+import sys
 import urllib
 
 import rhoci.jenkins.build as build_lib
@@ -105,8 +106,11 @@ def populate_db_with_jobs(agent):
                     "[name,lastBuild[result,number,timestamp]]")
 
     request = urllib.request.Request(agent.url + ALL_JOBS_API)
-    jobs_json = json.loads(
-        urllib.request.urlopen(request).read())
+    try:
+        jobs_json = json.loads(urllib.request.urlopen(request).read())
+    except urllib.error.URLError:
+        LOG.error("Unable to reach the provided address: {}".format(agent.url))
+        sys.exit(2)
 
     for job in jobs_json['jobs']:
         if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':

@@ -13,7 +13,6 @@
 #    under the License.
 import bugzilla
 from flask import render_template
-from flask import Blueprint
 from flask import jsonify
 from flask import request
 import logging
@@ -34,32 +33,17 @@ else:
 
 LOG = logging.getLogger(__name__)
 
-home = Blueprint('home', __name__)
+from rhoci.main import bp  # noqa
 
 
 def get_DFG_summary(dfg):
     """Returns a dictionary which represents the summary of a given DFG."""
-    return {'FAILURE': models.Job.query.filter(models.Job.name.contains(
-        'DFG-%s' % dfg), models.Job.last_build_result.like('FAILURE')).count(),
-        'SUCCESS': models.Job.query.filter(
-            models.Job.name.contains(
-                'DFG-%s' % dfg), models.Job.last_build_result.like(
-                'SUCCESS')).count(), 'UNSTABLE': models.Job.query.filter(
-                    models.Job.name.contains('DFG-%s' % dfg),
-                    models.Job.last_build_result.like(
-                        'UNSTABLE')).count(),
-        'None': models.Job.query.filter(models.Job.name.contains(
-            'DFG-%s' % dfg), models.Job.last_build_result.is_('None')).count(),
-        'ABORTED': models.Job.query.filter(models.Job.name.contains(
-            'DFG-%s' % dfg), models.Job.last_build_result.is_(
-                'ABORTED')).count(),
-        'count': models.Job.query.filter(
-            models.Job.name.contains('DFG-%s' % dfg)).count()}
+    pass
 
 
-@home.route('/')
+@bp.route('/')
 def index():
-    """Home page."""
+    """Main page route."""
     DFGs_data = dict()
     DFGs = ['Network', 'Storage', 'Compute', 'Upgrades']
     for DFG in DFGs:
@@ -67,7 +51,7 @@ def index():
     return render_template('home.html', DFGs_to_display=DFGs, DFGs=DFGs_data)
 
 
-@home.route('/releases/ajax/jobs/<job_type>_<release>')
+@bp.route('/releases/ajax/jobs/<job_type>_<release>')
 def ajax_jobs(job_type, release):
 
     results = dict()
@@ -83,7 +67,7 @@ def ajax_jobs(job_type, release):
     return jsonify(results)
 
 
-@home.route('/v2.0/jobs', methods=['GET', 'POST'])
+@bp.route('/v2.0/jobs', methods=['GET', 'POST'])
 def list_jobs():
     """Returns all jobs in the DB."""
     if request.method == 'POST':
@@ -96,7 +80,7 @@ def list_jobs():
     return jsonify(output=jobs)
 
 
-@home.route('/v2.0/jobs/<string:job_name>', methods=['GET', 'DELETE'])
+@bp.route('/v2.0/jobs/<string:job_name>', methods=['GET', 'DELETE'])
 def get_job(job_name):
     """Returns data on a specific job."""
     job = models.Job.query.filter_by(name=job_name).all()
@@ -111,7 +95,7 @@ def get_job(job_name):
         return jsonify({'exist': False})
 
 
-@home.route('/v2.0/tests', methods=['GET', 'POST'])
+@bp.route('/v2.0/tests', methods=['GET', 'POST'])
 def list_tests():
     """Returns all unique tests in the DB."""
     tests = [i.serialize for i in models.Test.query.all()]
@@ -119,7 +103,7 @@ def list_tests():
     return jsonify(tests=tests)
 
 
-@home.route('/v2.0/releases', methods=['GET'])
+@bp.route('/v2.0/releases', methods=['GET'])
 def list_releases():
     """Returns all the releases in the DB."""
     releases = [i.serialize for i in models.Release.query.all()]
@@ -127,7 +111,7 @@ def list_releases():
     return jsonify(releases=releases)
 
 
-@home.route('/v2.0/bugs', methods=['GET'])
+@bp.route('/v2.0/bugs', methods=['GET'])
 def list_bugs():
     """Returns all the bugs in the DB."""
     bugs = [i.serialize for i in models.Bug.query.all()]
@@ -135,7 +119,7 @@ def list_bugs():
     return jsonify(bugs=bugs)
 
 
-@home.route('/v2.0/update_jobs', methods=['GET', 'POST'])
+@bp.route('/v2.0/update_jobs', methods=['GET', 'POST'])
 def update_jobs():
     """Shallow update of all jobs."""
     LOG.info("Jobs update requested.")
@@ -143,7 +127,7 @@ def update_jobs():
     return jsonify({'status': 'OK'})
 
 
-@home.route('/v2.0/jenkins_notifications', methods=['POST'])
+@bp.route('/v2.0/jenkins_notifications', methods=['POST'])
 def jenkins_notifications():
     """Recieving notifications from Jenkins."""
     LOG.info("Recieved notification from Jenkins.")
@@ -151,42 +135,42 @@ def jenkins_notifications():
     return jsonify({'notification': status})
 
 
-@home.route('/v2.0/builds', methods=['GET', 'POST'])
+@bp.route('/v2.0/builds', methods=['GET', 'POST'])
 def builds():
     """Returns information on Jenkins builds."""
     builds = [i.serialize for i in models.Build.query.all()]
     return jsonify(builds=builds)
 
 
-@home.route('/v2.0/dfg', methods=['GET', 'POST'])
+@bp.route('/v2.0/dfg', methods=['GET', 'POST'])
 def dfgs():
     """Returns all DFGs"""
     dfg = [i.serialize for i in models.DFG.query.all()]
     return jsonify(dfgs=dfg)
 
 
-@home.route('/v2.0/squads', methods=['GET', 'POST'])
+@bp.route('/v2.0/squads', methods=['GET', 'POST'])
 def squads():
     """Returns all squads"""
     squads = [i.serialize for i in models.Squad.query.all()]
     return jsonify(squads=squads)
 
 
-@home.route('/v2.0/components', methods=['GET', 'POST'])
+@bp.route('/v2.0/components', methods=['GET', 'POST'])
 def components():
     """Returns all components"""
     components = [i.serialize for i in models.Component.query.all()]
     return jsonify(components=components)
 
 
-@home.route('/v2.0/failures', methods=['GET', 'POST'])
+@bp.route('/v2.0/failures', methods=['GET', 'POST'])
 def failures():
     """Returns all failures"""
     failures = [i.serialize for i in models.Failure.query.all()]
     return jsonify(failures=failures)
 
 
-@home.route('/bug_exists/')
+@bp.route('/bug_exists/')
 def bug_exists():
     exists = True
     err_msg = ""
@@ -226,7 +210,7 @@ def bug_exists():
     return jsonify(exists=exists, err_msg=err_msg)
 
 
-@home.route('/bugs')
+@bp.route('/bugs')
 def bugs():
     """Bugs page."""
     bugs = models.Bug.query.all()
@@ -235,16 +219,16 @@ def bugs():
     return render_template('bugs.html', bugs=bugs, agent=agent)
 
 
-@home.route('/changelog')
+@bp.route('/changelog')
 def changelog():
     """Changelog page."""
     return render_template('changelog.html')
 
 
-@home.route('/get_bugs_datatable/<job>', methods=['GET'])
-@home.route('/get_bugs_datatable/<job>_<test_class>_<test_name>',
-            methods=['GET'])
-@home.route('/get_bugs_datatable/', methods=['GET'])
+@bp.route('/get_bugs_datatable/<job>', methods=['GET'])
+@bp.route('/get_bugs_datatable/<job>_<test_class>_<test_name>',
+          methods=['GET'])
+@bp.route('/get_bugs_datatable/', methods=['GET'])
 def get_bugs_datatable(job=None, test_class=None, test_name=None):
 
     results = dict()
@@ -269,8 +253,8 @@ def get_bugs_datatable(job=None, test_class=None, test_name=None):
     return jsonify(results)
 
 
-@home.route('/remove_bug/', methods=['GET'])
-@home.route('/remove_bug/<bug_num>_<job>_<remove_all>', methods=['GET'])
+@bp.route('/remove_bug/', methods=['GET'])
+@bp.route('/remove_bug/<bug_num>_<job>_<remove_all>', methods=['GET'])
 def remove_bug(bug_num=None, job=None, remove_all=None):
     """Removes bug from the database."""
     bug_num = request.args.get('bug_num')
@@ -283,8 +267,8 @@ def remove_bug(bug_num=None, job=None, remove_all=None):
     return jsonify(dict(status="OK"))
 
 
-@home.route('/remove_tests_bug/', methods=['GET'])
-@home.route(
+@bp.route('/remove_tests_bug/', methods=['GET'])
+@bp.route(
     '/remove_tests_bug/<bug_num>_<test_name>_<test_class>_<remove_all>',
     methods=['GET'])
 def remove_tests_bug(bug_num=None, test_name=None, test_class=None,

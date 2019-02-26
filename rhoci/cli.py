@@ -13,8 +13,7 @@
 #    under the License.
 import argparse
 
-import rhoci.prod
-import rhoci.demo
+from rhoci import create_app
 
 APP_NAME = "RHOCI"
 CONF_FILE = "/etc/{0}/{0}.conf".format(APP_NAME.lower())
@@ -38,17 +37,14 @@ def create_parser():
     return parser
 
 
-def launch_app(args=None):
-    """Runs the web application."""
-    if args.demo:
-        server = rhoci.demo.Server(args)
-    else:
-        server = rhoci.prod.Server(args)
-    server.run()
+def run_app(args=None):
+    """Creates and runs the Flask application."""
+    app = create_app()
+    app.run()
 
 
 def main():
     """Main entry for running the web server."""
     parser = create_parser()
     args = parser.parse_args()
-    launch_app(args)
+    run_app(args)
