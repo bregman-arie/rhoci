@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark" role="navigation">
 
         <!-- Logo -->
-        <a class="navbar-brand" href="{{ url_for('home.index') }}">
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">
            <img src="{{ url_for('static', filename='images/rhoci-logo.png') }}" alt="RHOCI"/>
         </a>
         
@@ -9,7 +9,7 @@
 
           <!-- Home page button -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('home.index') }}">Home</a>
+                <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
             </li>
 
           <!-- Views dropdown -->
@@ -19,9 +19,9 @@
               </a>
 
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('dfg.index') }}">DFGs</a>
-                <a class="dropdown-item" href="{{ url_for('dfg.squads') }}">Squads</a>
-                <a class="dropdown-item" href="{{ url_for('dfg.components') }}">Components</a>
+                <a class="dropdown-item" href="dfg.index">DFGs</a>
+                <a class="dropdown-item" href="dfg.squads">Squads</a>
+                <a class="dropdown-item" href="dfg.components">Components</a>
               </div>
           </li>
 
@@ -32,9 +32,9 @@
               </a>
 
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('jobs.index') }}">All</a>
-                <a class="dropdown-item" href="{{ url_for('add_job.index') }}">Add a job</a>
-                <a class="dropdown-item" href="{{ url_for('job_analyzer.index') }}">Trigger</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Add a job</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Trigger</a>
               </div>
           </li>
 
@@ -45,9 +45,9 @@
               </a>
 
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('builds.all') }}">All</a>
-                <a class="dropdown-item" href="{{ url_for('builds.active') }}">Active</a>
-                <a class="dropdown-item" href="{{ url_for('builds.tests_compare') }}">Compare Test Results</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Active</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Compare Test Results</a>
               </div>
           </li>
 
@@ -58,13 +58,13 @@
               </a>
 
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('builds.all') }}">Unique Tests</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Unique Tests</a>
               </div>
           </li>
 
           <!-- Bugs page button -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('home.bugs') }}">Bugs</a>
+                <a class="nav-link" href="{{ url_for('main.index') }}">Bugs</a>
             </li>
 
         </ul>

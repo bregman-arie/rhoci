@@ -12,15 +12,22 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from rhoci.database import Database
+from rhoci.jenkins import agent
 
 from flask import Flask
 
 
 def create_app():
+    # Create application
     app = Flask(__name__)
+
     Database.initialize()
 
     register_blueprints(app)
+
+    jenkins_agent = agent.Agent()
+    # Separate process which runs in the background
+    jenkins_agent.run()
 
     return app
 
