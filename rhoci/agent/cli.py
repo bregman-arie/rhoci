@@ -11,9 +11,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from __future__ import absolute_import
+
 import argparse
 
 from rhoci.jenkins.agent import JenkinsAgent
+from rhoci.common.config import Config
 
 
 def create_parser():
@@ -28,7 +31,9 @@ def create_parser():
 
 def run_agent(args=None):
     """Creates and runs the agent."""
-    jenkins_agent = JenkinsAgent()
+    app_config = Config()
+    jenkins_agent = JenkinsAgent(app_config.user, app_config.password,
+                                 app_config.url)
     jenkins_agent.run()
 
 

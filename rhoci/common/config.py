@@ -18,5 +18,15 @@ LOG = logging.getLogger(__name__)
 
 class Config():
 
-    def __init__(self):
+    def __init__(self, config_file=None):
+        self.config_file = self.get_config_file(config_file)
+        self.config = self.load_configuration()
+
+    def get_config_file(config_file):
+        """Returns config file."""
         pass
+
+    def load_configuration(self):
+        """Returns loaded YAML stream."""
+        with open(self.config_file, 'r') as stream:
+            pass
