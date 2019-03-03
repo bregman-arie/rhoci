@@ -5,8 +5,8 @@ name = "pypi"
 
 [packages]
 flask = "*"
-rhoci = {editable = true,path = "."}
 pyyaml = "*"
+rhoci = {editable = true,path = "."}
 
 [dev-packages]
 

@@ -4,28 +4,25 @@
 
 RHOCI is Red Hat OpenStack CI Dashboard.
 
-Among its features, you will find:
+It's used for:
 
-* Modern dashboard that summarizes the status of your jobs
-* Deep dive into each one of the available levels: Team, Squad, Job, Build & Test
+* Summarizing CI/CD results status in different levels (project, job, test)
 
-## Quick Start
+## Quickstart
 
-Want to run a production instance of RHOCI? Follow this[https://github.com/bregman-arie/rhoci/wiki/quickstart_prod]
+To run RHOCI server:
 
-Want to run a demo instance of RHOCI? Follow this[https://github.com/bregman-arie/rhoci/wiki/quickstart_demo]
+    rhoci-server
 
-## User guide
+To run RHOCI Jenkins agent:
 
-A user? start [here](https://github.com/bregman-arie/rhoci/wiki/User_guide)
+    rhoci-agent
 
-## Developer guide
-
-A developer? start [here](https://github.com/bregman-arie/rhoci/wiki/Developer_guide)
+Note: the agent used to populate the database with information gathered from Jenkins.
 
 ## The Tech Behind RHOCI
 
-RHOCI is using several cool projects which allows it to do what it does:
+RHOCI is using several technologies:
 
 * Flask
 * Bootstrap

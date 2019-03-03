@@ -1,4 +1,4 @@
-# Copyright 2017 Arie Bregman
+# Copyright 2019 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,16 +11,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import abc
-from multiprocessing import Process
+import logging
+
+LOG = logging.getLogger(__name__)
 
 
-class Agent(object):
+class Config():
 
-    def __init__(self, name):
-        self.name = name
-        self.run_process = Process(target=self.start)
-
-    @abc.abstractmethod
-    def start(self):
-        """Start service."""
+    def __init__(self):
+        pass
