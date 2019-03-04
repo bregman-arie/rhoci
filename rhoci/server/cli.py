@@ -11,12 +11,15 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from __future__ import absolute_import
+
 import argparse
+import logging
 
 from rhoci import create_app
+from rhoci.common.config import Config
 
-APP_NAME = "RHOCI"
-CONF_FILE = "/etc/{0}/{0}.conf".format(APP_NAME.lower())
+LOG = logging.getLogger(__name__)
 
 
 def create_parser():
@@ -25,10 +28,7 @@ def create_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--conf', '-c', dest="config_file",
-                        default=CONF_FILE,
                         help='Configuration file')
-    parser.add_argument('--port', '-p', dest="%s_SERVER_PORT" % APP_NAME,
-                        help='Server port')
     parser.add_argument('--demo', dest="demo", help='Run in demo mode',
                         action='store_true')
     parser.add_argument('--debug', dest="debug", help='Turn on debug',
@@ -37,9 +37,18 @@ def create_parser():
     return parser
 
 
+def setup_logging(debug):
+    """Sets the logging."""
+    format = '%(message)s'
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(level=level, format=format)
+
+
 def run_app(args=None):
     """Creates and runs the Flask application."""
-    app = create_app()
+    setup_logging(args.debug)
+    conf = Config(args.config_file)
+    app = create_app(conf)
     app.run()
 
 

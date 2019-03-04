@@ -11,6 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from __future__ import absolute_import
+
 from flask import render_template
 import logging
 
@@ -21,7 +23,7 @@ from rhoci.main import bp  # noqa
 
 def get_DFG_summary(dfg):
     """Returns a dictionary which represents the summary of a given DFG."""
-    pass
+    return "bla"
 
 
 @bp.route('/')

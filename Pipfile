@@ -7,6 +7,7 @@ name = "pypi"
 flask = "*"
 pyyaml = "*"
 rhoci = {editable = true,path = "."}
+pymongo = "*"
 
 [dev-packages]
 
