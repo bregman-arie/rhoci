@@ -37,9 +37,8 @@ def create_parser():
 
 def setup_logging(debug):
     """Sets the logging."""
-    format = '%(message)s'
     level = logging.DEBUG if debug else logging.INFO
-    logging.basicConfig(level=level, format=format)
+    logging.basicConfig(level=level)
 
 
 def run_agent(args=None):
