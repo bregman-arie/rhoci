@@ -25,6 +25,7 @@ def create_app(config):
     Database.initialize()
 
     register_blueprints(app)
+    print(app)
 
     return app
 
@@ -34,5 +35,5 @@ def register_blueprints(app):
     from rhoci.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    from rhoci.views import bp as views_bp
-    app.register_blueprint(views_bp)
+    from rhoci.DFG import bp as DFG_bp
+    app.register_blueprint(DFG_bp, url_prefix='/DFG')

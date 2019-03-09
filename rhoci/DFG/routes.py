@@ -16,14 +16,12 @@ from __future__ import absolute_import
 from flask import render_template
 import logging
 
-from rhoci.models.job import Job
-
 LOG = logging.getLogger(__name__)
 
-from rhoci.views import bp  # noqa
+from rhoci.DFG import bp  # noqa
 
 
-@bp.route('/DFGs')
-def DFGs():
-    """DFGs route."""
-    return render_templates()
+@bp.route('/all')
+def all():
+    """All DFGs."""
+    return render_template('DFG/all.html')

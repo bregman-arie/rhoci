@@ -48,5 +48,5 @@ def index():
     """Main page route."""
     DFGs = ['Network', 'Storage', 'Compute', 'Upgrades']
     DFGs_data = get_DFGs_summary(DFGs)
-    return render_template('main.html', DFGs_to_display=DFGs,
+    return render_template('main/index.html', DFGs_to_display=DFGs,
                            DFGs_data=DFGs_data)
