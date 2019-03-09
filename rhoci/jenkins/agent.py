@@ -13,7 +13,12 @@
 #    under the License.
 from __future__ import absolute_import
 
+import json
 import logging
+import requests
+
+from rhoci.jenkins.api import API
+from rhoci.models.job import Job
 
 LOG = logging.getLogger(__name__)
 
@@ -29,5 +34,22 @@ class JenkinsAgent():
     def run(self):
         """Runs the agent proess."""
         LOG.info("Running Jenkins agent")
+        jobs = self.get_jobs()
+        print(jobs)
+        for job in jobs:
+            self.add_job_to_db(job)
         while True:
             pass
+
+    def get_jobs(self):
+        """Returns jobs."""
+        request = requests.get(self.url + API['get_jobs'], verify=False)
+        result_json = json.loads(request.text)
+        return result_json['jobs']
+
+    def add_job_to_db(self, job):
+        """Add job to the database."""
+        # Avoid inserting folders to the database
+        if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':
+            new_job = Job(_class=job['_class'], name=job['name'], last_build=job['lastBuild'])
+            new_job.save_to_db()

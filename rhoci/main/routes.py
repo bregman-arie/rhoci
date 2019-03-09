@@ -16,21 +16,37 @@ from __future__ import absolute_import
 from flask import render_template
 import logging
 
+from rhoci.models.job import Job
+import rhoci.jenkins.constants as jenkins_const
+
 LOG = logging.getLogger(__name__)
 
 from rhoci.main import bp  # noqa
 
 
-def get_DFG_summary(dfg):
-    """Returns a dictionary which represents the summary of a given DFG."""
-    return "bla"
+def get_DFGs_summary(DFGs):
+    """Given a list of DFG names, returns a dictionary with the
+    summary of a given DFG CI jobs.
+    DFGs_summary = {'Network': {'FAILED': 2,
+                                'PASSED': 12},
+                    'Compute': {'FAILED': 3,
+                    ...
+                   }
+    """
+    DFGs_summary = dict()
+    for DFG in DFGs:
+        DFGs_summary[DFG] = {}
+        for res in jenkins_const.RESULTS:
+            DFGs_summary[DFG][res] = Job.count(
+                name_regex='DFG-{}'.format(DFG),
+                last_build_res=res)
+    return DFGs_summary
 
 
 @bp.route('/')
 def index():
     """Main page route."""
-    DFGs_data = dict()
     DFGs = ['Network', 'Storage', 'Compute', 'Upgrades']
-    for DFG in DFGs:
-        DFGs_data[DFG] = get_DFG_summary(DFG)
-    return render_template('main.html', DFGs_to_display=DFGs, DFGs=DFGs_data)
+    DFGs_data = get_DFGs_summary(DFGs)
+    return render_template('main.html', DFGs_to_display=DFGs,
+                           DFGs_data=DFGs_data)

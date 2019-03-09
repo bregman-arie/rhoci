@@ -14,10 +14,10 @@
 var myChart = new Chart(ctx, {
     type: 'pie',
     data: {
-        labels: ["Failure", "Unstable", "Success"],
+        labels: ["Failure", "Unstable", "Success", "Aborted"],
         datasets: [{
             label: '# of Votes',
-            data: ["{{ DFGs[DFG]['FAILURE'] }}", 19, 3],
+          data: ["{{ DFGs_data[DFG]['FAILURE'] }}", "{{DFGs_data[DFG]['UNSTABLE'] }}", "{{ DFGs_data[DFG]['SUCCESS'] }}", "{{ DFGs_data[DFG]['ABORTED'] }}"],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(255, 206, 86, 0.2)',

@@ -18,6 +18,7 @@ import logging
 
 from rhoci.jenkins.agent import JenkinsAgent
 from rhoci.common.config import Config
+from rhoci.database import Database
 
 LOG = logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ def run_agent(args=None):
     """Creates and runs the agent."""
     setup_logging(args.debug)
     app_conf = Config()
+    Database.initialize()
     jenkins_agent = JenkinsAgent(app_conf.config['jenkins']['user'],
                                  app_conf.config['jenkins']['password'],
                                  app_conf.config['jenkins']['url'])

@@ -18,7 +18,7 @@ from rhoci.database import Database
 from flask import Flask
 
 
-def create_app():
+def create_app(config):
     # Create application
     app = Flask(__name__)
 
@@ -33,3 +33,6 @@ def register_blueprints(app):
 
     from rhoci.main import bp as main_bp
     app.register_blueprint(main_bp)
+
+    from rhoci.views import bp as views_bp
+    app.register_blueprint(views_bp)
