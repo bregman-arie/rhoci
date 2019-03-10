@@ -43,16 +43,29 @@ class Job(object):
         }
 
     @classmethod
-    def get_DFGs_names(self):
-        for job in Database.find(collection='jobs',
-                                 query={}):
-            print(job)
+    def get_all_DFGs(self):
+        """Returns list of all DFGs based on jobs names.
+        all_DFGs = [{'name': network, 'num_of_jobs': 20}, ...]
+        """
+        DFGs = []
+        regex = re.compile('DFG-', re.IGNORECASE)
+        DFG_jobs = Database.find(collection='jobs',
+                                 query={'name': regex})
+        for job in DFG_jobs:
+            jname = job['name']
+            DFG_name = jname.split('-')[1] if '-' in jname else jname
+            if DFG_name not in DFGs:
+                DFGs.append(DFG_name)
+        return DFGs
 
     @classmethod
     def count(cls, name_regex, last_build_res):
         """Returns counts of jobs based on passed arguments."""
-        regex = re.compile(name_regex, re.IGNORECASE)
-        jobs = Database.find(collection='jobs',
-                             query={'name': regex,
-                                    'last_build.result': last_build_res})
+        query = {}
+        if name_regex:
+            regex = re.compile(name_regex, re.IGNORECASE)
+            query['name'] = regex
+        if last_build_res:
+            query[last_build_res] = last_build_res
+        jobs = Database.find(collection='jobs', query=query)
         return jobs.count()

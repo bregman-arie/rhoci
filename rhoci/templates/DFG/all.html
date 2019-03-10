@@ -2,17 +2,26 @@
 
 {% block content %}
 
-<!-- Main container -->
-<br>
-<div class="container-fluid col-md-custom col-md-offset-custom">
-  <div class="row text-center">
-  </div>
 
-{% for DFG in DFGs %}
+<div class="container-fluid">
 
-{% include "DFG/single_card.html" -%}
+  <!-- Breadcrumbs-->
+  {% with breadcrumb_section='DFGs' %}
+     {% include "breadcrumb.html" %}
+  {% endwith %}
 
-{% endfor %}
+  <div class="row">
 
-<!-- -->
+     {% for DFG in DFGs %}
+       {% with DFG=DFG %}
+         {% include "DFG/single_DFG_card.html" -%}
+       {% endwith %}
+     {% endfor %}
+
+  </div> <!-- row -->
+
+</div> <!-- /container-fluid -->
+
+        
+
 {% endblock %}

@@ -25,7 +25,6 @@ def create_app(config):
     Database.initialize()
 
     register_blueprints(app)
-    print(app)
 
     return app
 
