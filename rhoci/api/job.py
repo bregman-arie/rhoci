@@ -13,32 +13,27 @@
 #    under the License.
 from __future__ import absolute_import
 
-from rhoci.database import Database
+from flask import jsonify
+import logging
 
-from flask import Flask
+from rhoci.models.job import Job
 
+LOG = logging.getLogger(__name__)
 
-def create_app(config):
-    # Create application
-    app = Flask(__name__)
-
-    Database.initialize()
-
-    register_blueprints(app)
-
-    return app
+from rhoci.api import bp  # noqa
 
 
-def register_blueprints(app):
+@bp.route('/jobs/all')
+def all_jobs():
+    """All jobs route."""
+    results = {'data': []}
+    jobs = Job.find()
+    for job in jobs:
+        print(job)
+        last_build_result = job['last_build']['result'] or '-'
+        last_build_num = job['last_build']['number'] or 0
+        created_at = job['last_build']['created_at'] or '-'
+        results['data'].append([job['name'], last_build_result,
+                               last_build_num, created_at, ''])
 
-    from rhoci.main import bp as main_bp
-    app.register_blueprint(main_bp)
-
-    from rhoci.DFG import bp as DFG_bp
-    app.register_blueprint(DFG_bp, url_prefix='/DFG')
-
-    from rhoci.jobs import bp as jobs_bp
-    app.register_blueprint(jobs_bp, url_prefix='/jobs')
-
-    from rhoci.api import bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+    return jsonify(results)

@@ -17,6 +17,7 @@ from flask import render_template
 import logging
 
 from rhoci.models.job import Job
+import rhoci.DFG.database as DFG_db
 
 LOG = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ from rhoci.DFG import bp  # noqa
 def all():
     """All DFGs."""
     DFGs_data = []
-    DFGs = Job.get_all_DFGs()
+    DFGs = DFG_db.get_all_DFGs()
     for DFG in DFGs:
         DFGs_data.append({'name': DFG,
                           'num_of_jobs': Job.count(name_regex=DFG)})

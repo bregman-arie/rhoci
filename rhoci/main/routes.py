@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 from rhoci.main import bp  # noqa
 
 
-def get_DFGs_summary(DFGs):
+def get_DFGs_result_summary(DFGs):
     """Given a list of DFG names, returns a dictionary with the
     summary of a given DFG CI jobs.
     DFGs_summary = {'Network': {'FAILED': 2,
@@ -47,6 +47,6 @@ def get_DFGs_summary(DFGs):
 def index():
     """Main page route."""
     DFGs = ['Network', 'Storage', 'Compute', 'Upgrades']
-    DFGs_data = get_DFGs_summary(DFGs)
+    DFGs_data = get_DFGs_result_summary(DFGs)
     return render_template('main/index.html', DFGs_to_display=DFGs,
                            DFGs_data=DFGs_data)

@@ -26,7 +26,7 @@ class Job(object):
         self.name = name
         self._id = _id
         self.last_build = last_build
-        self.created_date = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.utcnow()
 
     def save_to_db(self):
         if not Database.find_one("jobs", {"name": self.name}):
@@ -39,33 +39,24 @@ class Job(object):
             'name': self.name,
             '_id': self._id,
             'last_build': self.last_build,
-            'created_date': self.created_date
+            'created_at': self.created_at
         }
 
     @classmethod
-    def get_all_DFGs(self):
-        """Returns list of all DFGs based on jobs names.
-        all_DFGs = [{'name': network, 'num_of_jobs': 20}, ...]
-        """
-        DFGs = []
-        regex = re.compile('DFG-', re.IGNORECASE)
-        DFG_jobs = Database.find(collection='jobs',
-                                 query={'name': regex})
-        for job in DFG_jobs:
-            jname = job['name']
-            DFG_name = jname.split('-')[1] if '-' in jname else jname
-            if DFG_name not in DFGs:
-                DFGs.append(DFG_name)
-        return DFGs
-
-    @classmethod
-    def count(cls, name_regex, last_build_res):
+    def count(cls, name_regex=None, last_build_res=None):
         """Returns counts of jobs based on passed arguments."""
         query = {}
         if name_regex:
             regex = re.compile(name_regex, re.IGNORECASE)
             query['name'] = regex
         if last_build_res:
-            query[last_build_res] = last_build_res
+            query['last_build.result'] = last_build_res
         jobs = Database.find(collection='jobs', query=query)
         return jobs.count()
+
+    @classmethod
+    def find(cls):
+        """Returns find query."""
+        query = {}
+        jobs = Database.find(collection="jobs", query=query)
+        return jobs

@@ -13,32 +13,22 @@
 #    under the License.
 from __future__ import absolute_import
 
+import re
+
 from rhoci.database import Database
 
-from flask import Flask
 
-
-def create_app(config):
-    # Create application
-    app = Flask(__name__)
-
-    Database.initialize()
-
-    register_blueprints(app)
-
-    return app
-
-
-def register_blueprints(app):
-
-    from rhoci.main import bp as main_bp
-    app.register_blueprint(main_bp)
-
-    from rhoci.DFG import bp as DFG_bp
-    app.register_blueprint(DFG_bp, url_prefix='/DFG')
-
-    from rhoci.jobs import bp as jobs_bp
-    app.register_blueprint(jobs_bp, url_prefix='/jobs')
-
-    from rhoci.api import bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+def get_all_DFGs():
+    """Returns list of all DFGs based on jobs names.
+    all_DFGs = [{'name': network, 'num_of_jobs': 20}, ...]
+    """
+    DFGs = []
+    regex = re.compile('DFG-', re.IGNORECASE)
+    DFG_jobs = Database.find(collection='jobs',
+                             query={'name': regex})
+    for job in DFG_jobs:
+        jname = job['name']
+        DFG_name = jname.split('-')[1] if '-' in jname else jname
+        if DFG_name not in DFGs:
+            DFGs.append(DFG_name)
+    return DFGs
