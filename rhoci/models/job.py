@@ -21,10 +21,9 @@ from rhoci.database import Database
 
 class Job(object):
 
-    def __init__(self, _class, name, last_build, _id=None):
+    def __init__(self, _class, name, last_build):
         self._class = _class
         self.name = name
-        self._id = _id
         self.last_build = last_build
         self.created_at = datetime.datetime.utcnow()
 
@@ -37,7 +36,6 @@ class Job(object):
         return {
             '_class': self._class,
             'name': self.name,
-            '_id': self._id,
             'last_build': self.last_build,
             'created_at': self.created_at
         }

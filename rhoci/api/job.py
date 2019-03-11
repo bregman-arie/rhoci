@@ -30,10 +30,12 @@ def all_jobs():
     jobs = Job.find()
     for job in jobs:
         print(job)
-        last_build_result = job['last_build']['result'] or '-'
-        last_build_num = job['last_build']['number'] or 0
-        created_at = job['last_build']['created_at'] or '-'
+        if job['last_build']:
+            last_build_result = job['last_build']['result']
+            last_build_num = job['last_build']['number']
+        else:
+            last_build_result = last_build_num = "No Last Build"
         results['data'].append([job['name'], last_build_result,
-                               last_build_num, created_at, ''])
+                               last_build_num, job['created_at'], ''])
 
     return jsonify(results)
