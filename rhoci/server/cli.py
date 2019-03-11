@@ -17,7 +17,6 @@ import argparse
 import logging
 
 from rhoci import create_app
-from rhoci.common.config import Config
 
 LOG = logging.getLogger(__name__)
 
@@ -39,16 +38,14 @@ def create_parser():
 
 def setup_logging(debug):
     """Sets the logging."""
-    format = '%(message)s'
     level = logging.DEBUG if debug else logging.INFO
-    logging.basicConfig(level=level, format=format)
+    logging.basicConfig(level=level)
 
 
 def run_app(args=None):
     """Creates and runs the Flask application."""
     setup_logging(args.debug)
-    conf = Config(args.config_file)
-    app = create_app(conf)
+    app = create_app()
     app.run()
 
 

@@ -51,5 +51,6 @@ class JenkinsAgent():
         """Add job to the database."""
         # Avoid inserting folders to the database
         if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':
-            new_job = Job(_class=job['_class'], name=job['name'], last_build=job['lastBuild'])
+            new_job = Job(_class=job['_class'], name=job['name'],
+                          last_build=job['lastBuild'])
             new_job.save_to_db()

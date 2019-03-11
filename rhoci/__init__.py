@@ -18,7 +18,7 @@ from rhoci.database import Database
 from flask import Flask
 
 
-def create_app(config):
+def create_app():
     # Create application
     app = Flask(__name__)
 

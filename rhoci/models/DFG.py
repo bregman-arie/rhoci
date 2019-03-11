@@ -20,7 +20,7 @@ class DFG(object):
 
     def __init__(self, name, squads):
         self.name = name
-        self.squads = self.squads
+        self.squads = squads
 
     def save_to_db(self):
         if not Database.find_one("DFGs", {"name": self.name}):

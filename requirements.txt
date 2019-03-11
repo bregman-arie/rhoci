@@ -1,9 +1,4 @@
-configparser
 flask
-flask-autodoc
-flask-sqlalchemy
-futures
-python-bugzilla
+pymongo
 python-jenkins
-sqlalchemy-migrate
 PyYAML
