@@ -13,7 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
-DFGs = {'network': {
-    'vNES': ['neutron', 'python-neutronclient'],
-    'Octavia': ['octavia', 'neutron-lbaas'],
-    'OVN': ['networking-ovn']}}
+DFGs = [{'name': 'network', 'squads': [
+    {'name': 'vNES', 'components': ['neutron', 'python-neutoronclient']},
+    {'name': 'octavia', 'components': ['octavia', 'neutron-lbaas']},
+    {'name': 'ovn', 'components': ['networking-ovn']}]}]

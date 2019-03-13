@@ -6,14 +6,21 @@ RHOCI is Red Hat OpenStack CI Dashboard.
 
 ## Quick start
 
-To run RHOCI server:
+Before running the server and the agent, you first need to set up a configuration (`/etc/rhoci/rhoci.conf`)
+The most basic configuration is:
+
+jenkins:
+  url: <Jenkins URL>
+  user: <Jenkins username>
+  password: <Jenkins API token>
+
+Once the configuration is in place, run the following command to start the server:
 
     rhoci-server
 
-To run RHOCI Jenkins agent:
+To run RHOCI Jenkins agent, run the following:
 
     rhoci-agent
-
 
 ## Developer Guide
 

@@ -46,7 +46,5 @@ def get_DFGs_result_summary(DFGs):
 @bp.route('/')
 def index():
     """Main page route."""
-    DFGs = ['Network', 'Storage', 'Compute', 'Upgrades']
-    DFGs_data = get_DFGs_result_summary(DFGs)
-    return render_template('main/index.html', DFGs_to_display=DFGs,
-                           DFGs_data=DFGs_data)
+    job_count = Job.count()
+    return render_template('main/index.html', job_count=job_count)

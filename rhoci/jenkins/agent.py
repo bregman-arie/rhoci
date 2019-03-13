@@ -19,6 +19,7 @@ import requests
 
 from rhoci.jenkins.api import API
 from rhoci.models.job import Job
+from rhoci.models.DFG import DFG as DFG_db
 
 LOG = logging.getLogger(__name__)
 
@@ -54,3 +55,13 @@ class JenkinsAgent():
             new_job = Job(_class=job['_class'], name=job['name'],
                           last_build=job['lastBuild'])
             new_job.save_to_db()
+
+    def insert_DFG_data_to_db(self, DFGs):
+        """Iterates over a list of DFGs and inserts their data into the db."""
+        for DFG in DFGs:
+            new_DFG = DFG_db(
+                name=DFG['name'],
+                squads=[{'name': sqd['name'],
+                         'components': sqd[
+                             'components']} for sqd in DFG['squads']])
+            new_DFG.save_to_db()
