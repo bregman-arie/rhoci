@@ -13,32 +13,19 @@
 #    under the License.
 from __future__ import absolute_import
 
-from rhoci.database import Database
+from flask import render_template
+import logging
 
-from flask import Flask
+from rhoci.models.job import Job
 
+LOG = logging.getLogger(__name__)
 
-def create_app():
-    # Create application
-    app = Flask(__name__)
-
-    Database.initialize()
-
-    register_blueprints(app)
-
-    return app
+from rhoci.jobs import bp  # noqa
 
 
-def register_blueprints(app):
-
-    from rhoci.main import bp as main_bp
-    app.register_blueprint(main_bp)
-
-    from rhoci.DFG import bp as DFG_bp
-    app.register_blueprint(DFG_bp, url_prefix='/DFG')
-
-    from rhoci.jobs import bp as jobs_bp
-    app.register_blueprint(jobs_bp, url_prefix='/jobs')
-
-    from rhoci.api import bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+@bp.route('/index')
+def index():
+    """All jobs route."""
+    jobs = Job.find()
+    print(jobs)
+    return render_template('jobs/index.html')

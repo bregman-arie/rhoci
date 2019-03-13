@@ -1,7 +1,7 @@
 # Move this file to /etc/systemd/system/
 
 [Unit]
-Description=RHOCI Web System
+Description=RHOCI Web Service
 After=network.target
 
 [Service]

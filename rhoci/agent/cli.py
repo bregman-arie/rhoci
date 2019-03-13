@@ -16,7 +16,10 @@ from __future__ import absolute_import
 import argparse
 import logging
 
-from rhoci import create_app
+from rhoci.jenkins.agent import JenkinsAgent
+from rhoci.common.config import Config
+from rhoci.database import Database
+from rhoci.DFG.constants import DFGs
 
 LOG = logging.getLogger(__name__)
 
@@ -28,11 +31,8 @@ def create_parser():
 
     parser.add_argument('--conf', '-c', dest="config_file",
                         help='Configuration file')
-    parser.add_argument('--demo', dest="demo", help='Run in demo mode',
-                        action='store_true')
     parser.add_argument('--debug', dest="debug", help='Turn on debug',
                         action='store_true')
-
     return parser
 
 
@@ -42,15 +42,20 @@ def setup_logging(debug):
     logging.basicConfig(level=level)
 
 
-def run_app(args=None):
-    """Creates and runs the Flask application."""
+def run_agent(args=None):
+    """Creates and runs the agent."""
     setup_logging(args.debug)
-    app = create_app()
-    app.run()
+    app_conf = Config()
+    Database.initialize()
+    jenkins_agent = JenkinsAgent(app_conf.config['jenkins']['user'],
+                                 app_conf.config['jenkins']['password'],
+                                 app_conf.config['jenkins']['url'])
+    jenkins_agent.insert_DFG_data_to_db(DFGs)
+    jenkins_agent.run()
 
 
 def main():
     """Main entry for running the web server."""
     parser = create_parser()
     args = parser.parse_args()
-    run_app(args)
+    run_agent(args)

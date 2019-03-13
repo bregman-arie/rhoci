@@ -1,0 +1,3 @@
+# pylint requirements
+
+pylint>=1.9  # GPLv2

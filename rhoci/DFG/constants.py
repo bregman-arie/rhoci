@@ -13,32 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
-from rhoci.database import Database
-
-from flask import Flask
-
-
-def create_app():
-    # Create application
-    app = Flask(__name__)
-
-    Database.initialize()
-
-    register_blueprints(app)
-
-    return app
-
-
-def register_blueprints(app):
-
-    from rhoci.main import bp as main_bp
-    app.register_blueprint(main_bp)
-
-    from rhoci.DFG import bp as DFG_bp
-    app.register_blueprint(DFG_bp, url_prefix='/DFG')
-
-    from rhoci.jobs import bp as jobs_bp
-    app.register_blueprint(jobs_bp, url_prefix='/jobs')
-
-    from rhoci.api import bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+DFGs = [{'name': 'network', 'squads': [
+    {'name': 'vNES', 'components': ['neutron', 'python-neutoronclient']},
+    {'name': 'octavia', 'components': ['octavia', 'neutron-lbaas']},
+    {'name': 'ovn', 'components': ['networking-ovn']}]}]

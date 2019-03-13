@@ -1,139 +1,71 @@
-<nav class="navbar navbar-default navbar-pf" role="navigation">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="{{ url_for('home.index') }}">
+<nav class="navbar navbar-expand navbar-dark bg-dark topbar mb-4 static-top shadow">
+
+        <!-- Logo -->
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">
            <img src="{{ url_for('static', filename='images/rhoci-logo.png') }}" alt="RHOCI"/>
         </a>
-    </div>
-    <div class="collapse navbar-collapse navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-utility">
-            <li><a href="{{ url_for('home.changelog') }}"><strong>Changelog</strong></a></li>
-            <li><a href="{{ url_for('doc.public_doc') }}"><strong>API</strong></a></li>
-            <li><a href="https://github.com/bregman-arie/RHOCI" target="_blank"><strong>Source Code</strong></a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-primary">
-          
+        
+        <ul class="navbar-nav"> 
+
           <!-- Home page button -->
-            <li>
-                <a href="{{ url_for('home.index') }}">Home</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
             </li>
 
-          <!-- Views page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Views<b class="caret"></b></a>
-               <ul class="dropdown-menu">
+          <!-- Views dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                DFG
+              </a>
 
-               <li>
-                 <a href="{{ url_for('dfg.index') }}">DFGs</a>
-               </li>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('DFG.all_DFGs') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('DFG.all_squads') }}">Squads</a>
+                <a class="dropdown-item" href="{{ url_for('DFG.all_components') }}">Components</a>
+              </div>
+          </li>
 
-               <li>
-                 <a href="{{ url_for('dfg.squads') }}">Squads</a>
-               </li>
+          <!-- Jobs dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Jobs
+              </a>
 
-               <li>
-                 <a href="{{ url_for('dfg.components') }}">Components</a>
-               </li>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('jobs.index') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Add a job</a>
+                <a class="dropdown-item" href="{{ url_for('main.index') }}">Trigger</a>
+              </div>
+          </li>
 
-               <li>
-                 <a href="{{ url_for('home.releases') }}">Release</a>
-               </li>
-
-               </ul>
-            </li>
-
-          <!-- Jobs dropdown-->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Jobs<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-               <li>
-                 <a href="{{ url_for('jobs.index') }}">All jobs</a>
-               </li>
-
-               <li class="divider"></li>
-
-               <li>
-                 <a href="{{ url_for('add_job.index') }}">Add job</a>
-               </li>
-
-               <li>
-                 <a href="{{ url_for('job_analyzer.index') }}">Trigger jobs</a>
-               </li>
-
-               </ul>
-            </li>
-
-          <!-- Builds page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Builds<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-               <li>
-                 <a href="{{ url_for('builds.active') }}">Active builds</a>
-               </li>
-
-               <li>
-                 <a href="{{ url_for('builds.all_builds') }}">All builds</a>
-               </li>
-
-               <li class="divider"></li>
-
-               <li>
-                 <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
-               </li>
-
-               </ul>
-            </li>
-
-          <!-- Tests page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tests<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-               <li>
-                 <a href="{{ url_for('tests.unique_tests') }}">Unique tests</a>
-               </li>
-
-               <li class="divider"></li>
-
-               <li>
-                 <a href="{{ url_for('builds.tests_compare') }}">Compare test results</a>
-               </li>
-
-               </ul>
-            </li>
-
-
-          <!-- Jenkins page button -->
-            <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Jenkins<b class="caret"></b></a>
-               <ul class="dropdown-menu">
-
-            <!-- Nodes page button -->
-              <li>
-                  <a href="{{ url_for('nodes.index') }}">Nodes</a>
-              </li>
-
-            <!-- Plugins page button -->
-              <li>
-                  <a href="{{ url_for('plugins.index') }}">Plugins</a>
-              </li>
-
-               </ul>
-            </li>
-
-
-          <!-- Bugs page button -->
-            <li>
-                <a href="{{ url_for('home.bugs') }}">Bugs</a>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Guest</span>
+              </a>
+              <!-- Dropdown - User Information -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Profile
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Settings
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Activity Log
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Logout
+                </a>
+              </div>
             </li>
 
         </ul>
-    </div>
 </nav>

@@ -2,21 +2,26 @@
 
 [![Build Status](https://travis-ci.org/bregman-arie/rhoci.svg?branch=master)](https://travis-ci.org/bregman-arie/rhoci)
 
-RHOCI is a dashboard for Red Hat OpenStack CI which includes:
+RHOCI is Red Hat OpenStack CI Dashboard.
 
-* Global view of jobs, builds and tests with filtering across Jenkins
-* Failure analyzing for builds that failed
-* job definitions generation
-* CI status summary per DFG, squad and component
+## Quick start
 
-## User guide
+Before running the server and the agent, you first need to set up a configuration (`/etc/rhoci/rhoci.conf`)
+The most basic configuration is:
 
-If you would like to use RHOCI click [here](https://github.com/bregman-arie/rhoci/wiki/User_guide)
+jenkins:
+  url: <Jenkins URL>
+  user: <Jenkins username>
+  password: <Jenkins API token>
 
-## Developer guide
+Once the configuration is in place, run the following command to start the server:
 
-If you would like to contribute to RHOCI click [here](https://github.com/bregman-arie/rhoci/wiki/Developer_guide)
+    rhoci-server
 
-## Overview
+To run RHOCI Jenkins agent, run the following:
 
-<div align="center"><img src="./images/overview.png" alt="RHOCI Overview"></div><hr />
+    rhoci-agent
+
+## Developer Guide
+
+Whould like to contribute to RHOCI? click [here](docs/developer.md)

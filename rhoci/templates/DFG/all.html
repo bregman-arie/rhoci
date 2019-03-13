@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+
+  <!-- Breadcrumbs-->
+  {% with breadcrumb_section='DFGs' %}
+     {% include "breadcrumb.html" %}
+  {% endwith %}
+
+  <div class="row">
+
+     {% for DFG in DFGs %}
+       {% with DFG=DFG %}
+         {% include "DFG/one_grp_card.html" -%}
+       {% endwith %}
+     {% endfor %}
+
+  </div> <!-- row -->
+
+</div> <!-- /container-fluid -->
+
+        
+
+{% endblock %}
