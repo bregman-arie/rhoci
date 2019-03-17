@@ -20,6 +20,7 @@ from rhoci.jenkins.agent import JenkinsAgent
 from rhoci.common.config import Config
 from rhoci.database import Database
 from rhoci.DFG.constants import DFGs
+from rhoci.DFG import db as DFG_db_lib
 
 LOG = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ def run_agent(args=None):
     jenkins_agent = JenkinsAgent(app_conf.config['jenkins']['user'],
                                  app_conf.config['jenkins']['password'],
                                  app_conf.config['jenkins']['url'])
-    jenkins_agent.insert_DFG_data_to_db(DFGs)
+    DFG_db_lib.insert_DFG_data_to_db(DFGs)
     jenkins_agent.run()
 
 

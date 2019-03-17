@@ -27,7 +27,7 @@ class Job(object):
         self.last_build = last_build
         self.created_at = datetime.datetime.utcnow()
 
-    def save_to_db(self):
+    def insert(self):
         if not Database.find_one("jobs", {"name": self.name}):
             Database.insert(collection='jobs',
                             data=self.json())

@@ -1,22 +1,13 @@
-<div class="col-md-3 py-1">
-    <div class="card text-center">
-      <div class="card-header">
-        {{ DFG }}
-      </div>
-        <div class="card-body">
-          <canvas id="{{ DFG }}Chart" width="400" height="400"></canvas>
-        </div>
-    </div>
-</div>
+<canvas id="overall_status_chart" width="20" height="20"></canvas>
 
 <script>
-  var ctx = document.getElementById("{{ DFG }}Chart").getContext('2d');
+  var ctx = document.getElementById("overall_status_chart").getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'pie',
     data: {
         labels: ["Failure", "Unstable", "Success"],
         datasets: [{
-          data: ["{{ DFGs_data[DFG]['FAILURE'] }}", "{{DFGs_data[DFG]['UNSTABLE'] }}", "{{ DFGs_data[DFG]['SUCCESS'] }}", "{{ DFGs_data[DFG]['ABORTED'] }}"],
+          data: ["{{ overall_status['FAILURE'] }}", "{{ overall_status['UNSTABLE'] }}", "{{ overall_status['SUCCESS'] }}"],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.5)',
                 'rgba(255, 206, 86, 0.5)',

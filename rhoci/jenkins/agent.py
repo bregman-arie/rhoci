@@ -20,6 +20,7 @@ import requests
 from rhoci.jenkins.api import API
 from rhoci.models.job import Job
 from rhoci.models.DFG import DFG as DFG_db
+from rhoci.jenkins import osp
 
 LOG = logging.getLogger(__name__)
 
@@ -35,10 +36,9 @@ class JenkinsAgent():
     def run(self):
         """Runs the agent proess."""
         LOG.info("Running Jenkins agent")
-        jobs = self.get_jobs()
-        print(jobs)
-        for job in jobs:
-            self.add_job_to_db(job)
+        self.get_jobs_and_insert_data_to_db()
+        # Agent should run forever
+        LOG.info("Running forever")
         while True:
             pass
 
@@ -48,20 +48,22 @@ class JenkinsAgent():
         result_json = json.loads(request.text)
         return result_json['jobs']
 
-    def add_job_to_db(self, job):
-        """Add job to the database."""
-        # Avoid inserting folders to the database
-        if job['_class'] != 'com.cloudbees.hudson.plugins.folder.Folder':
-            new_job = Job(_class=job['_class'], name=job['name'],
-                          last_build=job['lastBuild'])
-            new_job.save_to_db()
+    def get_jobs_and_insert_data_to_db(self):
+        """Get jobs from Jenkins and insert data to DB based on job class."""
+        jobs = self.get_jobs()
+        LOG.info("Obtained list of jobs")
 
-    def insert_DFG_data_to_db(self, DFGs):
-        """Iterates over a list of DFGs and inserts their data into the db."""
-        for DFG in DFGs:
-            new_DFG = DFG_db(
-                name=DFG['name'],
-                squads=[{'name': sqd['name'],
-                         'components': sqd[
-                             'components']} for sqd in DFG['squads']])
-            new_DFG.save_to_db()
+        # Add jobs (and any related info extracted) to the DB
+        for job in jobs:
+            job_class = osp.get_job_class(job)
+            if job_class != 'folder':
+                self.add_job_to_db(job, job_class)
+            if job_class == 'DFG':
+                DFG_name = osp.get_DFG_name(job['name'])
+                DFG_db.insert(DFG_db(name=DFG_name))
+
+    def add_job_to_db(self, job, job_class):
+        """Add job to the database."""
+        new_job = Job(_class=job_class, name=job['name'],
+                      last_build=job['lastBuild'])
+        new_job.insert()

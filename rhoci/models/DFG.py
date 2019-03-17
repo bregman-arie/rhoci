@@ -1,4 +1,4 @@
-# Copyright 2017 Arie Bregman
+# Copyright 2019 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -27,7 +27,7 @@ class DFG(object):
         self.components = components
         self.squad_to_components = squad_to_components
 
-    def save_to_db(self):
+    def insert(self):
         if not Database.find_one("DFGs", {"name": self.name}):
             Database.insert(collection='DFGs',
                             data=self.json())
@@ -93,3 +93,10 @@ class DFG(object):
             query['name'] = name
         DFGs = Database.find_one(collection="DFGs", query=query)
         return DFGs
+
+    @classmethod
+    def count(cls):
+        """Returns counts of DFGs documents."""
+        query = {}
+        DFGs = Database.find(collection='DFGs', query=query)
+        return DFGs.count()

@@ -17,6 +17,7 @@ from flask import render_template
 import logging
 
 from rhoci.models.job import Job
+from rhoci.models.DFG import DFG
 import rhoci.jenkins.constants as jenkins_const
 
 LOG = logging.getLogger(__name__)
@@ -34,11 +35,11 @@ def get_DFGs_result_summary(DFGs):
                    }
     """
     DFGs_summary = dict()
-    for DFG in DFGs:
+    for DFG_name in DFGs:
         DFGs_summary[DFG] = {}
         for res in jenkins_const.RESULTS:
-            DFGs_summary[DFG][res] = Job.count(
-                name_regex='DFG-{}'.format(DFG),
+            DFGs_summary[DFG_name][res] = Job.count(
+                name_regex='DFG-{}'.format(DFG_name),
                 last_build_res=res)
     return DFGs_summary
 
@@ -46,5 +47,11 @@ def get_DFGs_result_summary(DFGs):
 @bp.route('/')
 def index():
     """Main page route."""
-    job_count = Job.count()
-    return render_template('main/index.html', job_count=job_count)
+    overall_status = dict()
+    count = dict()
+    count['jobs'] = Job.count()
+    count['DFGs'] = DFG.count()
+    for res in jenkins_const.RESULTS:
+        overall_status[res] = Job.count(last_build_res=res)
+    return render_template('main/index.html', count=count,
+                           overall_status=overall_status)
