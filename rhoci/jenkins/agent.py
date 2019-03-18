@@ -61,6 +61,13 @@ class JenkinsAgent():
             if job_class == 'DFG':
                 DFG_name = osp.get_DFG_name(job['name'])
                 DFG_db.insert(DFG_db(name=DFG_name))
+            if job['last_build']:
+                self.add_build_to_db(job['name'], job['last_build'])
+
+    def add_build_to_db(self, job_name, build):
+        """Insets build into the database."""
+        print(job_name)
+        print(build)
 
     def add_job_to_db(self, job, job_class):
         """Add job to the database."""

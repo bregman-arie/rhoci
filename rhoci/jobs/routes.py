@@ -16,16 +16,19 @@ from __future__ import absolute_import
 from flask import render_template
 import logging
 
-from rhoci.models.job import Job
-
 LOG = logging.getLogger(__name__)
 
 from rhoci.jobs import bp  # noqa
 
 
 @bp.route('/index')
+@bp.route('/jobs')
 def index():
-    """All jobs route."""
-    jobs = Job.find()
-    print(jobs)
+    """All jobs."""
     return render_template('jobs/index.html')
+
+
+@bp.route('/builds')
+def all_builds():
+    """All builds."""
+    return render_template('builds/index.html')

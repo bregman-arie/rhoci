@@ -16,21 +16,21 @@ from __future__ import absolute_import
 from rhoci.database import Database
 
 
-class Build(object):
+class Test(object):
 
-    def __init__(self, number, job_name):
-        self.number = number
+    def __init__(self, build_number, job_name):
+        self.build_number = build_number
         self.job_name = job_name
 
     def insert(self):
-        if not Database.find_one("jobs", {"number": self.number,
+        if not Database.find_one("test", {"build_number": self.build_number,
                                           "job_name": self.job_name}):
             Database.insert(collection='builds',
                             data=self.json())
 
     def json(self):
         return {
-            'number': self.number,
+            'build_number': self.build_number,
             'job_name': self.job_name,
         }
 
@@ -38,5 +38,5 @@ class Build(object):
     def find(cls):
         """Returns find query."""
         query = {}
-        builds = Database.find(collection="builds", query=query)
-        return builds
+        tests = Database.find(collection="tests", query=query)
+        return tests
