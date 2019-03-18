@@ -4,6 +4,8 @@
 
 RHOCI is Red Hat OpenStack CI Dashboard.
 
+<div align="center"><img src="./images/rhoci_dashboard.png"></div><hr/>
+
 ## Quick start
 
 Before running the server and the agent, you first need to set up a configuration (`/etc/rhoci/rhoci.conf`)

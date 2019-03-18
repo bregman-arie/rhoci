@@ -29,7 +29,6 @@ def all_jobs():
     results = {'data': []}
     jobs = Job.find()
     for job in jobs:
-        print(job)
         if job['last_build']:
             last_build_result = job['last_build']['result']
             last_build_num = job['last_build']['number']

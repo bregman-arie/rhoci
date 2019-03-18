@@ -1,10 +1,10 @@
-<canvas id="builds_last_week_chart" width="20" height="20"></canvas>
+<canvas id="builds_last_week_chart" height="400"></canvas>
 
 <script>
   var ctx = document.getElementById("builds_last_week_chart").getContext('2d');
-var myChart = new Chart(ctx, {
-   "type":"line",
-   "data":{  
+  var myChart = new Chart(ctx, {
+   type:"line",
+   data:{  
       "labels":[  
          "January",
          "February",
@@ -14,9 +14,9 @@ var myChart = new Chart(ctx, {
          "June",
          "July"
       ],
-      "datasets":[  
+      datasets:[  
          {  
-            "label":"My First Dataset",
+            "label":"Number of builds",
             "data":[  
                65,
                59,
@@ -32,7 +32,8 @@ var myChart = new Chart(ctx, {
          }
       ]
    },
-   "options":{  
-
+   options:{
+     maintainAspectRatio: false,
    }
 });
+</script>

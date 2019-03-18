@@ -41,7 +41,6 @@ def all_squads():
     squads_data = []
     DFGs = DFG.find()
     for DFG_db in DFGs:
-        print(DFG_db)
         for squad in DFG_db['squads']:
             num_of_jobs = 0
             for component in squad['components']:

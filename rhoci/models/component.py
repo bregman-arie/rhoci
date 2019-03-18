@@ -21,6 +21,7 @@ class Squad(object):
     def __init__(self, name, squad, DFG):
         self.name = name
         self.squad = squad
+        self.DFG = DFG
 
     def insert(self):
         if not Database.find_one("components", {"name": self.name}):
