@@ -12,15 +12,21 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from __future__ import absolute_import
+from __future__ import division
 
 from rhoci.database import Database
+
+import datetime
 
 
 class Build(object):
 
-    def __init__(self, number, job_name):
-        self.number = number
+    def __init__(self, job_name, number, result, timestamp):
         self.job_name = job_name
+        self.number = number
+        self.result = result
+        self.date = datetime.datetime.fromtimestamp(
+            int(timestamp / 1000))
 
     def insert(self):
         if not Database.find_one("jobs", {"number": self.number,
@@ -32,6 +38,8 @@ class Build(object):
         return {
             'number': self.number,
             'job_name': self.job_name,
+            'result': self.result,
+            'date': self.date,
         }
 
     @classmethod
@@ -40,3 +48,16 @@ class Build(object):
         query = {}
         builds = Database.find(collection="builds", query=query)
         return builds
+
+    @classmethod
+    def count(cls):
+        """Returns the count of builds documents."""
+        query = {}
+        builds = Database.find(collection='builds', query=query)
+        return builds.count()
+
+    @classmethod
+    def get_builds_count_per_date(num_of_days=10):
+        """Returns a list of date and builds count."""
+        pipeline = {}
+        return pipeline

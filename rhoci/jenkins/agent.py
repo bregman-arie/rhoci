@@ -19,6 +19,7 @@ import requests
 
 from rhoci.jenkins.api import API
 from rhoci.models.job import Job
+from rhoci.models.build import Build
 from rhoci.models.DFG import DFG as DFG_db
 from rhoci.jenkins import osp
 
@@ -61,13 +62,15 @@ class JenkinsAgent():
             if job_class == 'DFG':
                 DFG_name = osp.get_DFG_name(job['name'])
                 DFG_db.insert(DFG_db(name=DFG_name))
-            if job['last_build']:
-                self.add_build_to_db(job['name'], job['last_build'])
+            if 'lastBuild' in job and job['lastBuild']:
+                self.add_build_to_db(job['name'], job['lastBuild'])
 
     def add_build_to_db(self, job_name, build):
         """Insets build into the database."""
-        print(job_name)
-        print(build)
+        new_build = Build(
+            job_name=job_name, number=build['number'],
+            result=build['result'], timestamp=build['timestamp'])
+        new_build.insert()
 
     def add_job_to_db(self, job, job_class):
         """Add job to the database."""

@@ -17,6 +17,7 @@ from flask import jsonify
 import logging
 
 from rhoci.models.build import Build
+from rhoci.models.job import Job
 
 LOG = logging.getLogger(__name__)
 
@@ -30,6 +31,20 @@ def all_builds():
     builds = Build.find()
     for build in builds:
         print(build)
-        results['data'].append('bla1', 'bla2')
+        results['data'].append([build['job_name'], build['result'],
+                               build['number'], build['date'],
+                               ''])
+    return jsonify(results)
 
+
+@bp.route('/builds/<DFG_name>/<result>')
+def get_builds(DFG_name, result):
+    """Return builds based on DFG and result parameters."""
+    results = {'data': []}
+    jobs = Job.find(name_regex='DFG-{}'.format(DFG_name),
+                    last_build_result=result)
+    for job in jobs:
+        lb = job['last_build']
+        results['data'].append([job['name'], lb['result'],
+                                lb['number'], lb['timestamp'], ''])
     return jsonify(results)

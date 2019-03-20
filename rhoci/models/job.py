@@ -53,8 +53,13 @@ class Job(object):
         return jobs.count()
 
     @classmethod
-    def find(cls):
+    def find(cls, name_regex=None, last_build_result=None):
         """Returns find query."""
         query = {}
+        if name_regex:
+            regex = re.compile(name_regex, re.IGNORECASE)
+            query['name'] = regex
+        if last_build_result:
+            query['last_build.result'] = last_build_result
         jobs = Database.find(collection="jobs", query=query)
         return jobs

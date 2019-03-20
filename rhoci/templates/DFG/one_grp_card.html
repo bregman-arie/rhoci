@@ -1,6 +1,6 @@
 <div class="col-md-3">
   <div class="card text-center">
-    <a href="{{ url_for('DFG.summary', DFG_name=DFG['name']) }}" style="text-decoration: none">
+    <a href="{{ DFG['summary_url_for'] }}" style="text-decoration: none">
       <h3>
         <div class="card-header"> {{ DFG['name'] }} </div>
       </h3>

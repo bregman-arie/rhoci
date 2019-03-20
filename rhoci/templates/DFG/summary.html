@@ -1,111 +1,80 @@
 {% extends "layout.html" %}
+
 {% block content %}
 
-<!-- Load d3 and c3 for displaying pie charts -->
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
-
+<!-- Main container -->
 <br>
 <div class="container-fluid col-md-custom col-md-offset-custom">
-
-{% include "bugs/add_bug_modal.html" -%}
-{% include "bugs/add_tests_bug_modal.html" -%}
-{% include "bugs/remove_tests_bug_modal.html" -%}
-{% include "bugs/remove_bug_modal.html" -%}
-{% include "bugs/show_bugs_modal_datatable.html" -%}
-
-{% include "failures/show_failure_modal.html" -%}
-{% include "tests/show_tests_modal_datatable.html" -%}
-{% include "jobs/show_jobs_table.html" -%}
-
-
-<div class="container-fluid">
-     <div class="col-lg-10">
-
-<!-- Pie chart for each release -->
-{% for release in releases %}
-  
-  {% if release.num_of_jobs != 0 %}
-    {% include "DFG/single_pie_chart.html" -%}
-  {% endif %}
-
-{% endfor %}
-</div>
-
-
-<div class="col-lg-2">
-<div class="card-pf">
- <div class="card-pf-heading">
-   <h2 class="card-pf-title">
-     Squads
-   </h2>
- </div>
-<div class="card-pf-body">
-  {% for squad in dfg.squads %}
-    <a href="{{ url_for('dfg.squad_summary', squad_name=squad.name, dfg_name=dfg.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ squad.name }}</button></a>
-    <br>
-  {% endfor %}
-</div>
-</div>
-</div>
-
-<div class="col-lg-2">
-<div class="card-pf">
- <div class="card-pf-heading">
-   <h2 class="card-pf-title">
-     Components
-   </h2>
- </div>
-<div class="card-pf-body">
-  {% for squad in dfg.squads %}
-    {% for component in squad.components %}
-      <a href="{{ url_for('dfg.component_summary', component_name=component.name, dfg_name=dfg.name, squad_name=squad.name) }}"><button type="button" class="btn btn-info" style="margin-bottom: 2px;">{{ component.name }}</button></a>
-      <br>
-    {% endfor %}
-  {% endfor %}
-</div>
-</div>
-</div>
-
-
-</div>
-<!-- -->
-
-{% include "tests/failing_tests_datatable.html" -%}
-
-
-<div class="container-fluid">
-  <div class="row">
-          <h3>
-            <strong>All Failing Jobs</strong>
-          </h3>
-
-{% include "jobs/show_failed_jobs_table.html" -%}
-
-      </div>
+  <div class="row text-center">
   </div>
 
+{% include "builds/table.html" -%}
+
 <script>
+$(document).ready(function() {
 
-{% include "failures/show_failure.js" -%}
-{% include "failures/analyze_failure.js" -%}
+$("#jobs_table").DataTable({
+  "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE') }}",
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            if ( aData[1] == "FAILURE" )
+            {
+            $('td', nRow).css('background-color', '#f2dede' );
+            }
+            else if ( aData[1] == "SUCCESS" )
+            {
+            $('td', nRow).css('background-color', '#dff0d8');
+            }
+            else if ( aData[1] == "UNSTABLE" )
+            {
+            $('td', nRow).css('background-color', '#fcf8e3');
+            }
+        },
+        columnDefs: [
+            {
+                targets:0,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display'){
+                        data = '<a href="/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:[2],
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[3] != 0 ){
+                        data = '<a href="/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets:[1],
+                render: function ( data, type, row, meta ) {
+                    data = '<a href="/job/' + row[1] + '/' + row[2] + '">' + data + '</a>';
+                    return data;
+                }
+            },
+            {
+                targets:4,
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[1] != 0 && (row[1] == 'SUCCESS' || row[1] == 'UNSTABLE')){
+                    data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
+                    }
+                    else {
+                      data = 'No Tests';
+                    }
 
-{% include "bugs/show_bugs.js" -%}
-{% include "bugs/remove_tests_bug_from_db.js" -%}
-{% include "bugs/remove_tests_bug.js" -%}
-{% include "bugs/remove_bug_from_db.js" -%}
-{% include "bugs/remove_bug.js" -%}
-{% include "bugs/add_bug.js" -%}
-{% include "bugs/add_tests_bug.js" -%}
-{% include "bugs/submit_bug.js" -%}
-{% include "bugs/submit_tests_bug.js" -%}
+                    return data;
+                }
+            },
+        ],
+  processing: true,
+  search: { "regex": true }, 
+});
 
-{% include "tests/show_tests.js" -%}
-
-{% include "jobs/show_failed_jobs_datatable.js" -%}
-
-{% include "common/modal_order.js" -%}
-$("#jobs_table").addClass('hidden');
+});
 </script>
 
+<!-- -->
 {% endblock %}
