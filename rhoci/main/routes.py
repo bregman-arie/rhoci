@@ -53,7 +53,10 @@ def index():
     count['jobs'] = Job.count()
     count['DFGs'] = DFG.count()
     count['builds'] = Build.count()
+    builds_count_li, dates_li = Build.get_builds_count_per_date()
     for res in jenkins_const.RESULTS:
         overall_status[res] = Job.count(last_build_res=res)
     return render_template('main/index.html', count=count,
-                           overall_status=overall_status)
+                           overall_status=overall_status,
+                           builds_count_li=list(reversed((builds_count_li))),
+                           dates_li=list(reversed(dates_li)))

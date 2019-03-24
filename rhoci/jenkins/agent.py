@@ -37,7 +37,12 @@ class JenkinsAgent():
     def run(self):
         """Runs the agent proess."""
         LOG.info("Running Jenkins agent")
-        self.get_jobs_and_insert_data_to_db()
+        jobs = self.get_jobs()
+        LOG.info("Obtained list of jobs")
+        for job in jobs:
+            JenkinsAgent.classify_and_insert_to_db(job)
+            if 'lastBuild' in job and job['lastBuild']:
+                self.add_build_to_db(job['name'], job['lastBuild'])
         # Agent should run forever
         LOG.info("Running forever")
         while True:
@@ -49,21 +54,28 @@ class JenkinsAgent():
         result_json = json.loads(request.text)
         return result_json['jobs']
 
-    def get_jobs_and_insert_data_to_db(self):
-        """Get jobs from Jenkins and insert data to DB based on job class."""
-        jobs = self.get_jobs()
-        LOG.info("Obtained list of jobs")
+    @staticmethod
+    def add_job_to_db(job, job_class):
+        """Add job to the database."""
+        if 'lastBuild' in job:
+            lb = job['lastBuild']
+        else:
+            lb = job['build']
+        new_job = Job(_class=job_class, name=job['name'],
+                      last_build=lb)
+        new_job.insert()
 
-        # Add jobs (and any related info extracted) to the DB
-        for job in jobs:
-            job_class = osp.get_job_class(job)
-            if job_class != 'folder':
-                self.add_job_to_db(job, job_class)
-            if job_class == 'DFG':
-                DFG_name = osp.get_DFG_name(job['name'])
-                DFG_db.insert(DFG_db(name=DFG_name))
-            if 'lastBuild' in job and job['lastBuild']:
-                self.add_build_to_db(job['name'], job['lastBuild'])
+    @staticmethod
+    def classify_and_insert_to_db(job):
+        """Classifies job type and insert data based on classification
+        to the db.
+        """
+        job_class = osp.get_job_class(job)
+        if job_class != 'folder':
+            JenkinsAgent.add_job_to_db(job, job_class)
+        if job_class == 'DFG':
+            DFG_name = osp.get_DFG_name(job['name'])
+            DFG_db.insert(DFG_db(name=DFG_name))
 
     def add_build_to_db(self, job_name, build):
         """Insets build into the database."""
@@ -71,9 +83,3 @@ class JenkinsAgent():
             job_name=job_name, number=build['number'],
             result=build['result'], timestamp=build['timestamp'])
         new_build.insert()
-
-    def add_job_to_db(self, job, job_class):
-        """Add job to the database."""
-        new_job = Job(_class=job_class, name=job['name'],
-                      last_build=job['lastBuild'])
-        new_job.insert()

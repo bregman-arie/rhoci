@@ -23,18 +23,12 @@ LOG = logging.getLogger(__name__)
 from rhoci.api import bp  # noqa
 
 
-@bp.route('/jobs/all')
+@bp.route('/jobs')
 def all_jobs():
     """All jobs API route."""
     results = {'data': []}
     jobs = Job.find()
     for job in jobs:
-        if job['last_build']:
-            last_build_result = job['last_build']['result']
-            last_build_num = job['last_build']['number']
-        else:
-            last_build_result = last_build_num = "No Last Build"
-        results['data'].append([job['name'], last_build_result,
-                               last_build_num, job['created_at'], ''])
-
+        job.pop('_id')
+        results['data'].append(job)
     return jsonify(results)

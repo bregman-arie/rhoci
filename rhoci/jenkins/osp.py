@@ -16,8 +16,9 @@ from __future__ import absolute_import
 
 def get_job_class(job):
     """Returns job class."""
-    if job['_class'] == 'com.cloudbees.hudson.plugins.folder.Folder':
-        return 'folder'
+    if '_class' in job:
+        if job['_class'] == 'com.cloudbees.hudson.plugins.folder.Folder':
+            return 'folder'
     elif 'DFG-' in job['name']:
         return 'DFG'
     elif 'util' in job['name']:

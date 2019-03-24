@@ -59,5 +59,19 @@ class Build(object):
     @classmethod
     def get_builds_count_per_date(num_of_days=10):
         """Returns a list of date and builds count."""
-        pipeline = {}
-        return pipeline
+        builds = []
+        dates = []
+        pipeline = [
+            {"$group":
+             {"_id": {"$add": [{"$dayOfYear": "$date"},
+                               {"$multiply": [400, {"$year": "$date"}]}]},
+              "builds": {"$sum": 1}, "first": {
+                  "$min": "$date"}}}, {"$sort": {
+                      "_id": -1}}, {"$limit": 10}, {
+                          "$project": {
+                              "date": "$first", "builds": 1, "_id": 0}}]
+        cursor = Database.DATABASE['builds'].aggregate(pipeline)
+        for build_date in cursor:
+            dates.append((build_date['date'].strftime("%m/%d/%Y")))
+            builds.append(build_date['builds'])
+        return builds, dates

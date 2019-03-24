@@ -14,8 +14,10 @@
 from __future__ import absolute_import
 
 from flask import jsonify
+from flask import request
 import logging
 
+from rhoci.jenkins.agent import JenkinsAgent
 from rhoci.models.build import Build
 from rhoci.models.job import Job
 
@@ -48,3 +50,11 @@ def get_builds(DFG_name, result):
         results['data'].append([job['name'], lb['result'],
                                 lb['number'], lb['timestamp'], ''])
     return jsonify(results)
+
+
+@bp.route('/jenkins_update', methods=['POST'])
+def jenkins_update():
+    """Handles update received from Jenkins."""
+    json = request.get_json(silent=True)
+    JenkinsAgent.classify_and_insert_to_db(json)
+    return jsonify({'notification': 'UPDATE_COMPLETE'})

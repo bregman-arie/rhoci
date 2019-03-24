@@ -22,22 +22,31 @@ from rhoci.database import Database
 class Job(object):
 
     def __init__(self, _class, name, last_build):
+        self.builds = []
         self._class = _class
         self.name = name
-        self.last_build = last_build
+        self.last_build = last_build or {'result': None, 'number': None}
+        self.builds.append(last_build)
         self.created_at = datetime.datetime.utcnow()
 
     def insert(self):
-        if not Database.find_one("jobs", {"name": self.name}):
-            Database.insert(collection='jobs',
-                            data=self.json())
+        job = Database.find_one("jobs", {"name": self.name})
+        if not job:
+            Database.insert(collection='jobs', data=self.json())
+        else:
+            Database.DATABASE['jobs'].find_one_and_update({"name": self.name},
+                                                          {"$set": {"last_build": self.last_build}})
+            Database.DATABASE['jobs'].update({"name": self.name},
+                                             {"$addToSet": {"builds": self.last_build}})
+            print(job)
 
     def json(self):
         return {
             '_class': self._class,
             'name': self.name,
             'last_build': self.last_build,
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'builds': self.builds
         }
 
     @classmethod

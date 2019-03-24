@@ -27,3 +27,11 @@ To run RHOCI Jenkins agent, run the following:
 ## Developer Guide
 
 Whould like to contribute to RHOCI? click [here](docs/developer.md)
+
+
+## API
+
+
+Route | Description
+:------|:------:
+/api/jobs | Show jobs details

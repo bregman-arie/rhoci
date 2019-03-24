@@ -15,6 +15,13 @@ $(document).ready(function() {
 
 $("#jobs_table").DataTable({
   "ajax": "{{ url_for('api.all_jobs') }}",
+        "columns": [
+          {"data": "name"},
+          {"data": "last_build.result"},
+          {"data": "last_build.number"},
+          {"data": "name"},
+          {"data": "name"},
+          ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             if ( aData[1] == "FAILURE" )
             {
