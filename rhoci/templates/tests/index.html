@@ -8,13 +8,13 @@
   <div class="row text-center">
   </div>
 
-{% include "builds/table.html" -%}
+{% include "tests/table.html" -%}
 
 <script>
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-  "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE', squad_name=squad_name) }}",
+  "ajax": "{{ url_for('api.all_builds') }}",
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             if ( aData[1] == "FAILURE" )
             {
@@ -51,7 +51,15 @@ $("#jobs_table").DataTable({
             {
                 targets:[1],
                 render: function ( data, type, row, meta ) {
-                    data = '<a href="/job/' + row[1] + '/' + row[2] + '">' + data + '</a>';
+                    if(type === 'display' && (row[1] == 'UNSTABLE' || row[1] == 'SUCCESS' || row[1] == 'ABORTED' || row[1] == null)){
+                        data = '<a href="/job/' + row[1] + '/' + row[2] + '">' + data + '</a>';
+                    }
+                    else if (type === 'display' && row[1] == 'FAILURE') {
+                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">Failure</button>'
+                    }
+                    else if (type === 'display' && row[1] != 'None' ){
+                    data = '<button type="button" onClick="show_failure(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
+                    }
                     return data;
                 }
             },

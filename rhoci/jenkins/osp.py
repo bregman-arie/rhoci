@@ -19,7 +19,7 @@ def get_job_class(job):
     if '_class' in job:
         if job['_class'] == 'com.cloudbees.hudson.plugins.folder.Folder':
             return 'folder'
-    elif 'DFG-' in job['name']:
+    if 'DFG-' in job['name']:
         return 'DFG'
     elif 'util' in job['name']:
         return 'utility'
@@ -28,3 +28,8 @@ def get_job_class(job):
 def get_DFG_name(job_name):
     """Returns DFG name."""
     return job_name.split('-')[1]
+
+
+def get_component_name(job_name):
+    """Returns component name."""
+    return job_name.split('-')[2]

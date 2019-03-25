@@ -20,14 +20,15 @@ from rhoci.database import Database
 
 class DFG(object):
 
-    def __init__(self, name, squads=None, components=None,
-                 squad_to_components=None):
+    def __init__(self, name, squads=[], components=[],
+                 squad_to_components={}):
         self.name = name
         self.squads = squads
         self.components = components
         self.squad_to_components = squad_to_components
 
     def insert(self):
+        """Inserts object to the database."""
         if not Database.find_one("DFGs", {"name": self.name}):
             Database.insert(collection='DFGs',
                             data=self.json())
@@ -71,6 +72,15 @@ class DFG(object):
             if DFG_db['components']:
                 components.extend(DFG_db['components'])
         return components
+
+    @classmethod
+    def get_squad(cls, DFG_name, component):
+        DFG_db = cls.find_one(name=DFG_name)
+        if DFG_db['squad_to_components']:
+            for k, v in DFG_db['squad_to_components'].items():
+                if component in v:
+                    return k
+            return
 
     @classmethod
     def get_squad_components(cls, DFG_name, squad):

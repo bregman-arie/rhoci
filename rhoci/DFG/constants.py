@@ -14,6 +14,6 @@
 from __future__ import absolute_import
 
 DFGs = [{'name': 'network', 'squads': [
-    {'name': 'vNES', 'components': ['neutron', 'python-neutoronclient']},
+    {'name': 'vNES', 'components': ['neutron', 'python-neutronclient']},
     {'name': 'octavia', 'components': ['octavia', 'neutron-lbaas']},
     {'name': 'ovn', 'components': ['networking-ovn']}]}]

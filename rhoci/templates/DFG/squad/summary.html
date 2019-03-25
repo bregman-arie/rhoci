@@ -14,7 +14,7 @@
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-  "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE') }}",
+  "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE', squad_name=squad_name) }}",
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             if ( aData[1] == "FAILURE" )
             {

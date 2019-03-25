@@ -21,8 +21,10 @@ from rhoci.database import Database
 
 class Job(object):
 
-    def __init__(self, _class, name, last_build):
-        self.builds = []
+    def __init__(self, _class, name, last_build, properties={}):
+        self.builds = [last_build]
+        self.tests = []
+        self.properties = properties
         self._class = _class
         self.name = name
         self.last_build = last_build or {'result': None, 'number': None}
@@ -34,11 +36,12 @@ class Job(object):
         if not job:
             Database.insert(collection='jobs', data=self.json())
         else:
-            Database.DATABASE['jobs'].find_one_and_update({"name": self.name},
-                                                          {"$set": {"last_build": self.last_build}})
-            Database.DATABASE['jobs'].update({"name": self.name},
-                                             {"$addToSet": {"builds": self.last_build}})
-            print(job)
+            Database.DATABASE['jobs'].find_one_and_update(
+                {"name": self.name},
+                {"$set": {"last_build": self.last_build}})
+            Database.DATABASE['jobs'].update(
+                {"name": self.name},
+                {"$addToSet": {"builds": self.last_build}})
 
     def json(self):
         return {
@@ -46,7 +49,9 @@ class Job(object):
             'name': self.name,
             'last_build': self.last_build,
             'created_at': self.created_at,
-            'builds': self.builds
+            'builds': self.builds,
+            'tests': self.tests,
+            'properties': self.properties
         }
 
     @classmethod
@@ -56,13 +61,14 @@ class Job(object):
         if name_regex:
             regex = re.compile(name_regex, re.IGNORECASE)
             query['name'] = regex
+            print(query)
         if last_build_res:
             query['last_build.result'] = last_build_res
         jobs = Database.find(collection='jobs', query=query)
         return jobs.count()
 
     @classmethod
-    def find(cls, name_regex=None, last_build_result=None):
+    def find(cls, name_regex=None, last_build_result=None, properties=None):
         """Returns find query."""
         query = {}
         if name_regex:
@@ -70,5 +76,7 @@ class Job(object):
             query['name'] = regex
         if last_build_result:
             query['last_build.result'] = last_build_result
+        if properties:
+            query['properties'] = properties
         jobs = Database.find(collection="jobs", query=query)
         return jobs

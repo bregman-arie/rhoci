@@ -28,7 +28,8 @@ class Database(object):
 
     @staticmethod
     def insert(collection, data):
-        Database.DATABASE[collection].insert(data)
+        _id = Database.DATABASE[collection].insert(data)
+        return _id
 
     @staticmethod
     def find(collection, query):

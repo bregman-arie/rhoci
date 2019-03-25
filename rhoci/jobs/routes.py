@@ -22,13 +22,19 @@ from rhoci.jobs import bp  # noqa
 
 
 @bp.route('/index')
-@bp.route('/jobs')
+@bp.route('/')
 def index():
     """All jobs."""
     return render_template('jobs/index.html')
 
 
 @bp.route('/builds')
-def all_builds():
+def builds():
     """All builds."""
     return render_template('builds/index.html')
+
+
+@bp.route('/tests')
+def tests():
+    """All tests."""
+    return render_template('tests/index.html')

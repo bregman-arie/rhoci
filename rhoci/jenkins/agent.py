@@ -38,7 +38,7 @@ class JenkinsAgent():
         """Runs the agent proess."""
         LOG.info("Running Jenkins agent")
         jobs = self.get_jobs()
-        LOG.info("Obtained list of jobs")
+        LOG.info("Obtained a list of jobs from Jenkins")
         for job in jobs:
             JenkinsAgent.classify_and_insert_to_db(job)
             if 'lastBuild' in job and job['lastBuild']:
@@ -55,14 +55,14 @@ class JenkinsAgent():
         return result_json['jobs']
 
     @staticmethod
-    def add_job_to_db(job, job_class):
+    def add_job_to_db(job, job_class, properties):
         """Add job to the database."""
         if 'lastBuild' in job:
             lb = job['lastBuild']
         else:
             lb = job['build']
         new_job = Job(_class=job_class, name=job['name'],
-                      last_build=lb)
+                      last_build=lb, properties=properties)
         new_job.insert()
 
     @staticmethod
@@ -70,12 +70,21 @@ class JenkinsAgent():
         """Classifies job type and insert data based on classification
         to the db.
         """
+        properties = {}
         job_class = osp.get_job_class(job)
-        if job_class != 'folder':
-            JenkinsAgent.add_job_to_db(job, job_class)
         if job_class == 'DFG':
             DFG_name = osp.get_DFG_name(job['name'])
-            DFG_db.insert(DFG_db(name=DFG_name))
+            new_DFG = DFG_db(name=DFG_name)
+            DFG_db.insert(new_DFG)
+            comp_name = osp.get_component_name(job['name'])
+            print(comp_name)
+            squad_name = DFG_db.get_squad(DFG_name, comp_name)
+            print(squad_name)
+            properties = {'DFG': DFG_name, 'component': comp_name}
+            if squad_name:
+                properties['squad'] = squad_name
+        if job_class != 'folder':
+            JenkinsAgent.add_job_to_db(job, job_class, properties)
 
     def add_build_to_db(self, job_name, build):
         """Insets build into the database."""

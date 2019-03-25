@@ -24,7 +24,7 @@ from rhoci.api import bp  # noqa
 
 
 @bp.route('/jobs')
-def all_jobs():
+def jobs():
     """All jobs API route."""
     results = {'data': []}
     jobs = Job.find()

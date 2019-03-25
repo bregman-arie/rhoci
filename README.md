@@ -35,3 +35,4 @@ Whould like to contribute to RHOCI? click [here](docs/developer.md)
 Route | Description
 :------|:------:
 /api/jobs | Show jobs details
+/api/DFGs | Show DFGs details

@@ -21,6 +21,8 @@ import datetime
 
 class Build(object):
 
+    COLLECTION = 'builds'
+
     def __init__(self, job_name, number, result, timestamp):
         self.job_name = job_name
         self.number = number
@@ -29,9 +31,9 @@ class Build(object):
             int(timestamp / 1000))
 
     def insert(self):
-        if not Database.find_one("jobs", {"number": self.number,
-                                          "job_name": self.job_name}):
-            Database.insert(collection='builds',
+        if not Database.find_one(self.COLLECTION, {"number": self.number,
+                                 "job_name": self.job_name}):
+            Database.insert(collection=self.COLLECTION,
                             data=self.json())
 
     def json(self):
@@ -70,7 +72,7 @@ class Build(object):
                       "_id": -1}}, {"$limit": 10}, {
                           "$project": {
                               "date": "$first", "builds": 1, "_id": 0}}]
-        cursor = Database.DATABASE['builds'].aggregate(pipeline)
+        cursor = Database.DATABASE['builds'].aggregate(pipeline)  # noqa
         for build_date in cursor:
             dates.append((build_date['date'].strftime("%m/%d/%Y")))
             builds.append(build_date['builds'])

@@ -1,7 +1,9 @@
 RHOCI V2.0
 
 * Moved from Python 2 to Python 3
-* Moved from SQLite to MongoDB
+* Moved from SQLite to MongoDB (embedded structure)
 * Dropped Patternfly
 * Datatable search uses regular expressions mode instead of keywords
 * New pages - squads, components
+* New main page layout
+* Server and agent run separately

@@ -16,5 +16,6 @@ from flask import Blueprint
 
 bp = Blueprint('api', __name__)
 
-from rhoci.api import job  # noqa
 from rhoci.api import build  # noqa
+from rhoci.api import job  # noqa
+from rhoci.api import DFG  # noqa

@@ -19,9 +19,9 @@
               </a>
 
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('DFG.all_DFGs') }}">All</a>
-                <a class="dropdown-item" href="{{ url_for('DFG.all_squads') }}">Squads</a>
-                <a class="dropdown-item" href="{{ url_for('DFG.all_components') }}">Components</a>
+                <a class="dropdown-item" href="{{ url_for('DFG.DFGs') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('DFG.squads') }}">Squads</a>
+                <a class="dropdown-item" href="{{ url_for('DFG.components') }}">Components</a>
               </div>
           </li>
 
@@ -43,7 +43,18 @@
               </a>
 
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('jobs.all_builds') }}">All</a>
+                <a class="dropdown-item" href="{{ url_for('jobs.builds') }}">All</a>
+              </div>
+          </li>
+
+          <!-- Tests dropdown -->
+           <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Tests
+              </a>
+
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('jobs.tests') }}">All</a>
               </div>
           </li>
 

@@ -32,7 +32,6 @@ def all_builds():
     results = {'data': []}
     builds = Build.find()
     for build in builds:
-        print(build)
         results['data'].append([build['job_name'], build['result'],
                                build['number'], build['date'],
                                ''])
@@ -40,15 +39,19 @@ def all_builds():
 
 
 @bp.route('/builds/<DFG_name>/<result>')
-def get_builds(DFG_name, result):
+@bp.route('/builds/<DFG_name>/<squad_name>/<result>')
+def get_builds(DFG_name, result, squad_name=None):
     """Return builds based on DFG and result parameters."""
     results = {'data': []}
-    jobs = Job.find(name_regex='DFG-{}'.format(DFG_name),
-                    last_build_result=result)
+    if not squad_name:
+        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name),
+                        last_build_result=result)
+    else:
+        jobs = Job.find(properties={'squad': squad_name},
+                        last_build_result=result)
     for job in jobs:
-        lb = job['last_build']
-        results['data'].append([job['name'], lb['result'],
-                                lb['number'], lb['timestamp'], ''])
+        job.pop('_id')
+        results['data'].append(job)
     return jsonify(results)
 
 

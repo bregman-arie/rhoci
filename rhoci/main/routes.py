@@ -17,6 +17,7 @@ from flask import render_template
 import logging
 
 from rhoci.models.build import Build
+from rhoci.models.test import Test
 from rhoci.models.job import Job
 from rhoci.models.DFG import DFG
 import rhoci.jenkins.constants as jenkins_const
@@ -53,6 +54,7 @@ def index():
     count['jobs'] = Job.count()
     count['DFGs'] = DFG.count()
     count['builds'] = Build.count()
+    count['tests'] = Test.count()
     builds_count_li, dates_li = Build.get_builds_count_per_date()
     for res in jenkins_const.RESULTS:
         overall_status[res] = Job.count(last_build_res=res)

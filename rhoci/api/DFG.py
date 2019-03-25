@@ -13,22 +13,22 @@
 #    under the License.
 from __future__ import absolute_import
 
-from rhoci.database import Database
+from flask import jsonify
+import logging
+
+from rhoci.models.DFG import DFG as DFG_db
+
+LOG = logging.getLogger(__name__)
+
+from rhoci.api import bp  # noqa
 
 
-class Squad(object):
-
-    def __init__(self, name, components):
-        self.name = name
-        self.components = components
-
-    def insert(self):
-        if not Database.find_one("squads", {"name": self.name}):
-            Database.insert(collection='squads',
-                            data=self.json())
-
-    def json(self):
-        return {
-            'name': self.name,
-            'components': self.components,
-        }
+@bp.route('/DFGs')
+def DFGs():
+    """All DFGs API route."""
+    results = {'DFGs': []}
+    DFGs_db = DFG_db.find()
+    for DFG in DFGs_db:
+        DFG.pop('_id')
+        results['DFGs'].append(DFG)
+    return jsonify(results)

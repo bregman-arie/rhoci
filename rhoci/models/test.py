@@ -18,13 +18,16 @@ from rhoci.database import Database
 
 class Test(object):
 
+    COLLECTION = 'tests'
+
     def __init__(self, build_number, job_name):
         self.build_number = build_number
         self.job_name = job_name
 
     def insert(self):
-        if not Database.find_one("test", {"build_number": self.build_number,
-                                          "job_name": self.job_name}):
+        if not Database.find_one(self.COLLECTION,
+                                 {"build_number": self.build_number,
+                                  "job_name": self.job_name}):
             Database.insert(collection='builds',
                             data=self.json())
 
@@ -38,5 +41,12 @@ class Test(object):
     def find(cls):
         """Returns find query."""
         query = {}
-        tests = Database.find(collection="tests", query=query)
+        tests = Database.find(collection=cls.COLLECTION, query=query)
         return tests
+
+    @classmethod
+    def count(cls):
+        """Returns the count of builds documents."""
+        query = {}
+        builds = Database.find(collection='builds', query=query)
+        return builds.count()
