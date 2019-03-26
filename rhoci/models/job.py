@@ -61,7 +61,6 @@ class Job(object):
         if name_regex:
             regex = re.compile(name_regex, re.IGNORECASE)
             query['name'] = regex
-            print(query)
         if last_build_res:
             query['last_build.result'] = last_build_res
         jobs = Database.find(collection='jobs', query=query)
@@ -77,6 +76,7 @@ class Job(object):
         if last_build_result:
             query['last_build.result'] = last_build_result
         if properties:
-            query['properties'] = properties
+            for k, v in properties.items():
+                query['properties.{}'.format(k)] = v
         jobs = Database.find(collection="jobs", query=query)
         return jobs

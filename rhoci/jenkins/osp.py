@@ -32,4 +32,9 @@ def get_DFG_name(job_name):
 
 def get_component_name(job_name):
     """Returns component name."""
-    return job_name.split('-')[2]
+    comp = job_name.split('-')[2]
+    NOT_COMPS = ["python", "networking", "openstack"]
+    if comp in NOT_COMPS:
+        return job_name.split('-')[2] + '-' + job_name.split('-')[3]
+    else:
+        return comp

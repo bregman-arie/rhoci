@@ -23,7 +23,6 @@ LOG = logging.getLogger(__name__)
 def insert_DFG_data_to_db(DFGs):
     """Iterates over a list of DFGs and inserts their data into the db."""
     for DFG in DFGs:
-        print(DFG)
         new_DFG = DFG_db(
             name=DFG['name'],
             squads=[sqd['name'] for sqd in DFG['squads']],

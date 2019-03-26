@@ -67,12 +67,9 @@ def components():
     DFGs = DFG.find()
     for DFG_db in DFGs:
         for component in DFG_db['components']:
-            print(component)
             uf = url_for('DFG.component_summary', DFG_name=DFG_db['name'],
                          component_name=component)
             count = Job.count(component)
-            print(component)
-            print(count)
             components_data.append({'name': component,
                                     'num_of_jobs': count,
                                     'summary_url_for': uf})

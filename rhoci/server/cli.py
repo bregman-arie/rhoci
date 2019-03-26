@@ -32,6 +32,8 @@ def create_parser():
                         action='store_true')
     parser.add_argument('--debug', dest="debug", help='Turn on debug',
                         action='store_true')
+    parser.add_argument('--port', '-p', dest="port", help='Port number',
+                        default=5000)
 
     return parser
 
@@ -46,7 +48,7 @@ def run_app(args=None):
     """Creates and runs the Flask application."""
     setup_logging(args.debug)
     app = create_app()
-    app.run()
+    app.run(host='0.0.0.0', port=args.port)
 
 
 def main():

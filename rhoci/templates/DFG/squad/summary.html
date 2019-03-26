@@ -14,17 +14,24 @@
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-  "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE', squad_name=squad_name) }}",
+        "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE', squad_name=squad_name) }}",
+        "columns": [
+          {"data": "name"},
+          {"data": "last_build.result"},
+          {"data": "last_build.number"},
+          {"data": "name"},
+          {"data": "name"},
+          ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData[1] == "FAILURE" )
+            if ( aData.last_build.result == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData[1] == "SUCCESS" )
+            else if ( aData.last_build.result == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData[1] == "UNSTABLE" )
+            else if ( aData.last_build.result == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }

@@ -39,15 +39,20 @@ def all_builds():
 
 
 @bp.route('/builds/<DFG_name>/<result>')
-@bp.route('/builds/<DFG_name>/<squad_name>/<result>')
-def get_builds(DFG_name, result, squad_name=None):
+@bp.route('/builds/<DFG_name>/squad/<squad_name>/<result>')
+@bp.route('/builds/<DFG_name>/component/<component_name>/<result>')
+def get_builds(DFG_name, result, squad_name=None, component_name=None):
     """Return builds based on DFG and result parameters."""
     results = {'data': []}
-    if not squad_name:
-        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name),
-                        last_build_result=result)
-    else:
+    if squad_name:
         jobs = Job.find(properties={'squad': squad_name},
+                        last_build_result=result)
+    elif component_name:
+        jobs = Job.find(
+            name_regex='DFG-{}-{}'.format(DFG_name, component_name),
+            last_build_result=result)
+    else:
+        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name),
                         last_build_result=result)
     for job in jobs:
         job.pop('_id')
@@ -59,5 +64,6 @@ def get_builds(DFG_name, result, squad_name=None):
 def jenkins_update():
     """Handles update received from Jenkins."""
     json = request.get_json(silent=True)
+    print(json)
     JenkinsAgent.classify_and_insert_to_db(json)
     return jsonify({'notification': 'UPDATE_COMPLETE'})

@@ -77,7 +77,6 @@ class JenkinsAgent():
             new_DFG = DFG_db(name=DFG_name)
             DFG_db.insert(new_DFG)
             comp_name = osp.get_component_name(job['name'])
-            print(comp_name)
             squad_name = DFG_db.get_squad(DFG_name, comp_name)
             print(squad_name)
             properties = {'DFG': DFG_name, 'component': comp_name}
