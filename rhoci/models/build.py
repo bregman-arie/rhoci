@@ -16,8 +16,6 @@ from __future__ import division
 
 from rhoci.database import Database
 
-import datetime
-
 
 class Build(object):
 
@@ -27,8 +25,7 @@ class Build(object):
         self.job_name = job_name
         self.number = number
         self.result = result
-        self.date = datetime.datetime.fromtimestamp(
-            int(timestamp / 1000))
+        self.date = timestamp
 
     def insert(self):
         if not Database.find_one(self.COLLECTION, {"number": self.number,

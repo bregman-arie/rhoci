@@ -38,3 +38,10 @@ def builds():
 def tests():
     """All tests."""
     return render_template('tests/index.html')
+
+
+@bp.route('/<name>')
+def job(name):
+    """Specific job summary."""
+    print(name)
+    return render_template('job/summary.html')

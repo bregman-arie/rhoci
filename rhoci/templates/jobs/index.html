@@ -17,8 +17,12 @@ $("#jobs_table").DataTable({
   "ajax": "{{ url_for('api.jobs') }}",
         "columns": [
           {"data": "name"},
-          {"data": "last_build.result"},
-          {"data": "last_build.number"},
+          {"data": "last_build.result",
+           "defaultContent": "None"
+          },
+          {"data": "properties.release",
+           "defaultContent": "None"
+          },
           {"data": "name"},
           {"data": "name"},
           ],
@@ -41,9 +45,14 @@ $("#jobs_table").DataTable({
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                        data = '<a href="/job/' + data + '">' + data + '</a>';
-                    }
-                    return data;
+                      return $('<a>')
+                       .attr('href', data)
+                       .text(data)
+                       .wrap('<div></div>')
+                       .parent()
+                       .html();
+                      }
+                  else { return data; }
                 }
             },
             {
@@ -85,6 +94,9 @@ $("#jobs_table").DataTable({
             },
         ],
   processing: true,
+  searchPane: {
+        columns: [1, 2],
+    },
   search: { "regex": true }, 
 });
 

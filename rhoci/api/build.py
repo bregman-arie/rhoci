@@ -62,6 +62,5 @@ def get_builds(DFG_name, squad_name=None, component_name=None):
 def jenkins_update():
     """Handles update received from Jenkins."""
     json = request.get_json(silent=True)
-    print(json)
     JenkinsAgent.classify_and_insert_to_db(json)
     return jsonify({'notification': 'UPDATE_COMPLETE'})

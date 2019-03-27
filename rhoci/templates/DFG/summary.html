@@ -19,7 +19,9 @@ $("#jobs_table").DataTable({
           {"data": "name"},
           {"data": "last_build.result"},
           {"data": "properties.release"},
-          {"data": "last_build.timestamp"},
+          {"data": "last_build.timestamp",
+           "defaultContent": "No Date"
+          }
           ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             if ( aData.last_build.result == "FAILURE" )
@@ -47,6 +49,7 @@ $("#jobs_table").DataTable({
             },
             {
                 targets:[2],
+                "visible": false,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[3] != 0 ){
                         data = '<a href="/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
@@ -68,7 +71,7 @@ $("#jobs_table").DataTable({
                     data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
                     }
                     else {
-                      data = 'No Tests';
+                      data = 'None';
                     }
 
                     return data;

@@ -22,13 +22,20 @@ from rhoci.database import Database
 class Job(object):
 
     def __init__(self, _class, name, last_build, properties={}):
-        self.builds = [last_build]
+        self.builds = []
         self.tests = []
+        if last_build:
+            last_build.pop('artifacts')
+            self.last_build = last_build
+            if 'timestamp' in self.last_build:
+                self.last_build['timestamp'] = datetime.datetime.fromtimestamp(
+                    int(self.last_build['timestamp'] / 1000))
+            self.builds.append(last_build)
+        else:
+            self.last_build = {'result': None, 'number': None}
         self.properties = properties
         self._class = _class
         self.name = name
-        self.last_build = last_build or {'result': None, 'number': None}
-        self.builds.append(last_build)
         self.created_at = datetime.datetime.utcnow()
 
     def insert(self):
