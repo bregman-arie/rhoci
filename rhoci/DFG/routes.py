@@ -79,18 +79,23 @@ def components():
 @bp.route('/<DFG_name>')
 def summary(DFG_name):
     """All DFGs."""
-    return render_template('DFG/summary.html', DFG_name=DFG_name)
+    uf = url_for('api.get_builds', DFG_name=DFG_name)
+    return render_template('DFG/summary.html', DFG_name=DFG_name, uf=uf)
 
 
 @bp.route('/<DFG_name>/squad/<squad_name>')
 def squad_summary(DFG_name, squad_name):
     """Specific squad summary."""
-    return render_template('DFG/squad/summary.html', DFG_name=DFG_name,
-                           squad_name=squad_name)
+    uf = url_for('api.get_builds', DFG_name=DFG_name, squad_name=squad_name)
+    print(uf)
+    return render_template('DFG/summary.html', DFG_name=DFG_name,
+                           squad_name=squad_name, uf=uf)
 
 
 @bp.route('/<DFG_name>/component/<component_name>')
 def component_summary(DFG_name, component_name):
     """Specific component summary."""
-    return render_template('DFG/component/summary.html', DFG_name=DFG_name,
-                           component_name=component_name)
+    uf = url_for('api.get_builds', DFG_name=DFG_name,
+                 component_name=component_name)
+    return render_template('DFG/summary.html', DFG_name=DFG_name,
+                           component_name=component_name, uf=uf)

@@ -13,6 +13,8 @@
 #    under the License.
 from __future__ import absolute_import
 
+import re
+
 
 def get_job_class(job):
     """Returns job class."""
@@ -38,3 +40,8 @@ def get_component_name(job_name):
         return job_name.split('-')[2] + '-' + job_name.split('-')[3]
     else:
         return comp
+
+
+def get_release(job_name):
+    m = re.search('-\d{1,2}', job_name)
+    return m.group().split('-')[1] if m else 0

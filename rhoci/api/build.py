@@ -38,22 +38,20 @@ def all_builds():
     return jsonify(results)
 
 
-@bp.route('/builds/<DFG_name>/<result>')
-@bp.route('/builds/<DFG_name>/squad/<squad_name>/<result>')
-@bp.route('/builds/<DFG_name>/component/<component_name>/<result>')
-def get_builds(DFG_name, result, squad_name=None, component_name=None):
+@bp.route('/builds/<DFG_name>')
+@bp.route('/builds/<DFG_name>/squad/<squad_name>')
+@bp.route('/builds/<DFG_name>/component/<component_name>')
+def get_builds(DFG_name, squad_name=None, component_name=None):
     """Return builds based on DFG and result parameters."""
+    print(squad_name)
     results = {'data': []}
     if squad_name:
-        jobs = Job.find(properties={'squad': squad_name},
-                        last_build_result=result)
+        jobs = Job.find(properties={'squad': squad_name})
     elif component_name:
         jobs = Job.find(
-            name_regex='DFG-{}-{}'.format(DFG_name, component_name),
-            last_build_result=result)
+            name_regex='DFG-{}-{}'.format(DFG_name, component_name))
     else:
-        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name),
-                        last_build_result=result)
+        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name))
     for job in jobs:
         job.pop('_id')
         results['data'].append(job)

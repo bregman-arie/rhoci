@@ -14,7 +14,7 @@
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-        "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE', squad_name=squad_name) }}",
+        "ajax": "{{ uf }}",
         "columns": [
           {"data": "name"},
           {"data": "last_build.result"},

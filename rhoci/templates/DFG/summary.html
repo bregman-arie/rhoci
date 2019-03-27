@@ -8,19 +8,18 @@
   <div class="row text-center">
   </div>
 
-{% include "builds/table.html" -%}
+{% include "DFG/table.html" -%}
 
 <script>
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-        "ajax": "{{ url_for('api.get_builds', DFG_name=DFG_name, result='FAILURE') }}",
+        "ajax": "{{ uf }}",
         "columns": [
           {"data": "name"},
           {"data": "last_build.result"},
-          {"data": "last_build.number"},
-          {"data": "name"},
-          {"data": "name"},
+          {"data": "properties.release"},
+          {"data": "last_build.timestamp"},
           ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             if ( aData.last_build.result == "FAILURE" )
@@ -77,6 +76,9 @@ $("#jobs_table").DataTable({
             },
         ],
   processing: true,
+  searchPane: {
+        columns: [1, 2],
+    },
   search: { "regex": true }, 
 });
 
