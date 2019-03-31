@@ -17,7 +17,7 @@ import json
 import logging
 import requests
 
-from rhoci.jenkins.api import API
+from rhoci.jenkins import api
 from rhoci.models.job import Job
 from rhoci.models.build import Build
 from rhoci.models.DFG import DFG as DFG_db
@@ -50,19 +50,18 @@ class JenkinsAgent():
 
     def get_jobs(self):
         """Returns jobs."""
-        request = requests.get(self.url + API['get_jobs'], verify=False)
+        request = requests.get(self.url + api.CALLS['get_jobs'], verify=False)
         result_json = json.loads(request.text)
         return result_json['jobs']
 
     @staticmethod
-    def add_job_to_db(job, job_class, properties):
+    def add_job_to_db(job, properties):
         """Add job to the database."""
-        if 'lastBuild' in job:
-            lb = job['lastBuild']
-        else:
-            lb = job['build']
-        new_job = Job(_class=job_class, name=job['name'],
-                      last_build=lb, properties=properties)
+        print(job)
+        job = api.adjust_job_data(job)
+        new_job = Job(name=job['name'],
+                      last_build=job['build'],
+                      properties=properties)
         new_job.insert()
 
     @staticmethod
@@ -71,21 +70,20 @@ class JenkinsAgent():
         to the db.
         """
         properties = {}
-        job_class = osp.get_job_class(job)
-        if job_class == 'DFG':
-            DFG_name = osp.get_DFG_name(job['name'])
-            new_DFG = DFG_db(name=DFG_name)
+        properties['class'] = osp.get_job_class(job)
+        if properties['class'] == 'DFG':
+            properties['DFG'] = osp.get_DFG_name(job['name'])
+            new_DFG = DFG_db(name=properties['DFG'])
             DFG_db.insert(new_DFG)
-            comp_name = osp.get_component_name(job['name'])
-            squad_name = DFG_db.get_squad(DFG_name, comp_name)
-            release = osp.get_release(job['name'])
-            print(release)
-            properties = {'DFG': DFG_name, 'component': comp_name,
-                          'release': release}
+            properties['component'] = osp.get_component_name(job['name'])
+            squad_name = DFG_db.get_squad(properties['DFG'],
+                                          properties['component'])
             if squad_name:
                 properties['squad'] = squad_name
-        if job_class != 'folder':
-            JenkinsAgent.add_job_to_db(job, job_class, properties)
+        if properties['class'] != 'folder':
+            release = osp.get_release(job['name'])
+            properties['release'] = release
+            JenkinsAgent.add_job_to_db(job, properties)
 
     def add_build_to_db(self, job_name, build):
         """Insets build into the database."""

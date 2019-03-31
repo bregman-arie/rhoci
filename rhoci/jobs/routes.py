@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 from flask import render_template
+from flask import url_for
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -31,7 +32,8 @@ def index():
 @bp.route('/builds')
 def builds():
     """All builds."""
-    return render_template('builds/index.html')
+    uf = url_for('api.all_builds')
+    return render_template('builds/index.html', uf=uf)
 
 
 @bp.route('/tests')
@@ -43,5 +45,5 @@ def tests():
 @bp.route('/<name>')
 def job(name):
     """Specific job summary."""
-    print(name)
-    return render_template('job/summary.html')
+    uf = url_for('api.get_builds', job_name=name)
+    return render_template('jobs/one_job_summary.html', job_name=name, uf=uf)

@@ -17,11 +17,15 @@ $("#jobs_table").DataTable({
         "ajax": "{{ uf }}",
         "columns": [
           {"data": "name"},
-          {"data": "last_build.result"},
-          {"data": "properties.release"},
+          {"data": "last_build.result",
+           "defaultContent": "None"
+          },
+          {"data": "properties.release",
+           "defaultContent": "None"
+          },
           {"data": "last_build.timestamp",
            "defaultContent": "No Date"
-          }
+          },
           ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             if ( aData.last_build.result == "FAILURE" )
@@ -42,7 +46,7 @@ $("#jobs_table").DataTable({
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                        data = '<a href="/job/' + data + '">' + data + '</a>';
+                        data = '<a href="/jobs/' + data + '">' + data + '</a>';
                     }
                     return data;
                 }

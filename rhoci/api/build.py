@@ -18,7 +18,6 @@ from flask import request
 import logging
 
 from rhoci.jenkins.agent import JenkinsAgent
-from rhoci.models.build import Build
 from rhoci.models.job import Job
 
 LOG = logging.getLogger(__name__)
@@ -30,31 +29,22 @@ from rhoci.api import bp  # noqa
 def all_builds():
     """All builds API route."""
     results = {'data': []}
-    builds = Build.find()
-    for build in builds:
-        results['data'].append([build['job_name'], build['result'],
-                               build['number'], build['date'],
-                               ''])
+    jobs = Job.find()
+    for job in jobs:
+        for build in job['builds']:
+            results['data'].append(build)
     return jsonify(results)
 
 
-@bp.route('/builds/<DFG_name>')
-@bp.route('/builds/<DFG_name>/squad/<squad_name>')
-@bp.route('/builds/<DFG_name>/component/<component_name>')
-def get_builds(DFG_name, squad_name=None, component_name=None):
-    """Return builds based on DFG and result parameters."""
-    print(squad_name)
+@bp.route('/job/<job_name>/builds')
+def get_builds(job_name=None):
+    """Return builds"""
     results = {'data': []}
-    if squad_name:
-        jobs = Job.find(properties={'squad': squad_name})
-    elif component_name:
-        jobs = Job.find(
-            name_regex='DFG-{}-{}'.format(DFG_name, component_name))
-    else:
-        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name))
+    jobs = Job.find(name_regex=job_name)
     for job in jobs:
-        job.pop('_id')
-        results['data'].append(job)
+        for build in job['builds']:
+            results['data'].append(build)
+    print(results)
     return jsonify(results)
 
 

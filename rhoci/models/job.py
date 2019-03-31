@@ -21,11 +21,14 @@ from rhoci.database import Database
 
 class Job(object):
 
-    def __init__(self, _class, name, last_build, properties={}):
+    def __init__(self, name, last_build, properties={}):
         self.builds = []
         self.tests = []
         if last_build:
-            last_build.pop('artifacts')
+            # TODO(abregman): some artifacts start with dot (e.g. ".envrc")
+            # MongoDB doesn't allow that. Will have to find a solution.
+            if 'artifacts' in last_build:
+                last_build.pop('artifacts')
             self.last_build = last_build
             if 'timestamp' in self.last_build:
                 self.last_build['timestamp'] = datetime.datetime.fromtimestamp(
@@ -34,7 +37,6 @@ class Job(object):
         else:
             self.last_build = {'result': None, 'number': None}
         self.properties = properties
-        self._class = _class
         self.name = name
         self.created_at = datetime.datetime.utcnow()
 
@@ -46,13 +48,15 @@ class Job(object):
             Database.DATABASE['jobs'].find_one_and_update(
                 {"name": self.name},
                 {"$set": {"last_build": self.last_build}})
-            Database.DATABASE['jobs'].update(
-                {"name": self.name},
-                {"$addToSet": {"builds": self.last_build}})
+            if not Database.DATABASE['jobs'].find_one({"builds.number": self.last_build['number'],
+                                                       "name": self.name}):
+                print("added a new build")
+                Database.DATABASE['jobs'].update(
+                    {"name": self.name},
+                    {"$addToSet": {"builds": self.last_build}})
 
     def json(self):
         return {
-            '_class': self._class,
             'name': self.name,
             'last_build': self.last_build,
             'created_at': self.created_at,
@@ -63,7 +67,7 @@ class Job(object):
 
     @classmethod
     def count(cls, name_regex=None, last_build_res=None):
-        """Returns counts of jobs based on passed arguments."""
+        """Returns number of jobs based on passed arguments."""
         query = {}
         if name_regex:
             regex = re.compile(name_regex, re.IGNORECASE)
@@ -72,6 +76,18 @@ class Job(object):
             query['last_build.result'] = last_build_res
         jobs = Database.find(collection='jobs', query=query)
         return jobs.count()
+
+    @classmethod
+    def count_builds(cls):
+        """Returns the number of builds."""
+        pipeline = [
+            {"$project": {"num_of_builds": {"$size": "$builds"}}},
+            {"$group": {"_id": None, "count": {"$sum": "$num_of_builds"}}}
+        ]
+        cursor = Database.DATABASE['jobs'].aggregate(pipeline)  # noqa
+        for data in cursor:
+            builds_count = data['count']
+        return builds_count
 
     @classmethod
     def find(cls, name_regex=None, last_build_result=None, properties=None):

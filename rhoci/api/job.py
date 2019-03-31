@@ -32,3 +32,25 @@ def jobs():
         job.pop('_id')
         results['data'].append(job)
     return jsonify(results)
+
+
+@bp.route('/jobs/<DFG_name>')
+@bp.route('/jobs/<job_name>')
+@bp.route('/jobs/<DFG_name>/squad/<squad_name>')
+@bp.route('/jobs/<DFG_name>/component/<component_name>')
+def get_jobs(DFG_name=None, squad_name=None, component_name=None, job_name=None):
+    """Returns jobs."""
+    results = {'data': []}
+    if squad_name:
+        jobs = Job.find(properties={'squad': squad_name})
+    elif component_name:
+        jobs = Job.find(
+            name_regex='DFG-{}-{}'.format(DFG_name, component_name))
+    elif DFG_name:
+        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name))
+    elif job_name:
+        jobs = Job.find(name_regex=job_name)
+    for job in jobs:
+        job.pop('_id')
+        results['data'].append(job)
+    return jsonify(results)

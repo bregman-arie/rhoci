@@ -11,5 +11,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-API = {'get_jobs':
-       "/api/json/?tree=jobs[name,lastBuild[result,number,timestamp]]"}
+CALLS = {'get_jobs':
+         "/api/json/?tree=jobs[name,lastBuild[result,number,timestamp]]"}
+
+
+def adjust_job_data(job):
+    """Adjusts job data to unified structure supported by the app."""
+    job['build'] = job.pop('lastBuild', None)
+    if job['build']:
+        job['build']['status'] = job['build'].pop('result')
+    return job

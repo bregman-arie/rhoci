@@ -1,41 +1,32 @@
-{% extends "layout.html" %}
-
-{% block content %}
-
-<!-- Main container -->
-<br>
-<div class="container-fluid col-md-custom col-md-offset-custom">
-  <div class="row text-center">
-  </div>
-
-{% include "jobs/table.html" -%}
-
 <script>
 $(document).ready(function() {
 
-$("#jobs_table").DataTable({
-  "ajax": "{{ url_for('api.jobs') }}",
+$("#builds_table").DataTable({
+    "ajax": "{{ uf }}",
         "columns": [
-          {"data": "name"},
-          {"data": "last_build.status",
+          {"data": "name",
+           "defaultContent": ""
+          },
+          {"data": "status",
            "defaultContent": "None"
           },
-          {"data": "properties.release",
+          {"data": "number",
            "defaultContent": "None"
           },
-          {"data": "name"},
-          {"data": "name"},
+          {"data": "timestamp",
+           "defaultContent": "No Date"
+          },
           ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData.last_build.result == "FAILURE" )
+            if ( aData[1] == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData.last_build.result == "SUCCESS" )
+            else if ( aData[1] == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData.last_build.result == "UNSTABLE" )
+            else if ( aData[1] == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }
@@ -43,16 +34,12 @@ $("#jobs_table").DataTable({
         columnDefs: [
             {
                 targets:0,
+                "visible": false,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                      return $('<a>')
-                       .attr('href', data)
-                       .text(data)
-                       .wrap('<div></div>')
-                       .parent()
-                       .html();
-                      }
-                  else { return data; }
+                        data = '<a href="/job/' + data + '">' + data + '</a>';
+                    }
+                    return data;
                 }
             },
             {
@@ -94,14 +81,9 @@ $("#jobs_table").DataTable({
             },
         ],
   processing: true,
-  searchPane: {
-        columns: [1, 2],
-    },
   search: { "regex": true }, 
 });
 
 });
 </script>
-
 <!-- -->
-{% endblock %}
