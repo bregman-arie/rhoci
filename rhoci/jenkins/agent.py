@@ -19,7 +19,6 @@ import requests
 
 from rhoci.jenkins import api
 from rhoci.models.job import Job
-from rhoci.models.build import Build
 from rhoci.models.DFG import DFG as DFG_db
 from rhoci.jenkins import osp
 
@@ -41,8 +40,6 @@ class JenkinsAgent():
         LOG.info("Obtained a list of jobs from Jenkins")
         for job in jobs:
             JenkinsAgent.classify_and_insert_to_db(job)
-            if 'lastBuild' in job and job['lastBuild']:
-                self.add_build_to_db(job['name'], job['lastBuild'])
         # Agent should run forever
         LOG.info("Running forever")
         while True:
@@ -84,10 +81,3 @@ class JenkinsAgent():
             release = osp.get_release(job['name'])
             properties['release'] = release
             JenkinsAgent.add_job_to_db(job, properties)
-
-    def add_build_to_db(self, job_name, build):
-        """Insets build into the database."""
-        new_build = Build(
-            job_name=job_name, number=build['number'],
-            result=build['result'], timestamp=build['timestamp'])
-        new_build.insert()

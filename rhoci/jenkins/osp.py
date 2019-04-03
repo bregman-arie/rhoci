@@ -43,5 +43,5 @@ def get_component_name(job_name):
 
 
 def get_release(job_name):
-    m = re.search('-\d{1,2}', job_name)
+    m = re.search(r"-\d{1,2}", job_name)
     return m.group().split('-')[1] if m else 0

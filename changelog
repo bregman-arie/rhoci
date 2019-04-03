@@ -6,4 +6,5 @@ RHOCI V2.0
 * Datatable search uses regular expressions mode instead of keywords
 * New pages - squads, components
 * New main page layout
-* Server and agent run separately
+* Server and agent run separately (rhoci-server and rhoci-agent commands)
+* Configuration files are using YAML

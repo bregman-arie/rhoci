@@ -18,15 +18,16 @@ $("#builds_table").DataTable({
           },
           ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            if ( aData[1] == "FAILURE" )
+            console.log(aData)
+            if ( aData.status == "FAILURE" )
             {
             $('td', nRow).css('background-color', '#f2dede' );
             }
-            else if ( aData[1] == "SUCCESS" )
+            else if ( aData.status == "SUCCESS" )
             {
             $('td', nRow).css('background-color', '#dff0d8');
             }
-            else if ( aData[1] == "UNSTABLE" )
+            else if ( aData.status == "UNSTABLE" )
             {
             $('td', nRow).css('background-color', '#fcf8e3');
             }

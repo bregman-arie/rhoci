@@ -45,15 +45,27 @@ class Job(object):
         if not job:
             Database.insert(collection='jobs', data=self.json())
         else:
-            Database.DATABASE['jobs'].find_one_and_update(
-                {"name": self.name},
-                {"$set": {"last_build": self.last_build}})
-            if not Database.DATABASE['jobs'].find_one({"builds.number": self.last_build['number'],
-                                                       "name": self.name}):
-                print("added a new build")
+            if not Database.DATABASE['jobs'].find_one(
+                {"builds.number": self.last_build['number'],
+                 "name": self.name}):
                 Database.DATABASE['jobs'].update(
                     {"name": self.name},
                     {"$addToSet": {"builds": self.last_build}})
+            Database.DATABASE['jobs'].find_one_and_update(
+                {"name": self.name},
+                {"$set": {"last_build": self.last_build}})
+
+    @classmethod
+    def update_build(cls, job_name, build):
+        if not Database.DATABASE['jobs'].find_one(
+            {"builds.number": build['number'],
+             "name": job_name}):
+            Database.DATABASE['jobs'].update(
+                {"name": job_name},
+                {"$addToSet": {"builds": build}})
+            Database.DATABASE['jobs'].find_one_and_update(
+                {"name": job_name},
+                {"$set": {"last_build": build}})
 
     def json(self):
         return {
@@ -73,7 +85,7 @@ class Job(object):
             regex = re.compile(name_regex, re.IGNORECASE)
             query['name'] = regex
         if last_build_res:
-            query['last_build.result'] = last_build_res
+            query['last_build.status'] = last_build_res
         jobs = Database.find(collection='jobs', query=query)
         return jobs.count()
 
@@ -103,3 +115,26 @@ class Job(object):
                 query['properties.{}'.format(k)] = v
         jobs = Database.find(collection="jobs", query=query)
         return jobs
+
+    @classmethod
+    def get_builds_count_per_date(num_of_days=10):
+        """Returns a list of date and builds count."""
+        builds = []
+        dates = []
+        pipeline = [{"$unwind": "$builds"},
+                    {"$group":
+                     {"_id": {"$add": [
+                         {"$dayOfYear": "$last_build.timestamp"},
+                         {"$multiply": [400, {
+                             "$year": "$last_build.timestamp"}]}]},
+                      "builds": {"$sum": 1}, "first": {
+                          "$min": "$last_build.timestamp"}}}, {"$sort": {
+                              "_id": -1}}, {"$limit": 10}, {
+                                  "$project": {
+                                      "timestamp": "$first",
+                                      "builds": 1, "_id": 0}}]
+        cursor = Database.DATABASE['jobs'].aggregate(pipeline)  # noqa
+        for build_date in cursor:
+            dates.append((build_date['timestamp'].strftime("%m/%d/%Y")))
+            builds.append(build_date['builds'])
+        return builds, dates

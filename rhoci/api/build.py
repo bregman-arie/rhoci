@@ -44,7 +44,6 @@ def get_builds(job_name=None):
     for job in jobs:
         for build in job['builds']:
             results['data'].append(build)
-    print(results)
     return jsonify(results)
 
 
@@ -52,5 +51,8 @@ def get_builds(job_name=None):
 def jenkins_update():
     """Handles update received from Jenkins."""
     json = request.get_json(silent=True)
-    JenkinsAgent.classify_and_insert_to_db(json)
+    if not Job.find(name_regex=json['name']).count():
+        JenkinsAgent.classify_and_insert_to_db(json)
+    else:
+        Job.update_build(job_name=json['name'], build=json['build'])
     return jsonify({'notification': 'UPDATE_COMPLETE'})

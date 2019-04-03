@@ -38,7 +38,8 @@ def jobs():
 @bp.route('/jobs/<job_name>')
 @bp.route('/jobs/<DFG_name>/squad/<squad_name>')
 @bp.route('/jobs/<DFG_name>/component/<component_name>')
-def get_jobs(DFG_name=None, squad_name=None, component_name=None, job_name=None):
+def get_jobs(DFG_name=None, squad_name=None,
+             component_name=None, job_name=None):
     """Returns jobs."""
     results = {'data': []}
     if squad_name:
