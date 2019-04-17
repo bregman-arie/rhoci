@@ -11,13 +11,26 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from rhoci.common.utils import unixtime_to_datetime
+
 CALLS = {'get_jobs':
          "/api/json/?tree=jobs[name,lastBuild[result,number,timestamp]]"}
 
 
 def adjust_job_data(job):
     """Adjusts job data to unified structure supported by the app."""
-    job['build'] = job.pop('lastBuild', None)
+    if 'lastBuild' in job:
+        job['build'] = job.pop('lastBuild')
     if job['build']:
-        job['build']['status'] = job['build'].pop('result')
+        if 'result' in job['build']:
+            job['build']['status'] = job['build'].pop('result')
+        job['build']['timestamp'] = unixtime_to_datetime(
+            job['build']['timestamp'])
     return job
+
+
+def adjust_build_data(build):
+    """Adjusts build data to unified structure supported by the app."""
+    if 'timestamp' in build:
+        build['timestamp'] = unixtime_to_datetime(build['timestamp'])
+    return build

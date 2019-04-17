@@ -34,7 +34,7 @@ def jobs():
     return jsonify(results)
 
 
-@bp.route('/jobs/<DFG_name>')
+@bp.route('/jobs/DFG=<DFG_name>')
 @bp.route('/jobs/<job_name>')
 @bp.route('/jobs/<DFG_name>/squad/<squad_name>')
 @bp.route('/jobs/<DFG_name>/component/<component_name>')

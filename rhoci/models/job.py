@@ -30,9 +30,6 @@ class Job(object):
             if 'artifacts' in last_build:
                 last_build.pop('artifacts')
             self.last_build = last_build
-            if 'timestamp' in self.last_build:
-                self.last_build['timestamp'] = datetime.datetime.fromtimestamp(
-                    int(self.last_build['timestamp'] / 1000))
             self.builds.append(last_build)
         else:
             self.last_build = {'result': None, 'number': None}
@@ -92,6 +89,7 @@ class Job(object):
     @classmethod
     def count_builds(cls):
         """Returns the number of builds."""
+        builds_count = 0
         pipeline = [
             {"$project": {"num_of_builds": {"$size": "$builds"}}},
             {"$group": {"_id": None, "count": {"$sum": "$num_of_builds"}}}

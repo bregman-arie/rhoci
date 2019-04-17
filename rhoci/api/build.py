@@ -17,6 +17,7 @@ from flask import jsonify
 from flask import request
 import logging
 
+from rhoci.jenkins.api import adjust_build_data
 from rhoci.jenkins.agent import JenkinsAgent
 from rhoci.models.job import Job
 
@@ -54,5 +55,6 @@ def jenkins_update():
     if not Job.find(name_regex=json['name']).count():
         JenkinsAgent.classify_and_insert_to_db(json)
     else:
-        Job.update_build(job_name=json['name'], build=json['build'])
+        build = adjust_build_data(json['build'])
+        Job.update_build(job_name=json['name'], build=build)
     return jsonify({'notification': 'UPDATE_COMPLETE'})

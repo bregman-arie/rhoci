@@ -54,7 +54,6 @@ class JenkinsAgent():
     @staticmethod
     def add_job_to_db(job, properties):
         """Add job to the database."""
-        print(job)
         job = api.adjust_job_data(job)
         new_job = Job(name=job['name'],
                       last_build=job['build'],
