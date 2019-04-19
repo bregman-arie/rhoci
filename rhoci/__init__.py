@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 from rhoci.database import Database
+from rhoci.db.enconders import MongoJSONEncoder, ObjectIdConverter
 
 from flask import Flask
 
@@ -21,6 +22,8 @@ from flask import Flask
 def create_app():
     # Create application
     app = Flask(__name__)
+    app.json_encoder = MongoJSONEncoder
+    app.url_map.converters['objectid'] = ObjectIdConverter
 
     Database.initialize()
 

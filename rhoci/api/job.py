@@ -26,11 +26,7 @@ from rhoci.api import bp  # noqa
 @bp.route('/jobs')
 def jobs():
     """All jobs API route."""
-    results = {'data': []}
-    jobs = Job.find()
-    for job in jobs:
-        job.pop('_id')
-        results['data'].append(job)
+    results = {'data': Job.find()}
     return jsonify(results)
 
 

@@ -54,12 +54,20 @@ class Job(object):
 
     @classmethod
     def update_build(cls, job_name, build):
+        # If new build, add it to the array of builds
         if not Database.DATABASE['jobs'].find_one(
             {"builds.number": build['number'],
              "name": job_name}):
             Database.DATABASE['jobs'].update(
                 {"name": job_name},
                 {"$addToSet": {"builds": build}})
+        else:
+            Database.DATABASE['jobs'].update(
+                {"name": job_name, "builds.number": build['number']},
+                {"$set": {"builds.$": build}})
+        # If last build, update last build reference
+        job = Database.DATABASE['jobs'].find_one({"name": job_name})
+        if build['number'] >= job['last_build']['number']:
             Database.DATABASE['jobs'].find_one_and_update(
                 {"name": job_name},
                 {"$set": {"last_build": build}})
@@ -111,7 +119,7 @@ class Job(object):
         if properties:
             for k, v in properties.items():
                 query['properties.{}'.format(k)] = v
-        jobs = Database.find(collection="jobs", query=query)
+        jobs = list(Database.find(collection="jobs", query=query))
         return jobs
 
     @classmethod

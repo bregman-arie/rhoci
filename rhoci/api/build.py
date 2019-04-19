@@ -52,7 +52,7 @@ def get_builds(job_name=None):
 def jenkins_update():
     """Handles update received from Jenkins."""
     json = request.get_json(silent=True)
-    if not Job.find(name_regex=json['name']).count():
+    if not len(Job.find(name_regex=json['name'])):
         JenkinsAgent.classify_and_insert_to_db(json)
     else:
         build = adjust_build_data(json['build'])
