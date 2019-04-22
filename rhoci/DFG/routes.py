@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+from flask import current_app as app
 from flask import render_template
 from flask import url_for
 import logging
@@ -80,15 +81,19 @@ def components():
 def summary(DFG_name):
     """All DFGs."""
     uf = url_for('api.get_jobs', DFG_name=DFG_name)
-    return render_template('DFG/summary.html', DFG_name=DFG_name, uf=uf)
+    jenkins_url = app.config['custom']['jenkins']['url']
+    return render_template('DFG/summary.html', DFG_name=DFG_name, uf=uf,
+                           jenkins_url=jenkins_url)
 
 
 @bp.route('/<DFG_name>/squad/<squad_name>')
 def squad_summary(DFG_name, squad_name):
     """Specific squad summary."""
     uf = url_for('api.get_jobs', DFG_name=DFG_name, squad_name=squad_name)
+    jenkins_url = app.config['custom']['jenkins']['url']
     return render_template('DFG/summary.html', DFG_name=DFG_name,
-                           squad_name=squad_name, uf=uf)
+                           squad_name=squad_name, uf=uf,
+                           jenkins_url=jenkins_url)
 
 
 @bp.route('/<DFG_name>/component/<component_name>')
@@ -96,5 +101,7 @@ def component_summary(DFG_name, component_name):
     """Specific component summary."""
     uf = url_for('api.get_jobs', DFG_name=DFG_name,
                  component_name=component_name)
+    jenkins_url = app.config['custom']['jenkins']['url']
     return render_template('DFG/summary.html', DFG_name=DFG_name,
-                           component_name=component_name, uf=uf)
+                           component_name=component_name, uf=uf,
+                           jenkins_url=jenkins_url)

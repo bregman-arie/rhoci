@@ -8,6 +8,8 @@ flask = "*"
 pyyaml = ">=4.2b1"
 rhoci = {editable = true,path = "."}
 pymongo = "*"
+jinja2 = "*"
+urllib3 = "*"
 
 [dev-packages]
 

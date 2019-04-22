@@ -13,7 +13,9 @@
 #    under the License.
 from __future__ import absolute_import
 
+from flask import current_app as app
 from flask import jsonify
+
 import logging
 
 from rhoci.models.job import Job

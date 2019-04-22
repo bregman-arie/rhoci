@@ -11,9 +11,13 @@ $("#jobs_table").DataTable({
           {"data": "properties.release",
            "defaultContent": "None"
           },
-          {"data": "name"},
+          {"data": "last_build.timestamp",
+           "defaultContent": "None"
+          },
           {"data": "name"},
           ],
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+        status = aData.last_build.status;
         {% include "tables/color_result.js" -%}
         columnDefs: [
             {
@@ -31,34 +35,18 @@ $("#jobs_table").DataTable({
                 }
             },
             {
-                targets:[2],
-                render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row[3] != 0 ){
-                        data = '<a href="/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
-                    }
-                    return data;
-                }
-            },
-            {
                 targets:[1],
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && (row[1] == 'UNSTABLE' || row[1] == 'SUCCESS' || row[1] == 'ABORTED' || row[1] == null)){
-                        data = '<a href="/job/' + row[1] + '/' + row[2] + '">' + data + '</a>';
-                    }
-                    else if (type === 'display' && row[1] == 'FAILURE') {
-                    data = '<button type="button" onClick="analyze_failure(this, \'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">Failure</button>'
-                    }
-                    else if (type === 'display' && row[1] != 'None' ){
-                    data = '<button type="button" onClick="show_failure(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-danger btn-lg">FAILURE_NAME</button>'.replace("FAILURE_NAME", row[1])
-                    }
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '">' + row['last_build']['status'] + '</a>';
                     return data;
                 }
             },
             {
                 targets:4,
                 render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row[1] != 0 && (row[1] == 'SUCCESS' || row[1] == 'UNSTABLE')){
-                    data = '<button type="button" onClick="show_tests(\'' + row[1] + '\', \'' + row[3] + '\')" class="btn btn-info btn-lg">Tests</button>'
+                    console.log(row);
+                    if(type === 'display' && row[1] != 0 && (row['last_build']['status'] == 'SUCCESS' || row['last_build']['status'] == 'UNSTABLE')){
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/testReport' + '">Tests</a>';
                     }
                     else {
                       data = 'No Tests';

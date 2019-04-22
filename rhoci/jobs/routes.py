@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+from flask import current_app as app
 from flask import render_template
 from flask import url_for
 import logging
@@ -26,14 +27,18 @@ from rhoci.jobs import bp  # noqa
 @bp.route('/')
 def index():
     """All jobs."""
-    return render_template('jobs/index.html')
+    jenkins_url = app.config['custom']['jenkins']['url']
+    return render_template('jobs/index.html',
+                           jenkins_url=jenkins_url)
 
 
 @bp.route('/builds')
 def builds():
     """All builds."""
     uf = url_for('api.all_builds')
-    return render_template('builds/index.html', uf=uf)
+    jenkins_url = app.config['custom']['jenkins']['url']
+    return render_template('builds/index.html', uf=uf,
+                           jenkins_url=jenkins_url)
 
 
 @bp.route('/tests')
@@ -46,4 +51,6 @@ def tests():
 def job(name):
     """Specific job summary."""
     uf = url_for('api.get_builds', job_name=name)
-    return render_template('jobs/one_job_summary.html', job_name=name, uf=uf)
+    jenkins_url = app.config['custom']['jenkins']['url']
+    return render_template('jobs/one_job_summary.html', job_name=name,
+                           uf=uf, jenkins_url=jenkins_url)

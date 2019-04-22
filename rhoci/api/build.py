@@ -33,6 +33,7 @@ def all_builds():
     jobs = Job.find()
     for job in jobs:
         for build in job['builds']:
+            build['job_name'] = job['name']
             results['data'].append(build)
     return jsonify(results)
 
@@ -44,6 +45,7 @@ def get_builds(job_name=None):
     jobs = Job.find(name_regex=job_name)
     for job in jobs:
         for build in job['builds']:
+            build['job_name'] = job['name']
             results['data'].append(build)
     return jsonify(results)
 

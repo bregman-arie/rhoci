@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+from rhoci.common.config import Config
 from rhoci.database import Database
 from rhoci.db.enconders import MongoJSONEncoder, ObjectIdConverter
 
@@ -24,6 +25,7 @@ def create_app():
     app = Flask(__name__)
     app.json_encoder = MongoJSONEncoder
     app.url_map.converters['objectid'] = ObjectIdConverter
+    app.config['custom'] = Config().config
 
     Database.initialize()
 
