@@ -32,7 +32,7 @@ class Job(object):
             self.last_build = last_build
             self.builds.append(last_build)
         else:
-            self.last_build = {'result': None, 'number': None}
+            self.last_build = {'status': "None", 'number': None}
         self.properties = properties
         self.name = name
         self.created_at = datetime.datetime.utcnow()

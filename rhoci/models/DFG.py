@@ -105,8 +105,11 @@ class DFG(object):
         return DFGs
 
     @classmethod
-    def count(cls):
+    def count(cls, squads=False):
         """Returns the count of DFGs documents."""
         query = {}
-        DFGs = Database.find(collection='DFGs', query=query)
+        if squads:
+            return len(cls.get_all_squads())
+        else:
+            DFGs = Database.find(collection='DFGs', query=query)
         return DFGs.count()

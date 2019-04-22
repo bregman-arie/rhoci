@@ -48,6 +48,5 @@ def get_jobs(DFG_name=None, squad_name=None,
     elif job_name:
         jobs = Job.find(name_regex=job_name)
     for job in jobs:
-        job.pop('_id')
         results['data'].append(job)
     return jsonify(results)
