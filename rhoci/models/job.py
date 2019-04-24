@@ -24,11 +24,14 @@ class Job(object):
     def __init__(self, name, last_build, properties={}):
         self.builds = []
         self.tests = []
+        self.last_successful_build = None
         if last_build:
             # TODO(abregman): some artifacts start with dot (e.g. ".envrc")
             # MongoDB doesn't allow that. Will have to find a solution.
             if 'artifacts' in last_build:
                 last_build.pop('artifacts')
+            if 'status' in last_build and last_build['status'] == "SUCCESS":
+                self.last_successful_build = last_build
             self.last_build = last_build
             self.builds.append(last_build)
         else:
@@ -71,6 +74,10 @@ class Job(object):
             Database.DATABASE['jobs'].find_one_and_update(
                 {"name": job_name},
                 {"$set": {"last_build": build}})
+        if build['status'] == "SUCCESS":
+            Database.DATABASE['jobs'].find_one_and_update(
+                {"name": job_name},
+                {"$set": {"last_successful_build": build}})
 
     def json(self):
         return {
@@ -79,7 +86,8 @@ class Job(object):
             'created_at': self.created_at,
             'builds': self.builds,
             'tests': self.tests,
-            'properties': self.properties
+            'properties': self.properties,
+            'last_successful_build': self.last_successful_build
         }
 
     @classmethod

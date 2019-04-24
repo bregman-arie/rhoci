@@ -18,10 +18,12 @@ DFGs = [{'name': 'network', 'squads': [
     {'name': 'octavia', 'components': ['octavia', 'neutron-lbaas']},
     {'name': 'ovn', 'components': ['networking-ovn']}]},
     {'name': 'storage', 'squads': [
-        {'name': 'cinder', 'components': ['cinder',
-                                          'python-os-brick', 'python-cinderclient']},
-        {'name': 'glance', 'components': ['glance',
-                                          'glance_store', 'python-glanceclient']},
+        {'name': 'cinder', 'components': [
+            'cinder',
+            'python-os-brick', 'python-cinderclient']},
+        {'name': 'glance', 'components': [
+            'glance',
+            'glance_store', 'python-glanceclient']},
         {'name': 'manila', 'components': ['manila', 'python-manilaclient']},
         {'name': 'sahara', 'components': ['sahara', 'python-saharaclient']},
         {'name': 'swift', 'components': ['swift', 'python-swiftclien']}]}]
