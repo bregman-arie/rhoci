@@ -42,7 +42,7 @@ def all_builds():
 def get_builds(job_name=None):
     """Return builds"""
     results = {'data': []}
-    jobs = Job.find(name_regex=job_name)
+    jobs = Job.find(name=job_name, exact_match=True)
     for job in jobs:
         for build in job['builds']:
             build['job_name'] = job['name']
@@ -54,7 +54,7 @@ def get_builds(job_name=None):
 def jenkins_update():
     """Handles update received from Jenkins."""
     json = request.get_json(silent=True)
-    if not len(Job.find(name_regex=json['name'])):
+    if not len(Job.find(name=json['name'])):
         JenkinsAgent.classify_and_insert_to_db(json)
     else:
         build = adjust_build_data(json['build'])

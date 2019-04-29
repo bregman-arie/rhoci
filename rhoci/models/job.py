@@ -91,11 +91,11 @@ class Job(object):
         }
 
     @classmethod
-    def count(cls, name_regex=None, last_build_res=None):
+    def count(cls, name=None, last_build_res=None):
         """Returns number of jobs based on passed arguments."""
         query = {}
-        if name_regex:
-            regex = re.compile(name_regex, re.IGNORECASE)
+        if name:
+            regex = re.compile(name, re.IGNORECASE)
             query['name'] = regex
         if last_build_res:
             query['last_build.status'] = last_build_res
@@ -116,12 +116,15 @@ class Job(object):
         return builds_count
 
     @classmethod
-    def find(cls, name_regex=None, last_build_result=None, properties=None):
+    def find(cls, name=None, exact_match=False,
+             last_build_result=None, properties=None):
         """Returns find query."""
         query = {}
-        if name_regex:
-            regex = re.compile(name_regex, re.IGNORECASE)
+        if name and not exact_match:
+            regex = re.compile(name, re.IGNORECASE)
             query['name'] = regex
+        elif name:
+            query['name'] = name
         if last_build_result:
             query['last_build.result'] = last_build_result
         if properties:

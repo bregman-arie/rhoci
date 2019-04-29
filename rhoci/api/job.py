@@ -27,7 +27,10 @@ from rhoci.api import bp  # noqa
 @bp.route('/jobs')
 def jobs():
     """All jobs API route."""
+    import datetime
+    print(datetime.datetime.utcnow())
     results = {'data': Job.find()}
+    print(datetime.datetime.utcnow())
     return jsonify(results)
 
 
@@ -43,11 +46,11 @@ def get_jobs(DFG_name=None, squad_name=None,
         jobs = Job.find(properties={'squad': squad_name})
     elif component_name:
         jobs = Job.find(
-            name_regex='DFG-{}-{}'.format(DFG_name, component_name))
+            name='DFG-{}-{}'.format(DFG_name, component_name))
     elif DFG_name:
-        jobs = Job.find(name_regex='DFG-{}'.format(DFG_name))
+        jobs = Job.find(name='DFG-{}'.format(DFG_name))
     elif job_name:
-        jobs = Job.find(name_regex=job_name)
+        jobs = Job.find(name=job_name, exact_match=True)
     for job in jobs:
         results['data'].append(job)
     return jsonify(results)

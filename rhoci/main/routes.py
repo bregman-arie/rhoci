@@ -39,7 +39,7 @@ def get_DFGs_result_summary(DFGs):
         DFGs_summary[DFG] = {}
         for res in jenkins_const.RESULTS:
             DFGs_summary[DFG_name][res] = Job.count(
-                name_regex='DFG-{}'.format(DFG_name),
+                name='DFG-{}'.format(DFG_name),
                 last_build_res=res)
     return DFGs_summary
 
