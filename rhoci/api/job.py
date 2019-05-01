@@ -27,10 +27,7 @@ from rhoci.api import bp  # noqa
 @bp.route('/jobs')
 def jobs():
     """All jobs API route."""
-    import datetime
-    print(datetime.datetime.utcnow())
     results = {'data': Job.find()}
-    print(datetime.datetime.utcnow())
     return jsonify(results)
 
 

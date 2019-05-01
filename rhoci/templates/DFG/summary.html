@@ -47,7 +47,6 @@ $("#jobs_table").DataTable({
                 targets:[2],
                 "visible": false,
                 render: function ( data, type, row, meta ) {
-                  console.log(row)
                     if(type === 'display' && row[3] != 0 ){
                         data = '<a href="/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
                     }
@@ -70,8 +69,14 @@ $("#jobs_table").DataTable({
                     else {
                       data = 'None';
                     }
-
                     return data;
+                }
+            },
+            {
+                targets:6,
+                render: function ( data, type, row, meta ) {
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">';
+                  return data;
                 }
             },
         ],

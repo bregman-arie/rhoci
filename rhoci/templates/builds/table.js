@@ -42,7 +42,6 @@ $("#builds_table").DataTable({
             {
                 targets:[1],
                 render: function ( data, type, row, meta ) {
-                  console.log(row);
                   data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['job_name'] + '/' + row['number'] + '">' + data + '</a>';
                   return data;
                 }
@@ -58,6 +57,13 @@ $("#builds_table").DataTable({
                     }
 
                     return data;
+                }
+            },
+            {
+                targets:5,
+                render: function ( data, type, row, meta ) {
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['job_name'] + '/' + row['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">';
+                  return data;
                 }
             },
         ],
