@@ -35,7 +35,7 @@ def DFGs():
     for DFG_name in all_DFGs:
         uf = url_for('DFG.summary', DFG_name=DFG_name)
         DFGs_data.append({'name': DFG_name,
-                          'num_of_jobs': Job.count(name=DFG_name),
+                          'num_of_jobs': Job.count(name="DFG-{}".format(DFG_name)),
                           'summary_url_for': uf})
     return render_template('DFG/all.html', DFGs=DFGs_data, title=title)
 
