@@ -138,20 +138,20 @@ class Job(object):
         """Returns a list of date and builds count."""
         builds = []
         dates = []
-        pipeline = [{"$unwind": "$builds"},
-                    {"$group":
-                     {"_id": {"$add": [
-                         {"$dayOfYear": "$last_build.timestamp"},
-                         {"$multiply": [400, {
-                             "$year": "$last_build.timestamp"}]}]},
-                      "builds": {"$sum": 1}, "first": {
-                          "$min": "$last_build.timestamp"}}}, {"$sort": {
-                              "_id": -1}}, {"$limit": 10}, {
-                                  "$project": {
-                                      "timestamp": "$first",
-                                      "builds": 1, "_id": 0}}]
+        pipeline = [
+            {"$project": {"_id": 0, "builds": 1}},
+            {"$unwind": "$builds"},
+            # {"$group": {"_id": "$builds.timestamp", "count": {"$sum": 1}}},
+            {"$group": {"_id": {"$add": [
+                {"$dayOfYear": "$builds.timestamp"},
+                {"$multiply": [400, {"$year": "$builds.timestamp"}]}]},
+                "builds": {"$sum": 1},
+                "first": {"$min": "$builds.timestamp"}}},
+            {"$sort": {"builds": -1}},
+            {"$limit": 10}
+        ]
         cursor = Database.DATABASE['jobs'].aggregate(pipeline)  # noqa
         for build_date in cursor:
-            dates.append((build_date['timestamp'].strftime("%m/%d/%Y")))
+            dates.append((build_date['first'].strftime("%m/%d/%Y")))
             builds.append(build_date['builds'])
         return builds, dates
