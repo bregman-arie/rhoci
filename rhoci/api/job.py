@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 from flask import jsonify
+from flask import request
 
 import logging
 
@@ -24,10 +25,12 @@ LOG = logging.getLogger(__name__)
 from rhoci.api import bp  # noqa
 
 
-@bp.route('/jobs')
-def jobs():
+@bp.route('/jobs', methods=['GET', 'POST'])
+def jobs(query_str=None):
     """All jobs API route."""
-    results = {'data': Job.find()}
+    q_str = request.args['query_str']
+    query_str = eval(q_str)
+    results = {'data': Job.find(**query_str)}
     return jsonify(results)
 
 
@@ -40,7 +43,7 @@ def get_jobs(DFG_name=None, squad_name=None,
     """Returns jobs."""
     results = {'data': []}
     if squad_name:
-        jobs = Job.find(properties={'squad': squad_name})
+        jobs = Job.find(squad=squad_name)
     elif component_name:
         jobs = Job.find(
             name='DFG-{}-{}'.format(DFG_name, component_name))

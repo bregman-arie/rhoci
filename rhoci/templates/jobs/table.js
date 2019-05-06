@@ -2,13 +2,17 @@
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-  "ajax": "{{ url_for('api.jobs') }}",
+    "ajax": {
+    'type': 'POST',
+    'url': "{{ url_for('api.jobs', query_str=query_str) }}",
+    'data': {"query_str": "aaaaaaaaaaaa", "asdasd": "asdads" },
+    },
         "columns": [
           {"data": "name"},
           {"data": "last_build.status",
            "defaultContent": "None"
           },
-          {"data": "properties.release",
+          {"data": "release",
            "defaultContent": "None"
           },
           {"data": "last_build.timestamp",
@@ -25,6 +29,7 @@ $("#jobs_table").DataTable({
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
+    console.log("{{ query_str }}");
                       return $('<a>')
                        .attr('href', data)
                        .text(data)
@@ -67,6 +72,7 @@ $("#jobs_table").DataTable({
         columns: [1, 2],
     },
   search: { "regex": true }, 
+  deferRender: true,
 });
 
 });

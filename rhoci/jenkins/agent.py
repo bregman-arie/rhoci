@@ -57,7 +57,7 @@ class JenkinsAgent():
         job = api.adjust_job_data(job)
         new_job = Job(name=job['name'],
                       last_build=job['build'],
-                      properties=properties)
+                      **properties)
         new_job.insert()
 
     @staticmethod

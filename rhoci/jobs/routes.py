@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 from flask import current_app as app
 from flask import render_template
+from flask import request
 from flask import url_for
 import logging
 
@@ -28,8 +29,10 @@ from rhoci.jobs import bp  # noqa
 def index():
     """All jobs."""
     jenkins_url = app.config['custom']['jenkins']['url']
+    query_str = request.args.to_dict()
     return render_template('jobs/index.html',
-                           jenkins_url=jenkins_url)
+                           jenkins_url=jenkins_url,
+                           query_str=query_str)
 
 
 @bp.route('/builds')

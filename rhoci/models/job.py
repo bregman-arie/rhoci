@@ -21,7 +21,7 @@ from rhoci.database import Database
 
 class Job(object):
 
-    def __init__(self, name, last_build, properties={}):
+    def __init__(self, name, last_build, **kwargs):
         self.builds = []
         self.tests = []
         self.last_successful_build = None
@@ -36,9 +36,10 @@ class Job(object):
             self.builds.append(last_build)
         else:
             self.last_build = {'status': "None", 'number': None}
-        self.properties = properties
         self.name = name
         self.created_at = datetime.datetime.utcnow()
+        for k in kwargs.keys():
+            self.__setattr__(k, kwargs[k])
 
     def insert(self):
         job = Database.find_one("jobs", {"name": self.name})
@@ -80,15 +81,7 @@ class Job(object):
                 {"$set": {"last_successful_build": build}})
 
     def json(self):
-        return {
-            'name': self.name,
-            'last_build': self.last_build,
-            'created_at': self.created_at,
-            'builds': self.builds,
-            'tests': self.tests,
-            'properties': self.properties,
-            'last_successful_build': self.last_successful_build
-        }
+        return self.__dict__
 
     @classmethod
     def count(cls, name=None, last_build_res=None):
@@ -117,7 +110,7 @@ class Job(object):
 
     @classmethod
     def find(cls, name=None, exact_match=False,
-             last_build_result=None, properties=None):
+             last_build_result=None, **kwargs):
         """Returns find query."""
         query = {}
         if name and not exact_match:
@@ -127,9 +120,8 @@ class Job(object):
             query['name'] = name
         if last_build_result:
             query['last_build.result'] = last_build_result
-        if properties:
-            for k, v in properties.items():
-                query['properties.{}'.format(k)] = v
+        for k, v in kwargs.items():
+            query[k] = v
         jobs = list(Database.find(collection="jobs", query=query))
         return jobs
 

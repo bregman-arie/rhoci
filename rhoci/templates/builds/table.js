@@ -69,6 +69,7 @@ $("#builds_table").DataTable({
         ],
   processing: true,
   search: { "regex": true }, 
+  deferRender: true,
 });
 
 });
