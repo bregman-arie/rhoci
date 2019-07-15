@@ -14,10 +14,13 @@
 from __future__ import absolute_import
 
 from flask import current_app as app
+from flask import jsonify
 from flask import render_template
 from flask import request
 from flask import url_for
 import logging
+
+from rhoci.jenkins.jjb import generate_job_definition
 
 LOG = logging.getLogger(__name__)
 
@@ -57,3 +60,12 @@ def job(name):
     jenkins_url = app.config['custom']['jenkins']['url']
     return render_template('jobs/one_job_summary.html', job_name=name,
                            uf=uf, jenkins_url=jenkins_url)
+
+
+@bp.route('/generate_job', methods=['GET', 'POST'])
+def generate_jjb():
+    output = generate_job_definition(request.form['DFG'],
+                                     request.form['component'],
+                                     request.form['tester'])
+
+    return jsonify(output=output)

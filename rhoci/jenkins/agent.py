@@ -16,6 +16,7 @@ from __future__ import absolute_import
 import json
 import logging
 import requests
+import time
 
 from rhoci.jenkins import api
 from rhoci.models.job import Job
@@ -37,13 +38,32 @@ class JenkinsAgent():
         """Runs the agent proess."""
         LOG.info("Running Jenkins agent")
         jobs = self.get_jobs()
+        self.remove_jobs([job['name'] for job in jobs])
         LOG.info("Obtained a list of jobs from Jenkins")
         for job in jobs:
             JenkinsAgent.classify_and_insert_to_db(job)
         # Agent should run forever
         LOG.info("Running forever")
         while True:
-            pass
+            self.wait_to_next_midnight()
+            jobs = self.get_jobs()
+            self.remove_jobs([job['name'] for job in jobs])
+
+    def remove_jobs(self, jenkins_jobs):
+        """Removes jobs from the database based on the list of jobs
+        in Jenkins.
+        """
+        for job in Job.find():
+            if job['name'] not in jenkins_jobs:
+                Job.delete_one(job['name'])
+                LOG.info("Deleted job: %s" % job['name'])
+
+    @staticmethod
+    def wait_to_next_midnight():
+        """Wait to tomorrow 00:00 am."""
+        time_now = time.localtime()
+        time_now = time.mktime(time_now[:3] + (0, 0, 0) + time_now[6:])
+        time.sleep(time_now + 24 * 3600 - time.time())
 
     def get_jobs(self):
         """Returns jobs."""

@@ -78,7 +78,7 @@ class DFG(object):
         DFG_db = cls.find_one(name=DFG_name)
         if DFG_db['squad_to_components']:
             for k, v in DFG_db['squad_to_components'].items():
-                if component in v:
+                if component == v:
                     return k
             return
 

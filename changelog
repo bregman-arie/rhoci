@@ -1,4 +1,8 @@
-RHOCI V2.0
+ 
+* query search in jobs page
+* Quick links in datatable
+
+RHOCI V0.2
 
 * Python 3 support
 * Moved from SQLite to MongoDB (embedded structure)

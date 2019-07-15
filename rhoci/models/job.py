@@ -38,6 +38,7 @@ class Job(object):
             self.last_build = {'status': "None", 'number': None}
         self.name = name
         self.created_at = datetime.datetime.utcnow()
+        self.properties = kwargs
         for k in kwargs.keys():
             self.__setattr__(k, kwargs[k])
 
@@ -54,7 +55,8 @@ class Job(object):
                     {"$addToSet": {"builds": self.last_build}})
             Database.DATABASE['jobs'].find_one_and_update(
                 {"name": self.name},
-                {"$set": {"last_build": self.last_build}})
+                {"$set": {**self.properties,
+                          "last_build": self.last_build}})
 
     @classmethod
     def update_build(cls, job_name, build):
@@ -126,6 +128,12 @@ class Job(object):
         return jobs
 
     @classmethod
+    def delete_one(cls, name):
+        """Deletes one job document from the database."""
+        query = {"name": name}
+        Database.delete_one("jobs", query)
+
+    @classmethod
     def get_builds_count_per_date(num_of_days=10):
         """Returns a list of date and builds count."""
         builds = []
@@ -144,6 +152,7 @@ class Job(object):
         ]
         cursor = Database.DATABASE['jobs'].aggregate(pipeline)  # noqa
         for build_date in cursor:
-            dates.append((build_date['first'].strftime("%m/%d/%Y")))
-            builds.append(build_date['builds'])
+            if build_date['first']:
+                dates.append((build_date['first'].strftime("%m/%d/%Y")))
+                builds.append(build_date['builds'])
         return builds, dates
