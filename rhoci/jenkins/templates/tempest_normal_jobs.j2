@@ -1,0 +1,126 @@
+{% set job_name_suffix = '' %}
+{% set name = 'DFG-' ~ jjb['DFG'] ~ '-' ~ jjb['component'] ~ '-{product_version}' %}
+{% set topology_nodes = 'controller:3,compute:2' %}
+{% set topology_str = '3cont_2comp' %}
+{% set overcloud_templates = 'nova-resize-on-the-same-host,l3_fip_qos,dns' %}
+{% set overcloud_override = 'ir_tripleo_overcloud_deploy_override_options: |-' %}
+{% if jjb['network_driver'] == 'ml2ovs' and jjb['release']|int|default(15) >= 15 %}
+{% set job_name_suffix = job_name_suffix ~ '-ml2ovs' %}
+{% set overcloud_override = overcloud_override ~ '\n' ~ '        --network-ovs yes \\'  %}
+{% endif %}
+{% if jjb['tls']|default('no') == 'yes' %}
+   {% set job_name_suffix = job_name_suffix ~ '-tls' %}
+   {% set topology_nodes = topology_nodes ~ ',freeipa:1' %}
+   {% set topology_str = topology_str ~ '_1ipa' %}
+   {% set overcloud_override = overcloud_override ~ '\n' ~ '        --tls-everywhere yes \\'  %}
+   {% set name = name ~ '-tls' %}
+{% endif %}
+{% if networker_node == 'yes' %}
+   {% set job_name_suffix = job_name_suffix ~ '-composable' %}
+   {% set topology_nodes = topology_nodes ~ ',networker:2' %}
+
+   {% set topology_str = topology_str ~ '_2net' %}
+   {% set name = name ~ '-composable' %}
+{% endif %}
+{% if jjb['octavia']|default('no') == 'yes' %}
+    {% set overcloud_templates = overcloud_templates ~ ',octavia' %}
+{% endif %}
+{% if jjb['network_driver'] =="ml2ovn" %}
+{% set overcloud_override = overcloud_override ~ '\n' ~ '        --network-ovn yes \\'  %}
+{% endif %}
+{% if jjb['ceph'] == 'yes' %}
+{% set name = name ~ '-ceph' %}
+{% set topology_nodes = topology_nodes ~ ',ceph:3' %}
+{% set topology_str = topology_str ~ '_3ceph' %}
+{% endif %}
+{% if jjb['ssl'] == 'yes' %}
+{% set name = name ~ '-ssl' %}
+{% endif %}
+
+- project:
+    defaults: tripleo_tempest_defaults
+    name: '{{ name }}'
+    dfg: '{{ jjb['DFG'] }}'
+    component: '{{ jjb['component'] }}'
+{% if jjb['gate']|default('no') == 'no' %}
+    job_triggers: ['dull-trigger']
+{% endif %}
+{% if jjb['networker_node'] == 'yes' %}
+    ir_tripleo_overcloud_composable_role_files: 'networker'
+    ir_tripleo_overcloud_deployment_files: 'composable_roles'
+{% endif %}
+    publish_to_reportportal: 'True'
+{% if jjb['ssl'] == 'yes' %}
+    ir_tripleo_undercloud_ssl: yes
+    ir_tripleo_overcloud_ssl: yes
+{% endif %}
+    ir_virsh_topology_nodes: '{{ topology_nodes }}'
+    ir_virsh_topology_str: '{{ topology_str }}'
+{% if jjb['ipv6'] == 'yes' %}
+    ir_tripleo_overcloud_network_protocol: 'ipv6'
+{% endif %}
+{% if jjb['dvr'] == "yes" or jjb['release']|int >= 15 %}
+    ir_tripleo_overcloud_network_dvr: 'yes'
+{% endif %}
+    job_name_suffix: '{{ job_name_suffix }}'
+    ir_tripleo_overcloud_network_backend: '{{ jjb['network_backend'] }}'
+{% if jjb['ceph'] == 'yes' %}
+    ir_tripleo_overcloud_storage_backend: 'ceph'
+{% endif %}
+    ir_tripleo_overcloud_templates: '{{ overcloud_templates }}'
+    ir_virsh_provision_override_options: |-
+        -e override.undercloud.disks.disk1.size=100G \
+        -e override.compute.cpu=8 \
+        -e override.compute.memory=32768
+    ir_virsh_host_memory_overcommit: 'True'
+    {{ overcloud_override }}
+{% if jjb['tls'] == 'yes' or jjb['ceph'] == 'yes' %}
+    ir_tripleo_undercloud_override_options: |-
+{% endif %}
+{% if jjb['tls'] == 'yes' %}
+        --tls-everywhere yes \
+{% endif %}
+{% if jjb['ceph'] == 'yes' %}
+        --registry-ceph-namespace docker-registry.upshift.redhat.com/ceph \
+        --registry-ceph-image rhceph-4.0-rhel8 \
+{% endif %}
+{% if jjb['release']|int >= 15 %}
+        --config-options DEFAULT.container_insecure_registries=<PUT_REGISTRY_ADDRESS>:8888 \
+        --registry-namespace rhosp{{ jjb['release'] }} \
+        --registry-mirror <PUT_REGISTRY_ADDRESS>:8888 \
+        --tls-ca https://<PUT_RH_IR_CERT> \
+{% endif %}
+{% if jjb['tempest_tests']|default('') %}
+    ir_tempest_tests: '{{ tempest_tests }}'
+    {% endif %}
+    product_version: '{{ version }}'
+    jobs:
+        - 'DFG-{DFG}-{component}-{product_version}_director-{rhel_version}-virthost-{ir_virsh_topology_str}-{ir_tripleo_overcloud_network_protocol}-{ir_tripleo_overcloud_network_backend}{job_name_suffix}':
+            product_version:
+                - '{{ jjb['release']|default('15') }}':
+                    {% if jjb['release']|int|default(15) == 15 %}
+component_gerrit_branch: 'rhos-15.0-trunk-patches'
+                    component_gerrit_refspec: '+refs/heads/rhos-{{ jjb['release']|default(15) }}.0-trunk-patches:refs/remotes/origin/rhos-{{ jjb['release']|default(15) }}.0-trunk-patches'
+                    ir_tripleo_overcloud_network_dvr: yes
+{% if jjb['tls'] == 'yes' or jjb['ceph'] == 'yes' or jjb['release']|int >= 15 %}
+                    ir_tripleo_undercloud_override_options: |-
+{% endif %}
+{% if jjb['tls'] == 'yes' %}
+                        --tls-everywhere yes \
+{% endif %}
+{% if jjb['ceph'] == 'yes' %}
+                        --registry-ceph-namespace docker-registry.upshift.redhat.com/ceph \
+                        --registry-ceph-image rhceph-4.0-rhel8 \
+{% endif %}
+{% if jjb['release']|int >= 15 %}
+                        --config-options DEFAULT.container_insecure_registries=<PUT_REGISTRY_ADDRESS>:8888 \
+                        --registry-namespace rhosp{{ jjb['release'] }} \
+                        --registry-mirror <PUT_REGISTRY_ADDRESS>:8888 \
+                        --tls-ca https://<PUT_RH_IR_CERT> \
+{% endif %}
+                    {% endif %}
+{% if jjb['release']|int|default(15) > 11 %}
+ir_containers: 'yes'
+{% else %}
+ir_containers: 'no'
+{% endif %}

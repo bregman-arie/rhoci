@@ -53,10 +53,10 @@ class Job(object):
                 Database.DATABASE['jobs'].update(
                     {"name": self.name},
                     {"$addToSet": {"builds": self.last_build}})
-            Database.DATABASE['jobs'].find_one_and_update(
-                {"name": self.name},
-                {"$set": {**self.properties,
-                          "last_build": self.last_build}})
+            # Database.DATABASE['jobs'].find_one_and_update(
+            #    {"name": self.name},
+            #    {"$set": {**self.properties,
+            #              "last_build": self.last_build}})
 
     @classmethod
     def update_build(cls, job_name, build):

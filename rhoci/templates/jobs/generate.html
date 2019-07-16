@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+<form class="form-horizontal" id="jjb_form">
+  <div class="form-group center-block container-fluid col-md-4 col-lg-offset-4">
+  <!-- form start-->
+
+  <!-- DFG input start -->
+    <label>DFG</label>
+    <input type="text" id="DFG_input" name="DFG" class="form-control" value="network">
+  <!-- DFG input end -->
+
+  <!-- component input start -->
+    <label>Component</label>
+    <input type="text" id="component_input" name="component" class="form-control" value="neutron">
+  <!-- component input end -->
+
+  <!-- tester input start -->
+    <label>Tester</label>
+    <input type="text" id="tester_input" name="tester" required class="form-control" value="tempest">
+  <!-- tester input end -->
+
+  <!-- tempest tests input start -->
+    <label>Tempest Tests</label>
+    <input type="text" name="tester" required class="form-control" value="neutron">
+  <!-- tempest tests input end -->
+
+  <!-- release input start -->
+    <label>Release</label>
+    <input type="text" name="release" required class="form-control" value="15">
+  <!-- release input end -->
+
+  <!-- network driver input start -->
+    <br>
+    <label>Network Driver</label>
+    <select name="network_driver">
+      <option value="ml2ovn">ml2/ovn</option>
+      <option value="ml2ovs">ml2/ovs</option>
+    </select>
+  <!-- network driver input end -->
+
+  &nbsp &nbsp
+  <label>TLS</label>
+  <input id="tls_input" type="checkbox" name="tls" value="yes">
+  &nbsp &nbsp
+  <label>Octavia</label>
+  <input id="octavia_input" type="checkbox" name="octavia" value="yes">
+  &nbsp &nbsp
+  <label>Networker Node</label>
+  <input id="networker_node_input" type="checkbox" name="networker_node" value="yes">
+  &nbsp &nbsp
+  <label>Gate</label>
+  <input id="gate_input" type="checkbox" name="gate" value="yes">
+
+  <br>
+    <label>Network Backend</label>
+    <select name="network_backend">
+      <option value="geneve">Geneve</option>
+      <option value="vxlan">VXLAN</option>
+      <option value="vlan">VLAN</option>
+    </select>
+  &nbsp &nbsp
+  <label>SSL</label>
+  <input id="ssl_input" type="checkbox" name="ssl" value="yes">
+  &nbsp &nbsp
+  <label>Ceph</label>
+  <input id="ceph_input" type="checkbox" name="ceph" value="yes">
+  &nbsp &nbsp
+  <label>IPv6</label>
+  <input id="ipv6_input" type="checkbox" name="ipv6" value="yes">
+  &nbsp &nbsp
+  <label>DVR</label>
+  <input id="dvr_input" type="checkbox" name="dvr" value="yes">
+
+
+  <!-- generate button start -->
+  <!-- generate button end -->
+
+  <!-- form end-->
+  </div>
+  <br>
+
+  <center>
+      <button type="button" class="btn btn-primary" id="generate">Generate Job Definition</button>
+      <button style="display:none;" type="button" class="btn btn-info" id="job_exists">Check if job exists</button>
+  </center>
+
+</form>
+
+<div class='printchatbox' id='printchatbox'></div>
+
+<br>
+  <!-- Alert for already existing job -->
+  <div style="display:none;" id="existing_job_error" class="container">
+    <div class="alert alert-danger">
+      <span class="pficon pficon-degraded"></span>
+      <strong>The job already exists!.</strong> You should avoid submitting two duplicated jobs
+    </div>
+  </div>
+
+  <!-- Alert for missing input -->
+  {% include "jobs/missing_input.html" -%}
+
+  <!-- Alert for couldn't find any job -->
+  <div style="display:none;" id="no_job_div" class="container">
+    <div class="alert alert-danger">
+      <strong>Couldn't find any job.</strong> Try to reduce input.
+    </div>
+  </div>
+
+    <!-- Jenkins job definition -->
+    <div style="display:none;" id="jjb_output_div">
+		<h2>Generated Job Definition</h2>
+		  <div class="alert alert-info">
+        <pre contenteditable="true"><code id="jjb_output"> </code></pre>
+      </div>
+		</div>
+
+    <!-- Jenkins job exists -->
+    <div style="display:none;" id="job_exists_output_div" class="container">
+		  <div class="alert alert-info">
+			  <pre id="job_exists_output"></pre>
+		  </div>
+	  </div>
+
+<script>
+
+$(function() {
+	$('button#generate').click(function(){
+
+    var formData = $('#jjb_form').serialize();
+    var tester = $('#tester_input').val();
+    var DFG = $('#DFG_input').val();
+    var component = $('#component_input').val();
+
+    $("#job_exists_output_div").hide();
+    $("#no_job_div").hide();
+
+    if (DFG && tester && component)
+    {
+         $("#missing_input_div").hide();
+
+		$.ajax({
+      url: "{{ url_for('jobs.generate') }}",
+      data: formData,
+			type: 'POST',
+			success: function(response){
+         $("#jjb_output_div").show();
+         $("#jjb_output_div").css({"max-width": "1000px", "word-wrap": "break-word", "overflow-wrap": "break-word", "margin": "0 auto"});
+         $("#jjb_output").css({"max-width": "1000px", "word-wrap": "break-word", "overflow-wrap": "break-word", "margin": "0 auto", "white-space": "pre-wrap"});
+         $("#jjb_output").text(response.output);
+			},
+			error: function(error){
+				console.log(error);
+			}
+		       });
+    }
+
+    else
+    {
+         $("#missing_input_div").show();
+         $("#jjb_output_div").hide();
+    }
+
+	});
+});
+
+
+$(function() {
+	$('button#job_exists').click(function(){
+
+    var DFG = $('#DFG_input').val();
+    var tester = $('#tester_input').val();
+    var component = $('#component_input').val();
+
+    $("#missing_input_div").hide();
+    $("#jjb_output_div").hide();
+
+		$.ajax({
+      url: "{{ url_for('jobs.exists') }}",
+      data: {"DFG":DFG,
+             "component":component,
+             "tester":tester},
+			type: 'POST',
+			success: function(response){
+
+        if (response.output) {
+         $("#no_job_div").hide();
+         $("#job_exists_output_div").show();
+         $("#job_exists_output").text(response.output);
+                             }
+        else {
+         $("#no_job_div").show();
+         $("#job_exists_output_div").hide();
+             }
+			                           },
+			error: function(error){
+				console.log(error);
+			                      }
+		       });
+
+	});
+});
+
+
+
+</script>
+
+{% endblock %}

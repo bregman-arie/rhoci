@@ -62,10 +62,15 @@ def job(name):
                            uf=uf, jenkins_url=jenkins_url)
 
 
-@bp.route('/generate_job', methods=['GET', 'POST'])
-def generate_jjb():
-    output = generate_job_definition(request.form['DFG'],
-                                     request.form['component'],
-                                     request.form['tester'])
+@bp.route('/exists')
+def exists(DFG=None, tester=None, component=None):
+    return False
 
-    return jsonify(output=output)
+
+@bp.route('/generate', methods=['GET', 'POST'])
+def generate():
+    if request.method == 'POST':
+        output = generate_job_definition(jjb_data=request.form)
+        return jsonify(output=output)
+    else:
+        return render_template('jobs/generate.html')

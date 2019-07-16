@@ -1,0 +1,11 @@
+- project:
+    name: {{ jjb['component'] }}-single-node-jobs-{{ range(1, 2751) | random }}
+    defaults: single_node_defaults
+    jobs:
+        - 'DFG-{dfg}-{component}-{tester}-rhos':
+            component: '{{ jjb['component'] }}'
+            image: 'rhel-8.0-x86_64-latest'
+            nodes: 'tester:1'
+            dfg: '{{ jjb['DFG'] }}'
+            tester: '{{ jjb['tester'] }}'
+            product_version: '{{ jjb['release'] }}'
