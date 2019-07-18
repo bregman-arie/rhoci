@@ -10,6 +10,7 @@ rhoci = {editable = true,path = "."}
 pymongo = "*"
 jinja2 = "*"
 urllib3 = "*"
+flask-login = "*"
 
 [dev-packages]
 

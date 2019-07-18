@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+from flask_login import LoginManager
 from rhoci.common.config import Config
 from rhoci.database import Database
 from rhoci.db.enconders import MongoJSONEncoder, ObjectIdConverter
@@ -28,6 +29,7 @@ def create_app():
     app.config['custom'] = Config().config
 
     Database.initialize()
+    login = LoginManager(app)
 
     register_blueprints(app)
 

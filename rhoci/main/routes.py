@@ -14,6 +14,11 @@
 from __future__ import absolute_import
 
 from flask import render_template
+from flask import request
+from flask import redirect
+from flask import url_for
+from flask_login import current_user
+from flask_login import login_user
 import logging
 
 from rhoci.models.job import Job
@@ -60,3 +65,18 @@ def index():
                            overall_status=overall_status,
                            builds_count_li=list(reversed((builds_count_li))),
                            dates_li=list(reversed(dates_li)))
+
+
+@bp.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    if request.method == 'POST':
+        if (request.form['username'] != 'admin' or
+                request.form['password'] != 'admin'):
+            error = 'Invalid Credentials. Please try again.'
+        else:
+            login_user(user, remember=form.remember_me.data)
+            return redirect(url_for('main.index'))
+    return render_template('main/login.html', error=error)
