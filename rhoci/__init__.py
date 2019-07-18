@@ -14,11 +14,15 @@
 from __future__ import absolute_import
 
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
+
 from rhoci.common.config import Config
 from rhoci.database import Database
 from rhoci.db.enconders import MongoJSONEncoder, ObjectIdConverter
+from rhoci.models.user import User
 
 from flask import Flask
+import os
 
 
 def create_app():
@@ -28,8 +32,21 @@ def create_app():
     app.url_map.converters['objectid'] = ObjectIdConverter
     app.config['custom'] = Config().config
 
+    SECRET_KEY = os.urandom(32)
+    app.config['SECRET_KEY'] = SECRET_KEY
+
+    csrf = CSRFProtect()
+    csrf.init_app(app)
+
+    login_manager = LoginManager(app)
+    login_manager.login_view = 'login'
+    app.config['login_manager'] = login_manager
+
+    @login_manager.user_loader
+    def load_user(user):
+        return User.find_one(user)
+
     Database.initialize()
-    login = LoginManager(app)
 
     register_blueprints(app)
 

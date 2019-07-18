@@ -13,16 +13,21 @@
 #    under the License.
 from __future__ import absolute_import
 
+from flask import flash
 from flask import render_template
 from flask import request
 from flask import redirect
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_user
+from flask_login import logout_user
 import logging
+from werkzeug.urls import url_parse
 
+from rhoci.forms.login import Login
 from rhoci.models.job import Job
 from rhoci.models.DFG import DFG
+from rhoci.models.user import User
 import rhoci.jenkins.constants as jenkins_const
 
 LOG = logging.getLogger(__name__)
@@ -69,14 +74,24 @@ def index():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    if request.method == 'POST':
-        if (request.form['username'] != 'admin' or
-                request.form['password'] != 'admin'):
-            error = 'Invalid Credentials. Please try again.'
+        return redirect(url_for('index'))
+    form = Login()
+    if form.validate_on_submit():
+        user = User.find_one(form.username.data)
+        if user and User.check_password(user['password'], form.password.data):
+            user_obj = User(user['username'])
+            login_user(user_obj)
+            next_page = request.args.get('next')
+            if not next_page or url_parse(next_page).netloc != '':
+                next_page = url_for('main.index')
+            return redirect(next_page)
         else:
-            login_user(user, remember=form.remember_me.data)
-            return redirect(url_for('main.index'))
-    return render_template('main/login.html', error=error)
+            flash("Invalid username or password")
+    return render_template('main/login.html', title='Sign In', form=form)
+
+
+@bp.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('main.index'))

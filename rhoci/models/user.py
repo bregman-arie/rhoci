@@ -14,6 +14,9 @@
 from __future__ import absolute_import
 
 from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
+
+from rhoci.database import Database
 
 
 class User(object):
@@ -24,6 +27,9 @@ class User(object):
     @staticmethod
     def is_authenticated():
         return True
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
     @staticmethod
     def is_active():
@@ -39,3 +45,24 @@ class User(object):
     @staticmethod
     def check_password(password_hash, password):
         return check_password_hash(password_hash, password)
+
+    @classmethod
+    def find_one(cls, username):
+        """Returns one query result."""
+        query = {}
+        if username:
+            query['username'] = username
+        user = Database.find_one(collection="users", query=query)
+        return user
+
+    def insert(self):
+        """Inserts object to the database."""
+        if not Database.find_one("users", {"username": self.username}):
+            Database.insert(collection='users',
+                            data=self.json())
+
+    def json(self):
+        return {
+            'username': self.username,
+            'password': self.password_hash,
+        }

@@ -21,6 +21,7 @@ from flask import url_for
 import logging
 
 from rhoci.jenkins.jjb import generate_job_definition
+from rhoci.forms.dummy import Dummy
 
 LOG = logging.getLogger(__name__)
 
@@ -73,4 +74,5 @@ def generate():
         output = generate_job_definition(jjb_data=request.form)
         return jsonify(output=output)
     else:
-        return render_template('jobs/generate.html')
+        form = Dummy()
+        return render_template('jobs/generate.html', form=form)

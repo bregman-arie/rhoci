@@ -44,10 +44,19 @@ def setup_logging(debug):
     logging.basicConfig(level=level)
 
 
+def add_dummey_user():
+    """Add fake admin user."""
+    from rhoci.models.user import User
+    user = User(username='admin')
+    user.set_password('admin')
+    user.insert()
+
+
 def run_app(args=None):
     """Creates and runs the Flask application."""
     setup_logging(args.debug)
     app = create_app()
+    add_dummey_user()
     app.run(host='0.0.0.0', port=args.port)
 
 

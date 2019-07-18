@@ -11,6 +11,7 @@ pymongo = "*"
 jinja2 = "*"
 urllib3 = "*"
 flask-login = "*"
+flask-wtf = "*"
 
 [dev-packages]
 
