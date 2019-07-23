@@ -47,16 +47,20 @@ class Job(object):
         if not job:
             Database.insert(collection='jobs', data=self.json())
         else:
+            # Check if last build is in job builds. If not, add it.
             if not Database.DATABASE['jobs'].find_one(
                 {"builds.number": self.last_build['number'],
                  "name": self.name}):
                 Database.DATABASE['jobs'].update(
                     {"name": self.name},
                     {"$addToSet": {"builds": self.last_build}})
+            # Update job
             # Database.DATABASE['jobs'].find_one_and_update(
             #    {"name": self.name},
-            #    {"$set": {**self.properties,
-            #              "last_build": self.last_build}})
+            #    {"$set": self.properties})
+            Database.DATABASE['jobs'].find_one_and_update(
+                {"name": self.name},
+                {"$set": {'lol': 'lol2'}})
 
     @classmethod
     def update_build(cls, job_name, build):

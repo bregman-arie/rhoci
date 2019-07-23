@@ -25,6 +25,7 @@ import logging
 from werkzeug.urls import url_parse
 
 from rhoci.forms.login import Login
+from rhoci.forms.register import Register
 from rhoci.models.job import Job
 from rhoci.models.DFG import DFG
 from rhoci.models.user import User
@@ -95,3 +96,9 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    form = Register()
+    return render_template('main/register.html', title='Register', form=form)

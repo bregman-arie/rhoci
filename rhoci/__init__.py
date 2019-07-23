@@ -14,7 +14,6 @@
 from __future__ import absolute_import
 
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
 
 from rhoci.common.config import Config
 from rhoci.database import Database
@@ -35,8 +34,8 @@ def create_app():
     SECRET_KEY = os.urandom(32)
     app.config['SECRET_KEY'] = SECRET_KEY
 
-    csrf = CSRFProtect()
-    csrf.init_app(app)
+    # csrf = CSRFProtect()
+    # csrf.init_app(app)
 
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'

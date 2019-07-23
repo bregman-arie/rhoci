@@ -34,9 +34,11 @@ def index():
     """All jobs."""
     jenkins_url = app.config['custom']['jenkins']['url']
     query_str = request.args.to_dict()
+    form = Dummy()
     return render_template('jobs/index.html',
                            jenkins_url=jenkins_url,
-                           query_str=query_str)
+                           query_str=query_str,
+                           form=form)
 
 
 @bp.route('/builds')
@@ -76,3 +78,12 @@ def generate():
     else:
         form = Dummy()
         return render_template('jobs/generate.html', form=form)
+
+
+@bp.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        pass
+    else:
+        form = Dummy()
+        return render_template('jobs/search.html', form=form)
