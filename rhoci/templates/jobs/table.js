@@ -5,7 +5,6 @@ $("#jobs_table").DataTable({
     "ajax": {
     'type': 'POST',
     'url': "{{ url_for('api.jobs', query_str=query_str) }}",
-    'data': {"query_str": "aaaaaaaaaaaa", "asdasd": "asdads" },
     },
         "columns": [
           {"data": "name"},
@@ -29,7 +28,6 @@ $("#jobs_table").DataTable({
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-    console.log("{{ query_str }}");
                       return $('<a>')
                        .attr('href', data)
                        .text(data)
