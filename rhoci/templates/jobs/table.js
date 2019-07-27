@@ -62,7 +62,12 @@ $("#jobs_table").DataTable({
             {
                 targets:5,
                       render: function ( data, type, row, meta ) {
+          {% if current_user.is_anonymous %}
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">';
+          {% else %}
                     data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">   <a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/build"><img src="{{ url_for('static'      , filename='images/clock.png') }}">   <a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/configure"><img src="{{ url_for('static', filename='images/gear.png') }}">  ';
+          {% endif %}
+
                       return data;
                       }
             }

@@ -13,14 +13,17 @@
 #    under the License.
 from __future__ import absolute_import
 
+from bson import json_util
 from flask import current_app as app
 from flask import jsonify
 from flask import render_template
 from flask import request
 from flask import url_for
+import json
 import logging
 
 from rhoci.jenkins.jjb import generate_job_definition
+from rhoci.models.job import Job
 from rhoci.forms.dummy import Dummy
 
 LOG = logging.getLogger(__name__)
@@ -60,9 +63,13 @@ def tests():
 def job(name):
     """Specific job summary."""
     uf = url_for('api.get_builds', job_name=name)
+    job = Job.find(name=name)
+    job[0].pop('_id')
+    job_json = json.dumps(job, indent=4, sort_keys=True,
+                          default=json_util.default)
     jenkins_url = app.config['custom']['jenkins']['url']
     return render_template('jobs/one_job_summary.html', job_name=name,
-                           uf=uf, jenkins_url=jenkins_url)
+                           uf=uf, jenkins_url=jenkins_url, job_json=job_json)
 
 
 @bp.route('/exists')
