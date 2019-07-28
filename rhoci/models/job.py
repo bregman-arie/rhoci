@@ -17,6 +17,7 @@ import datetime
 import re
 
 from rhoci.database import Database
+import rhoci.jenkins.constants as jenkins_const
 
 
 class Job(object):
@@ -90,7 +91,7 @@ class Job(object):
         return self.__dict__
 
     @classmethod
-    def count(cls, name=None, last_build_res=None):
+    def count(cls, name=None, last_build_res=None, DFG=None, release=None):
         """Returns number of jobs based on passed arguments."""
         query = {}
         if name:
@@ -98,6 +99,10 @@ class Job(object):
             query['name'] = regex
         if last_build_res:
             query['last_build.status'] = last_build_res
+        if DFG:
+            query['DFG'] = DFG
+        if release:
+            query['release'] = release
         jobs = Database.find(collection='jobs', query=query)
         return jobs.count()
 
@@ -136,6 +141,16 @@ class Job(object):
         """Deletes one job document from the database."""
         query = {"name": name}
         Database.delete_one("jobs", query)
+
+    @classmethod
+    def get_builds_count_per_release(cls, DFG=None):
+        pie = {}
+        for rel in jenkins_const.RELEASES:
+            pie[rel] = {}
+            for res in jenkins_const.RESULTS:
+                pie[rel][res] = Job.count(
+                    last_build_res=res, DFG=DFG, release=rel)
+        return pie
 
     @classmethod
     def get_builds_count_per_date(num_of_days=10):

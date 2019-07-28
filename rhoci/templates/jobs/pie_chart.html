@@ -1,0 +1,47 @@
+<div class="col-xl-3 col-lg-5 mb-4">
+              <div class="card shadow mb-4 h-100 text-center">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header">
+                  <h6 class="m-0 font-weight-bold text-primary">Release {{ rel }}</h6>
+                </div>
+                <!-- Card Body -->
+<div class="card-body">
+<div class="chart-pie pt-4 pb-2">
+<canvas id="overall_status_chart_{{ rel }}" width="5" height="5"></canvas>
+</div>
+</div>
+              </div>
+</div>
+
+<script>
+  var ctx = document.getElementById("overall_status_chart_{{ rel }}").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ["Failure", "Unstable", "Success"],
+        datasets: [{
+          data: ["{{ val['FAILURE'] }}", "{{ val['UNSTABLE'] }}", "{{ val['SUCCESS'] }}"],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>

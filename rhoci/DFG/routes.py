@@ -83,8 +83,10 @@ def summary(DFG_name):
     """All DFGs."""
     uf = url_for('api.get_jobs', DFG_name=DFG_name)
     jenkins_url = app.config['custom']['jenkins']['url']
+    pie = Job.get_builds_count_per_release(DFG=DFG_name)
+    print(pie)
     return render_template('DFG/summary.html', DFG_name=DFG_name, uf=uf,
-                           jenkins_url=jenkins_url)
+                           jenkins_url=jenkins_url, pie=pie)
 
 
 @bp.route('/<DFG_name>/squad/<squad_name>')

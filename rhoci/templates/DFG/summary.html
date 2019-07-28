@@ -9,6 +9,14 @@
   </div>
 
 {% include "DFG/table.html" -%}
+<br>
+<h3>Status per release</h3>
+<div class="row">
+{% for rel,val in pie.items() %}
+  {% include "jobs/pie_chart.html" -%}
+{% endfor %}
+</div>
+  
 
 <script>
 $(document).ready(function() {

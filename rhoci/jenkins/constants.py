@@ -12,3 +12,4 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 RESULTS = ['FAILURE', 'SUCCESS', 'UNSTABLE', 'ABORTED']
+RELEASES = ['10', '11', '12', '13', '14', '15']
