@@ -36,14 +36,14 @@ class JenkinsAgent():
 
     def run(self):
         """Runs the agent proess."""
-        LOG.info("Running Jenkins agent")
+        LOG.info("Starting rhoci agent")
         jobs = self.get_jobs()
         self.remove_jobs([job['name'] for job in jobs])
-        LOG.info("Obtained a list of jobs from Jenkins")
+        LOG.info("Obtained a list of jobs from Jenkins. Processing...")
         for job in jobs:
             JenkinsAgent.classify_and_insert_to_db(job)
         # Agent should run forever
-        LOG.info("Running forever")
+        LOG.info("Prcoessing complete. Switching to standby mode.")
         while True:
             self.wait_to_next_midnight()
             jobs = self.get_jobs()
@@ -67,9 +67,19 @@ class JenkinsAgent():
 
     def get_jobs(self):
         """Returns jobs."""
-        request = requests.get(self.url + api.CALLS['get_jobs'], verify=False)
+        request = requests.get(self.url + api.API_CALLS['get_jobs'],
+                               verify=False)
         result_json = json.loads(request.text)
         return result_json['jobs']
+
+    def get_tests(self, job, build):
+        """Returns tests given a job name and a build number."""
+        request = requests.get(
+            self.url + api.API_CALLS['get_tests'].format(job, build),
+            verify=False)
+        result_json = json.loads(request.text)
+        print(result_json)
+        return result_json['tests']
 
     @staticmethod
     def add_job_to_db(job, properties):

@@ -13,8 +13,9 @@
 #    under the License.
 from rhoci.common.utils import unixtime_to_datetime
 
-CALLS = {'get_jobs':
-         "/api/json/?tree=jobs[name,lastBuild[result,number,timestamp]]"}
+API_CALLS = {'get_jobs':
+             "/api/json/?tree=jobs[name,lastBuild[result,number,timestamp]]",
+             'get_tests': "/job/{}/{}/testReport/api/json"}
 
 
 def adjust_job_data(job):

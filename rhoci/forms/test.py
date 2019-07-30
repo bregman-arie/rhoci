@@ -11,12 +11,19 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from __future__ import absolute_import
-from flask import Blueprint
+from flask_wtf import FlaskForm
+from wtforms import BooleanField
+from wtforms import StringField
+from wtforms import SubmitField
 
-bp = Blueprint('api', __name__)
 
-from rhoci.api import build  # noqa
-from rhoci.api import job  # noqa
-from rhoci.api import DFG  # noqa
-from rhoci.api import test  # noqa
+class TestsSearch(FlaskForm):
+    class_name = StringField('class name')
+    test_name = StringField('test name')
+    status = StringField('status')
+    failed_since = StringField('failed since')
+    skipped_message = StringField('skipped message')
+    stdout = StringField('stdout')
+    stderr = StringField('stderr')
+    skipped = BooleanField()
+    submit = SubmitField('Search')

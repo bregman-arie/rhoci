@@ -24,7 +24,6 @@ class Job(object):
 
     def __init__(self, name, last_build, **kwargs):
         self.builds = []
-        self.tests = []
         self.last_successful_build = None
         if last_build:
             # TODO(abregman): some artifacts start with dot (e.g. ".envrc")
@@ -121,7 +120,8 @@ class Job(object):
 
     @classmethod
     def find(cls, name=None, exact_match=False,
-             last_build_result=None, **kwargs):
+             last_build_result=None, projection=None,
+             **kwargs):
         """Returns find query."""
         query = {}
         if name and not exact_match:
@@ -133,7 +133,8 @@ class Job(object):
             query['last_build.result'] = last_build_result
         for k, v in kwargs.items():
             query[k] = v
-        jobs = list(Database.find(collection="jobs", query=query))
+        jobs = list(Database.find(collection="jobs", query=query,
+                                  projection=projection))
         return jobs
 
     @classmethod

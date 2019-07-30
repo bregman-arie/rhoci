@@ -32,12 +32,12 @@ class Database(object):
         return _id
 
     @staticmethod
-    def find(collection, query):
-        return Database.DATABASE[collection].find(query)
+    def find(collection, query, projection=None):
+        return Database.DATABASE[collection].find(query, projection)
 
     @staticmethod
-    def find_one(collection, query):
-        return Database.DATABASE[collection].find_one(query)
+    def find_one(collection, query, projection=None):
+        return Database.DATABASE[collection].find_one(query, projection)
 
     @staticmethod
     def delete_one(collection, query):

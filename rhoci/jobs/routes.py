@@ -114,3 +114,27 @@ def search():
         return redirect(url_for('jobs.index', query=q))
     else:
         return render_template('jobs/search.html', form=form)
+
+
+@bp.route('/tests/search', methods=['GET', 'POST'])
+def search_tests():
+    form = JobSearch()
+    q = {}
+    if form.name.data:
+        q['name'] = form.name.data
+    if form.DFG.data:
+        q['DFG'] = form.DFG.data
+    if form.squad.data:
+        q['squad'] = form.squad.data
+    if form.component.data:
+        q['component'] = form.component.data
+    if form.tester.data:
+        q['tester'] = form.tester.data
+    if form.job_class.data:
+        q['class'] = form.job_class.data
+
+    if request.method == 'POST':
+        print(request.args)
+        return redirect(url_for('jobs.index', query=q))
+    else:
+        return render_template('jobs/search.html', form=form)

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+
+  <div class="form-group center-block container-fluid col-md-2 col-lg-offset-1">
+<form method="post">
+    {{ form.csrf_token }}
+  <!-- form start-->
+
+    <label>Name:</label>
+    <br>
+    {{ form.name }}
+    <br>
+    <label>Release:</label>
+    <br>
+    {{ form.release }}
+    <br>
+    <label>DFG:</label>
+    <br>
+    {{ form.DFG }}
+    <br>
+    <label>squad:</label>
+    <br>
+    {{ form.squad }}
+    <br>
+    <label>component:</label>
+    <br>
+    {{ form.component }}
+    <br>
+    <label>tester:</label>
+    <br>
+    {{ form.tester }}
+    <br>
+    <label>class:</label>
+    <br>
+    {{ form.job_class }}
+    <br>
+
+  <!-- form end-->
+  <br>
+
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+</div>
+</form>
+
+{% endblock %}

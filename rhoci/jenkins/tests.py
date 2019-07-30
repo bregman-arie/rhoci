@@ -12,11 +12,20 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from __future__ import absolute_import
-from flask import Blueprint
 
-bp = Blueprint('api', __name__)
+import logging
 
-from rhoci.api import build  # noqa
-from rhoci.api import job  # noqa
-from rhoci.api import DFG  # noqa
-from rhoci.api import test  # noqa
+from rhoci.common.config import Config
+from rhoci.jenkins.agent import JenkinsAgent
+
+LOG = logging.getLogger(__name__)
+
+
+def get_tests(job, build):
+    """returns tests given a job name and build number."""
+    app_conf = Config()
+    jenkins_agent = JenkinsAgent(app_conf.config['jenkins']['user'],
+                                 app_conf.config['jenkins']['password'],
+                                 app_conf.config['jenkins']['url'])
+    tests = jenkins_agent.get_tests(job, build)
+    return tests
