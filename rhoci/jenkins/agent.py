@@ -101,7 +101,8 @@ class JenkinsAgent():
             properties['DFG'] = osp.get_DFG_name(job['name'])
             new_DFG = DFG_db(name=properties['DFG'])
             DFG_db.insert(new_DFG)
-            properties['component'] = osp.get_component_name(job['name'])
+            properties['component'] = osp.get_component_name(
+                job['name'], properties['DFG'])
             properties['squad'] = DFG_db.get_squad(properties['DFG'],
                                                    properties['component'])
         if properties['class'] != 'folder':

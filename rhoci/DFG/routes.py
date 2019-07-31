@@ -81,21 +81,35 @@ def components():
 @bp.route('/<DFG_name>')
 def summary(DFG_name):
     """All DFGs."""
+    squads_uf = {}
     uf = url_for('api.get_jobs', DFG_name=DFG_name)
     jenkins_url = app.config['custom']['jenkins']['url']
     pie = Job.get_builds_count_per_release(DFG=DFG_name)
+    found_DFG = DFG.find_one(DFG_name)
+    if found_DFG['squads']:
+        for squad in found_DFG['squads']:
+            squads_uf[squad] = url_for('DFG.squad_summary',
+                                       DFG_name=DFG_name, squad_name=squad)
     return render_template('DFG/summary.html', DFG_name=DFG_name, uf=uf,
-                           jenkins_url=jenkins_url, pie=pie)
+                           jenkins_url=jenkins_url, pie=pie,
+                           squads=found_DFG['squads'], squads_uf=squads_uf)
 
 
 @bp.route('/<DFG_name>/squad/<squad_name>')
 def squad_summary(DFG_name, squad_name):
     """Specific squad summary."""
+    comps_uf = {}
     uf = url_for('api.get_jobs', DFG_name=DFG_name, squad_name=squad_name)
     jenkins_url = app.config['custom']['jenkins']['url']
+    pie = Job.get_builds_count_per_release(DFG=DFG_name, squad=squad_name)
+    components = DFG.get_squad_components(DFG_name, squad_name)
+    for component in components:
+        comps_uf[component] = url_for(
+            'DFG.component_summary', DFG_name=DFG_name,
+            component_name=component)
     return render_template('DFG/summary.html', DFG_name=DFG_name,
-                           squad_name=squad_name, uf=uf,
-                           jenkins_url=jenkins_url)
+                           squad_name=squad_name, uf=uf, pie=pie,
+                           jenkins_url=jenkins_url, comps_uf=comps_uf)
 
 
 @bp.route('/<DFG_name>/component/<component_name>')
@@ -104,6 +118,8 @@ def component_summary(DFG_name, component_name):
     uf = url_for('api.get_jobs', DFG_name=DFG_name,
                  component_name=component_name)
     jenkins_url = app.config['custom']['jenkins']['url']
+    pie = Job.get_builds_count_per_release(DFG=DFG_name,
+                                           component=component_name)
     return render_template('DFG/summary.html', DFG_name=DFG_name,
                            component_name=component_name, uf=uf,
-                           jenkins_url=jenkins_url)
+                           jenkins_url=jenkins_url, pie=pie)

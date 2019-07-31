@@ -16,8 +16,25 @@
   {% include "jobs/pie_chart.html" -%}
 {% endfor %}
 </div>
+
+{% if squads_uf is defined %}
 <h3>Squads</h3>
-  
+
+<div class="row">
+
+{% for squad in squads %}
+ {% with squad=squad %}
+   {% include "DFG/one_grp_card_name_only.html" -%}
+ {% endwith %}
+{% endfor %}
+
+</div> <!-- row -->
+
+<br>
+<br>
+
+{% endif %}
+
 
 <script>
 $(document).ready(function() {

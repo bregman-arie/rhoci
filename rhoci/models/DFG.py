@@ -77,12 +77,12 @@ class DFG(object):
     def get_squad(cls, DFG_name, component):
         DFG_db = cls.find_one(name=DFG_name)
         if DFG_db['squad_to_components']:
-            for k, v in DFG_db['squad_to_components'].items():
-                for comp in v:
+            for squad, components in DFG_db['squad_to_components'].items():
+                for comp in components:
                     if comp == component:
-                        return k
-                if component == v:
-                    return k
+                        return squad
+                if component == components:
+                    return squad
             return
 
     @classmethod

@@ -1,0 +1,20 @@
+<div class="col-md-2">
+  <div class="card text-center">
+    <a href="{{ squads_uf[squad] }}" style="text-decoration: none">
+      <h3>
+        <div class="card-header"> {{ squad }} </div>
+      </h3>
+      <div class="{{ squad }} card-pf-top-element text-center">
+        <img id="{{ squad }}" src="{{ url_for('static', filename='images/DFG/{0}.png'.format(squad)) }}" onerror="no_image(this)" width=70 height=70>
+      </div>
+    </a>
+  </div>
+</div>
+
+<script>
+  function no_image(source) {
+    source.onerror = "";
+    source.src = "{{ url_for('static', filename='images/users.png') }}";
+    return true;
+  }
+</script>

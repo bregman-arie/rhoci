@@ -32,14 +32,13 @@ def get_DFG_name(job_name):
     return job_name.split('-')[1]
 
 
-def get_component_name(job_name):
+def get_component_name(job_name, DFG_name):
     """Returns component name."""
-    comp = job_name.split('-')[2]
-    NOT_COMPS = ["python", "networking", "openstack"]
-    if comp in NOT_COMPS:
-        return job_name.split('-')[2] + '-' + job_name.split('-')[3]
+    match = re.match(r"DFG-%s-(.*)-\d{1,2}" % DFG_name, job_name)
+    if match:
+        return match.group(1)
     else:
-        return comp
+        return ''
 
 
 def get_release(job_name):

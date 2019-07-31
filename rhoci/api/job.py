@@ -48,9 +48,11 @@ def get_jobs(DFG_name=None, squad_name=None,
     if squad_name:
         jobs = Job.find(squad=squad_name)
     elif component_name:
+        print(DFG_name)
+        print(component_name)
         jobs = Job.find(
-            name='DFG-{}-{}-'.format(DFG_name, component_name),
-            exact_match=True)
+            name='DFG-{}-{}-'.format(DFG_name, component_name))
+        print(jobs)
     elif DFG_name:
         jobs = Job.find(name='DFG-{}'.format(DFG_name))
     elif job_name:

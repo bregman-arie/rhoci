@@ -90,7 +90,8 @@ class Job(object):
         return self.__dict__
 
     @classmethod
-    def count(cls, name=None, last_build_res=None, DFG=None, release=None):
+    def count(cls, name=None, last_build_res=None, DFG=None, release=None,
+              squad=None, component=None):
         """Returns number of jobs based on passed arguments."""
         query = {}
         if name:
@@ -100,6 +101,10 @@ class Job(object):
             query['last_build.status'] = last_build_res
         if DFG:
             query['DFG'] = DFG
+        if squad:
+            query['squad'] = squad
+        if component:
+            query['component'] = component
         if release:
             query['release'] = release
         jobs = Database.find(collection='jobs', query=query)
@@ -144,13 +149,15 @@ class Job(object):
         Database.delete_one("jobs", query)
 
     @classmethod
-    def get_builds_count_per_release(cls, DFG=None):
+    def get_builds_count_per_release(cls, DFG=None, squad=None,
+                                     component=None):
         pie = {}
         for rel in jenkins_const.RELEASES:
             pie[rel] = {}
             for res in jenkins_const.RESULTS:
                 pie[rel][res] = Job.count(
-                    last_build_res=res, DFG=DFG, release=rel)
+                    last_build_res=res, DFG=DFG, release=rel,
+                    component=component, squad=squad)
         return pie
 
     @classmethod
