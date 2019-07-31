@@ -27,6 +27,8 @@ from rhoci.jenkins.jjb import generate_job_definition
 from rhoci.models.job import Job
 from rhoci.forms.dummy import Dummy
 from rhoci.forms.job import JobSearch
+from rhoci.forms.build import BuildSearch
+from rhoci.forms.test import TestSearch
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +43,6 @@ def index():
     query_str = request.args.to_dict()
     if 'query' in query_str:
         query_str = query_str['query']
-    print(query_str)
     form = Dummy()
     return render_template('jobs/index.html',
                            jenkins_url=jenkins_url,
@@ -110,7 +111,6 @@ def search():
         q['class'] = form.job_class.data
 
     if request.method == 'POST':
-        print(request.args)
         return redirect(url_for('jobs.index', query=q))
     else:
         return render_template('jobs/search.html', form=form)
@@ -118,23 +118,20 @@ def search():
 
 @bp.route('/tests/search', methods=['GET', 'POST'])
 def search_tests():
-    form = JobSearch()
+    form = TestSearch()
     q = {}
-    if form.name.data:
-        q['name'] = form.name.data
-    if form.DFG.data:
-        q['DFG'] = form.DFG.data
-    if form.squad.data:
-        q['squad'] = form.squad.data
-    if form.component.data:
-        q['component'] = form.component.data
-    if form.tester.data:
-        q['tester'] = form.tester.data
-    if form.job_class.data:
-        q['class'] = form.job_class.data
+    if request.method == 'POST':
+        return redirect(url_for('tests.index', query=q))
+    else:
+        return render_template('tests/search.html', form=form)
+
+
+@bp.route('/builds/search', methods=['GET', 'POST'])
+def search_builds():
+    form = BuildSearch()
+    q = {}
 
     if request.method == 'POST':
-        print(request.args)
-        return redirect(url_for('jobs.index', query=q))
+        return redirect(url_for('builds.index', query=q))
     else:
-        return render_template('jobs/search.html', form=form)
+        return render_template('builds/search.html', form=form)

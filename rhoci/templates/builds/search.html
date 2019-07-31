@@ -9,38 +9,30 @@
     {{ form.csrf_token }}
   <!-- form start-->
 
-    <label>Class name:</label>
+    <label>Job:</label>
     <br>
-    {{ form.class_name }}
+    {{ form.job }}
     <br>
-    <label>Test name:</label>
+    <label>Build number:</label>
     <br>
-    {{ form.test_name }}
+    {{ form.number }}
     <br>
     <label>Status:</label>
     <br>
     {{ form.status }}
     <br>
-    <label>Failed since:</label>
+    <label>Parameters:</label>
     <br>
-    {{ form.failed_since }}
+    {{ form.parameters }}
     <br>
-    <label>Skipped message:</label>
+    <label>Artifacts:</label>
     <br>
-    {{ form.skipped_message }}
+    {{ form.artifacts }}
     <br>
-    <label>Stdout:</label>
     <br>
-    {{ form.stdout }}
+    <label>Cleanup:</label>
+    {{ form.cleanup }}
     <br>
-    <label>Stderr:</label>
-    <br>
-    {{ form.stderr }}
-    <br>
-    <label>Skipped:</label>
-    {{ form.skipped }}
-    <br>
-
   <!-- form end-->
   <br>
 

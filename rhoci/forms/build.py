@@ -17,13 +17,11 @@ from wtforms import StringField
 from wtforms import SubmitField
 
 
-class TestSearch(FlaskForm):
-    class_name = StringField('class name')
-    test_name = StringField('test name')
+class BuildSearch(FlaskForm):
+    number = StringField('number')
+    job = StringField('job')
     status = StringField('status')
-    failed_since = StringField('failed since')
-    skipped_message = StringField('skipped message')
-    stdout = StringField('stdout')
-    stderr = StringField('stderr')
-    skipped = BooleanField()
+    parameters = StringField('parameters')
+    artifacts = StringField('artifacts')
+    cleanup = BooleanField('cleanup')
     submit = SubmitField('Search')
