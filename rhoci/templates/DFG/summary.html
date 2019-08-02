@@ -35,6 +35,23 @@
 
 {% endif %}
 
+{% if comps_uf is defined %}
+<h3>Components</h3>
+
+<div class="row">
+
+{% for comp in components %}
+ {% with squad=comp, squads_uf=comps_uf %}
+   {% include "DFG/one_grp_card_name_only.html" -%}
+ {% endwith %}
+{% endfor %}
+
+</div> <!-- row -->
+
+<br>
+<br>
+
+{% endif %}
 
 <script>
 $(document).ready(function() {

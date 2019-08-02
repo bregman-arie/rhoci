@@ -63,6 +63,13 @@ class Job(object):
                 {"$set": {'lol': 'lol2'}})
 
     @classmethod
+    def update_tests(cls, job_name, build_num, tests):
+        """Add tests to build."""
+        Database.DATABASE['jobs'].find_one_and_update(
+            {"name": job_name, "builds.number": int(build_num)},
+            {"$set": {"builds.$.tests": tests}})
+
+    @classmethod
     def update_build(cls, job_name, build):
         # If new build, add it to the array of builds
         if not Database.DATABASE['jobs'].find_one(
@@ -126,7 +133,7 @@ class Job(object):
     @classmethod
     def find(cls, name=None, exact_match=False,
              last_build_result=None, projection=None,
-             **kwargs):
+             build_number=None, **kwargs):
         """Returns find query."""
         query = {}
         if name and not exact_match:
@@ -134,6 +141,8 @@ class Job(object):
             query['name'] = regex
         elif name:
             query['name'] = name
+        if build_number:
+            query['builds.number'] = build_number
         if last_build_result:
             query['last_build.result'] = last_build_result
         for k, v in kwargs.items():

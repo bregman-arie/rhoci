@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+import datetime
 from flask import jsonify
 from flask import request
 
@@ -28,12 +29,14 @@ from rhoci.api import bp  # noqa
 @bp.route('/jobs', methods=['GET', 'POST'])
 def jobs(query_str=None):
     """All jobs API route."""
+    print(datetime.datetime.now())
     q_str = request.args.get('query_str', default={})
     if q_str:
         query_str = eval(q_str)
     else:
         query_str = {}
     results = {'data': Job.find(**query_str)}
+    print(datetime.datetime.now())
     return jsonify(results)
 
 
@@ -48,11 +51,7 @@ def get_jobs(DFG_name=None, squad_name=None,
     if squad_name:
         jobs = Job.find(squad=squad_name)
     elif component_name:
-        print(DFG_name)
-        print(component_name)
-        jobs = Job.find(
-            name='DFG-{}-{}-'.format(DFG_name, component_name))
-        print(jobs)
+        jobs = Job.find(**{'DFG': DFG_name, 'component': component_name})
     elif DFG_name:
         jobs = Job.find(name='DFG-{}'.format(DFG_name))
     elif job_name:

@@ -78,8 +78,8 @@ class JenkinsAgent():
             self.url + api.API_CALLS['get_tests'].format(job, build),
             verify=False)
         result_json = json.loads(request.text)
-        print(result_json)
-        return result_json['tests']
+        Job.update_tests(job, build, result_json['suites'][0]['cases'])
+        return result_json['suites'][0]['cases']
 
     @staticmethod
     def add_job_to_db(job, properties):

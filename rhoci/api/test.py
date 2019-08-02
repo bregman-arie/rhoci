@@ -17,7 +17,7 @@ from flask import jsonify
 import logging
 
 from rhoci.models.job import Job
-from rhoci.jenkins.tests import get_tests
+from rhoci.jenkins.tests import get_tests as load_tests
 
 LOG = logging.getLogger(__name__)
 
@@ -38,13 +38,14 @@ def all_tests():
 
 
 @bp.route('/job/<job_name>/<build_number>/tests')
-def get_test(job_name=None, build_number=None):
+def get_tests(job_name=None, build_number=None):
     """Return builds"""
     results = {'data': []}
-    job = Job.find(job_name, {"builds.number": build_number}, projection={'tests'})
-    if not job[0]['tests']:
-        tests = get_tests(job=job_name, build=build_number)
-        print(tests)
+    job = Job.find(job_name, build_number=int(build_number), exact_match=True,
+                   projection={'builds.$.tests': 1, '_id': 0})
+    if 'tests' in job[0]['builds'][0]:
+        tests = job[0]['builds'][0]['tests']
     else:
-        results['data'].append(job[0]['tests'])
-        return jsonify(results)
+        tests = load_tests(job=job_name, build=build_number)
+    results = {'data': tests}
+    return jsonify(results)

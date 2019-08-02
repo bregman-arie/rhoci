@@ -34,7 +34,7 @@ $("#builds_table").DataTable({
                 targets:[2],
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[3] != 0 ){
-                        data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['job_name'] + '/' + row['number'] + '">' + data + '</a>';
+                          data = '<a href="/jobs/' + row['job_name'] + '/' + data + '">' + data + '</a>';
                     }
                     return data;
                 }
@@ -62,7 +62,11 @@ $("#builds_table").DataTable({
             {
                 targets:5,
                 render: function ( data, type, row, meta ) {
-                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['job_name'] + '/' + row['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">';
+          {% if current_user.is_anonymous %}
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">';
+          {% else %}
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">   <a href="' + "{{ jenkins_url }}" + '/job/' + '/build"><img src="{{ url_for('static', filename='images/clock.png') }}">   <a href="' + "{{ jenkins_url }}" + '/job/' + '/configure"><img src="{{ url_for('static', filename='images/parameters.png') }}">  ';
+          {% endif %}
                   return data;
                 }
             },

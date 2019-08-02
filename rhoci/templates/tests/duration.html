@@ -1,0 +1,23 @@
+<canvas id="builds_last_week_chart" height="400"></canvas>
+
+<script>
+  var ctx = document.getElementById("builds_last_week_chart").getContext('2d');
+  var myChart = new Chart(ctx, {
+   type:"line",
+   data:{  
+      "labels": ["1", "2", "3", "4", "5", "6", "7"],
+      datasets:[  
+         {  
+            "label":"Duration",
+            "data": [3, 4.5, 5.2, 3.2, 4.8, 3.9, 5.1],
+            "fill":false,
+            "borderColor":"rgb(75, 192, 192)",
+            "lineTension":0.1
+         }
+      ]
+   },
+   options:{
+     maintainAspectRatio: false,
+   }
+});
+</script>

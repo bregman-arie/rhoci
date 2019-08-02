@@ -63,5 +63,8 @@ def register_blueprints(app):
     from rhoci.jobs import bp as jobs_bp
     app.register_blueprint(jobs_bp, url_prefix='/jobs')
 
+    from rhoci.test import bp as tests_bp
+    app.register_blueprint(tests_bp, url_prefix='/tests')
+
     from rhoci.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!-- Main container -->
+<br>
+<div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
+
+{% include "tests/table.html" -%}
+{% include "tests/table.js" -%}
+{% with header="Full build data" %}
+{% include "jobs/job_json_data.html" -%}
+{% endwith %}
+
+{% endblock %}

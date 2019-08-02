@@ -109,6 +109,7 @@ def squad_summary(DFG_name, squad_name):
             component_name=component)
     return render_template('DFG/summary.html', DFG_name=DFG_name,
                            squad_name=squad_name, uf=uf, pie=pie,
+                           components=components,
                            jenkins_url=jenkins_url, comps_uf=comps_uf)
 
 

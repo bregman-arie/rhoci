@@ -71,11 +71,27 @@ def job(name):
     uf = url_for('api.get_builds', job_name=name)
     job = Job.find(name=name)
     job[0].pop('_id')
-    job_json = json.dumps(job, indent=4, sort_keys=True,
-                          default=json_util.default)
+    entity_json = json.dumps(job, indent=4, sort_keys=True,
+                             default=json_util.default)
     jenkins_url = app.config['custom']['jenkins']['url']
     return render_template('jobs/one_job_summary.html', job_name=name,
-                           uf=uf, jenkins_url=jenkins_url, job_json=job_json)
+                           uf=uf, jenkins_url=jenkins_url,
+                           entity_json=entity_json)
+
+
+@bp.route('/<name>/<number>')
+def build(name, number):
+    """Specific build summary."""
+    uf = url_for('api.get_tests', job_name=name, build_number=number)
+    entity = Job.find(name, build_number=int(number),
+                      exact_match=True,
+                      projection={"builds.$": 1, "_id": 0})
+    entity_json = json.dumps(entity, indent=4, sort_keys=True,
+                             default=json_util.default)
+    jenkins_url = app.config['custom']['jenkins']['url']
+    return render_template('builds/one_build_summary.html', job_name=name,
+                           uf=uf, jenkins_url=jenkins_url, build_num=number,
+                           entity_json=entity_json)
 
 
 @bp.route('/exists')
