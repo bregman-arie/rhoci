@@ -1,4 +1,6 @@
 flask
+flask-login
+flask-wtf
 pymongo
 python-jenkins
 PyYAML

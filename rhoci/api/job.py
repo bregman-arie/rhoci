@@ -35,7 +35,7 @@ def jobs(query_str=None):
         query_str = eval(q_str)
     else:
         query_str = {}
-    results = {'data': Job.find(**query_str)}
+    results = {'data': Job.find({}, projection={'name': 1, 'last_build': 1})}
     print(datetime.datetime.now())
     return jsonify(results)
 

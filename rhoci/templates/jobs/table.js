@@ -4,7 +4,6 @@ $(document).ready(function() {
 $("#jobs_table").DataTable({
     "ajax": {
     'type': 'POST',
-    "pagingType": "scrolling",
     'url': "{{ url_for('api.jobs', query_str=query_str) }}",
     },
         "columns": [

@@ -88,10 +88,11 @@ class Job(object):
             Database.DATABASE['jobs'].find_one_and_update(
                 {"name": job_name},
                 {"$set": {"last_build": build}})
-        if build['status'] == "SUCCESS":
-            Database.DATABASE['jobs'].find_one_and_update(
-                {"name": job_name},
-                {"$set": {"last_successful_build": build}})
+        if 'status' in build:
+            if build['status'] == "SUCCESS":
+                Database.DATABASE['jobs'].find_one_and_update(
+                    {"name": job_name},
+                    {"$set": {"last_successful_build": build}})
 
     def json(self):
         return self.__dict__
