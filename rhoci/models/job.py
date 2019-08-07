@@ -99,7 +99,7 @@ class Job(object):
 
     @classmethod
     def count(cls, name=None, last_build_res=None, DFG=None, release=None,
-              squad=None, component=None):
+              squad=None, component=None, query_str=None):
         """Returns number of jobs based on passed arguments."""
         query = {}
         if name:
@@ -134,7 +134,7 @@ class Job(object):
     @classmethod
     def find(cls, name=None, exact_match=False,
              last_build_result=None, projection=None,
-             build_number=None, **kwargs):
+             build_number=None, query_str=None, **kwargs):
         """Returns find query."""
         query = {}
         if name and not exact_match:
@@ -148,6 +148,8 @@ class Job(object):
             query['last_build.result'] = last_build_result
         for k, v in kwargs.items():
             query[k] = v
+        if query_str:
+            query = query_str
         jobs = list(Database.find(collection="jobs", query=query,
                                   projection=projection))
         return jobs

@@ -13,7 +13,6 @@
 #    under the License.
 from __future__ import absolute_import
 
-import datetime
 from flask import jsonify
 from flask import request
 
@@ -25,18 +24,18 @@ LOG = logging.getLogger(__name__)
 
 from rhoci.api import bp  # noqa
 
+PROJECTION = {'name': 1, 'last_build': 1, 'release': 1}
+
 
 @bp.route('/jobs', methods=['GET', 'POST'])
 def jobs(query_str=None):
     """All jobs API route."""
-    print(datetime.datetime.now())
     q_str = request.args.get('query_str', default={})
     if q_str:
         query_str = eval(q_str)
     else:
         query_str = {}
-    results = {'data': Job.find({}, projection={'name': 1, 'last_build': 1})}
-    print(datetime.datetime.now())
+    results = {'data': Job.find(query_str=query_str, projection=PROJECTION)}
     return jsonify(results)
 
 
@@ -49,13 +48,16 @@ def get_jobs(DFG_name=None, squad_name=None,
     """Returns jobs."""
     results = {'data': []}
     if squad_name:
-        jobs = Job.find(squad=squad_name)
+        jobs = Job.find(squad=squad_name, )
     elif component_name:
-        jobs = Job.find(**{'DFG': DFG_name, 'component': component_name})
+        jobs = Job.find(query_str={'DFG': DFG_name, 'component': component_name},
+                        projection=PROJECTION)
     elif DFG_name:
-        jobs = Job.find(name='DFG-{}'.format(DFG_name))
+        jobs = Job.find(name='DFG-{}'.format(DFG_name),
+                        projection=PROJECTION)
     elif job_name:
-        jobs = Job.find(name=job_name, exact_match=True)
+        jobs = Job.find(name=job_name, exact_match=True,
+                        projection=PROJECTION)
     for job in jobs:
         results['data'].append(job)
     return jsonify(results)
