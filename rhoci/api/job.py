@@ -48,7 +48,7 @@ def get_jobs(DFG_name=None, squad_name=None,
     """Returns jobs."""
     results = {'data': []}
     if squad_name:
-        jobs = Job.find(squad=squad_name, )
+        jobs = Job.find(squad=squad_name, projection=PROJECTION)
     elif component_name:
         jobs = Job.find(query_str={'DFG': DFG_name, 'component': component_name},
                         projection=PROJECTION)

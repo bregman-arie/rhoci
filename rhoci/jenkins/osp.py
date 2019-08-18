@@ -34,7 +34,7 @@ def get_DFG_name(job_name):
 
 def get_component_name(job_name, DFG_name):
     """Returns component name."""
-    match = re.match(r"DFG-%s-(.*)-\d{1,2}" % DFG_name, job_name)
+    match = re.match(r"DFG-%s-(.*?)-\d{1,2}" % (DFG_name), job_name)
     if match:
         return match.group(1)
     else:
