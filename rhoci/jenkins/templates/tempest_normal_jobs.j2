@@ -15,10 +15,9 @@
    {% set overcloud_override = overcloud_override ~ '\n' ~ '        --tls-everywhere yes \\'  %}
    {% set name = name ~ '-tls' %}
 {% endif %}
-{% if networker_node == 'yes' %}
+{% if jjb['networker_node'] == 'yes' %}
    {% set job_name_suffix = job_name_suffix ~ '-composable' %}
    {% set topology_nodes = topology_nodes ~ ',networker:2' %}
-
    {% set topology_str = topology_str ~ '_2net' %}
    {% set name = name ~ '-composable' %}
 {% endif %}

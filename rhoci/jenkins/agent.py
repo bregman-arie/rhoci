@@ -105,6 +105,8 @@ class JenkinsAgent():
                 job['name'], properties['DFG'])
             properties['squad'] = DFG_db.get_squad(properties['DFG'],
                                                    properties['component'])
+            properties['tester'] = osp.get_tester(job['name'])
+
         if properties['class'] != 'folder':
             release = osp.get_release(job['name'])
             properties['release'] = release

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!-- Main container -->
+<br>
+<div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
+
+<h3>10 newest added jobs by date:</h3>
+
+{% include "jobs/last_added_table.html" -%}
+{% include "jobs/last_added_table.js" -%}
+
+{% endblock %}

@@ -1,63 +1,11 @@
-{% extends "layout.html" %}
-
-{% block content %}
-
-<!-- Main container -->
-<br>
-<div class="container-fluid col-md-custom col-md-offset-custom">
-  <div class="row text-center">
-  </div>
-
-{% include "DFG/table.html" -%}
-<br>
-<h3>Status per release</h3>
-<div class="row">
-{% for rel,val in pie.items() %}
-  {% include "jobs/pie_chart.html" -%}
-{% endfor %}
-</div>
-
-{% if squads_uf is defined %}
-<h3>Squads</h3>
-
-<div class="row">
-
-{% for squad in squads %}
- {% with squad=squad %}
-   {% include "DFG/one_grp_card_name_only.html" -%}
- {% endwith %}
-{% endfor %}
-
-</div> <!-- row -->
-
-<br>
-<br>
-
-{% endif %}
-
-{% if comps_uf is defined %}
-<h3>Components</h3>
-
-<div class="row">
-
-{% for comp in components %}
- {% with squad=comp, squads_uf=comps_uf %}
-   {% include "DFG/one_grp_card_name_only.html" -%}
- {% endwith %}
-{% endfor %}
-
-</div> <!-- row -->
-
-<br>
-<br>
-
-{% endif %}
-
 <script>
 $(document).ready(function() {
 
 $("#jobs_table").DataTable({
-        "ajax": "{{ uf }}",
+    "ajax": {
+    'type': 'POST',
+    'url': "{{ url_for('api.jobs', query_str=query_str) }}",
+    },
         "columns": [
           {"data": "name"},
           {"data": "last_build.status",
@@ -67,11 +15,10 @@ $("#jobs_table").DataTable({
            "defaultContent": "None"
           },
           {"data": "last_build.timestamp",
-           "defaultContent": "No Date"
+           "defaultContent": "None"
           },
-          {"data": "last_successful_build.timestamp",
-           "defaultContent": "No Date"
-          },
+          {"data": "name"},
+          {"data": "name"},
           ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         status = aData.last_build.status;
@@ -81,62 +28,53 @@ $("#jobs_table").DataTable({
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                        data = '<a href="/jobs/' + data + '">' + data + '</a>';
-                    }
-                    return data;
-                }
-            },
-            {
-                targets:[2],
-                "visible": false,
-                render: function ( data, type, row, meta ) {
-                    if(type === 'display' && row[3] != 0 ){
-                        data = '<a href="/job/' + row['job_name'] + '/' + row['last_build_number'] + '">' + data + '</a>';
-                    }
-                    return data;
+                      return $('<a>')
+                       .attr('href', data)
+                       .text(data)
+                       .wrap('<div></div>')
+                       .parent()
+                       .html();
+                      }
+                  else { return data; }
                 }
             },
             {
                 targets:[1],
                 render: function ( data, type, row, meta ) {
-                  data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '">' + row['last_build']['status'] + '</a>';
+                    data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '">' + row['last_build']['status'] + '</a>';
                     return data;
                 }
             },
             {
-                targets:5,
+                targets:4,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[1] != 0 && (row['last_build']['status'] == 'SUCCESS' || row['last_build']['status'] == 'UNSTABLE')){
                     data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/testReport' + '">Tests</a>';
                     }
                     else {
-                      data = 'None';
+                      data = 'No Tests';
                     }
                     return data;
                 }
             },
             {
-                targets:6,
-                render: function ( data, type, row, meta ) {
+                targets:5,
+                      render: function ( data, type, row, meta ) {
           {% if current_user.is_anonymous %}
                     data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">';
           {% else %}
                     data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/consoleFull"><img src="{{ url_for('static', filename='images/terminal.png') }}">   <a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/build"><img src="{{ url_for('static'      , filename='images/clock.png') }}">   <a href="' + "{{ jenkins_url }}" + '/job/' + row['name'] + '/' + row['last_build']['number'] + '/configure"><img src="{{ url_for('static', filename='images/gear.png') }}">  ';
           {% endif %}
-                  return data;
-                }
-            },
+
+                      return data;
+                      }
+            }
         ],
   processing: true,
-  order: [[ 2, "desc" ]],
-  searchPane: {
-        columns: [1, 2],
-    },
   search: { "regex": true }, 
+  "lengthChange": false,
+  deferRender: true,
 });
 
 });
 </script>
-
-<!-- -->
-{% endblock %}

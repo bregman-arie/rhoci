@@ -137,8 +137,8 @@ class Job(object):
              build_number=None, query_str=None, **kwargs):
         """Returns find query."""
         query = {}
-        if name and not exact_match:
-            regex = re.compile(name, re.IGNORECASE)
+        if (name or (query_str and "name" in query_str)) and not exact_match:
+            regex = re.compile(name or query_str['name'], re.IGNORECASE)
             query['name'] = regex
         elif name:
             query['name'] = name
@@ -148,10 +148,17 @@ class Job(object):
             query['last_build.result'] = last_build_result
         for k, v in kwargs.items():
             query[k] = v
-        if query_str:
+        if query_str and "last_added" not in query_str:
+            if "name" in query_str:
+                regex = re.compile(query_str['name'], re.IGNORECASE)
+                query_str['name'] = regex
             query = query_str
-        jobs = list(Database.find(collection="jobs", query=query,
-                                  projection=projection))
+        if query_str and "last_added" in query_str:
+            jobs = list(Database.find(collection="jobs", query={'last_build.status': 'None', 'release': "15"},
+                                      projection=projection).limit(10))
+        else:
+            jobs = list(Database.find(collection="jobs", query=query,
+                                      projection=projection))
         return jobs
 
     @classmethod

@@ -27,6 +27,22 @@ def get_job_class(job):
         return 'utility'
 
 
+def get_tester(job):
+    """Returns job's tester type."""
+    if 'pep8' in job:
+        return 'pep8'
+    if 'unit' in job:
+        return 'unit'
+    if 'functional' in job:
+        return 'functional'
+    if 'tempest' in job:
+        return 'tempest'
+    if 'rally' in job:
+        return 'rally'
+    if 'sts' in job:
+        return 'sts'
+
+
 def get_DFG_name(job_name):
     """Returns DFG name."""
     return job_name.split('-')[1]
@@ -43,4 +59,4 @@ def get_component_name(job_name, DFG_name):
 
 def get_release(job_name):
     m = re.search(r"-\d{1,2}", job_name)
-    return m.group().split('-')[1] if m else 0
+    return m.group().split('-')[1] if m else None

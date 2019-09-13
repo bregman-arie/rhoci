@@ -130,6 +130,18 @@
 		  </div>
 	  </div>
 
+  <center>
+      <button style="display:none;" type="button" class="btn btn-danger" id="submit">Submit</button>
+  </center>
+
+  <br>
+
+  <div style="display:none;" id="no_connection_div" class="container">
+    <div class="alert alert-danger">
+      <strong>Couldn't form a connection.</strong> Please check you are connected to the internal network
+    </div>
+  </div>
+
 <script>
 
 $(function() {
@@ -142,6 +154,7 @@ $(function() {
 
     $("#job_exists_output_div").hide();
     $("#no_job_div").hide();
+    $("#no_connection_div").hide();
 
     if (DFG && tester && component)
     {
@@ -152,6 +165,7 @@ $(function() {
       data: formData,
 			type: 'POST',
 			success: function(response){
+         $("#submit").show();
          $("#jjb_output_div").show();
          $("#jjb_output_div").css({"max-width": "1000px", "word-wrap": "break-word", "overflow-wrap": "break-word", "margin": "0 auto"});
          $("#jjb_output").css({"max-width": "1000px", "word-wrap": "break-word", "overflow-wrap": "break-word", "margin": "0 auto", "white-space": "pre-wrap"});
@@ -209,7 +223,12 @@ $(function() {
 	});
 });
 
+$(function() {
+	$('button#submit').click(function(){
 
+    $("#no_connection_div").show();
+});
+});
 
 </script>
 

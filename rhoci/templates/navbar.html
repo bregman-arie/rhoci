@@ -35,6 +35,7 @@
                 <a class="dropdown-item" href="{{ url_for('jobs.index') }}">All</a>
                 <a class="dropdown-item" href="{{ url_for('jobs.generate') }}">Generate</a>
                 <a class="dropdown-item" href="{{ url_for('jobs.search') }}">Search</a>
+                <a class="dropdown-item" href="{{ url_for('jobs.last_added') }}">Last Added</a>
               </div>
           </li>
 
@@ -47,6 +48,7 @@
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="{{ url_for('jobs.builds') }}">All</a>
                 <a class="dropdown-item" href="{{ url_for('jobs.search_builds') }}">Search</a>
+                <a class="dropdown-item" href="{{ url_for('jobs.active_builds') }}">Active Builds</a>
               </div>
           </li>
 

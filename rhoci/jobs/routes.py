@@ -50,6 +50,18 @@ def index():
                            form=form)
 
 
+@bp.route('/last_added')
+def last_added():
+    """Last added jobs."""
+    jenkins_url = app.config['custom']['jenkins']['url']
+    form = Dummy()
+    query_str = {"last_added": 1}
+    return render_template('jobs/last_added.html',
+                           jenkins_url=jenkins_url,
+                           query_str=query_str,
+                           form=form)
+
+
 @bp.route('/builds')
 def builds():
     """All builds."""
@@ -151,3 +163,8 @@ def search_builds():
         return redirect(url_for('builds.index', query=q))
     else:
         return render_template('builds/search.html', form=form)
+
+
+@bp.route('/builds/active', methods=['GET', 'POST'])
+def active_builds():
+    pass
