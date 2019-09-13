@@ -31,4 +31,19 @@ var myChart = new Chart(ctx, {
         }
     }
 });
+
+document.getElementById("overall_status_chart").onclick = function(evt)
+{
+  var activePoints = myChart.getElementsAtEvent(evt);
+  if(activePoints.length > 0)
+    {
+      //get the internal index of slice in pie chart
+      var clickedElementindex = activePoints[0]["_index"];
+
+      //get specific label by index
+      var label = myChart.data.labels[clickedElementindex];
+      var uppercase_label = label.toUpperCase();
+      window.location = "{{ url_for('jobs.index', query={'last_build.status': 'LABEL'}) }}".replace("LABEL", uppercase_label);
+    }
+}
 </script>
