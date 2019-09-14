@@ -110,4 +110,5 @@ class JenkinsAgent():
         if properties['class'] != 'folder':
             release = osp.get_release(job['name'])
             properties['release'] = release
-            JenkinsAgent.add_job_to_db(job, properties)
+            if not job['name'].startswith('DFG-rear') and not job['name'].startswith('risk-1'):
+                JenkinsAgent.add_job_to_db(job, properties)

@@ -11,26 +11,31 @@
   <!-- DFG input start -->
     <label>DFG</label>
     <input type="text" id="DFG_input" name="DFG" class="form-control" value="network">
+    <br>
   <!-- DFG input end -->
 
   <!-- component input start -->
     <label>Component</label>
     <input type="text" id="component_input" name="component" class="form-control" value="neutron">
+    <br>
   <!-- component input end -->
 
   <!-- tester input start -->
     <label>Tester</label>
     <input type="text" id="tester_input" name="tester" required class="form-control" value="tempest">
+    <br>
   <!-- tester input end -->
 
   <!-- tempest tests input start -->
     <label>Tempest Tests</label>
     <input type="text" name="tester" required class="form-control" value="neutron">
+    <br>
   <!-- tempest tests input end -->
 
   <!-- release input start -->
     <label>Release</label>
     <input type="text" name="release" required class="form-control" value="15">
+    <br>
   <!-- release input end -->
 
   <!-- network driver input start -->
@@ -180,6 +185,7 @@ $(function() {
     else
     {
          $("#missing_input_div").show();
+         $("#submit").hide();
          $("#jjb_output_div").hide();
     }
 

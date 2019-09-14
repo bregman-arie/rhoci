@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 
 from rhoci.api import bp  # noqa
 
-PROJECTION = {'name': 1, 'last_build': 1, 'release': 1}
+PROJECTION = {'name': 1, 'last_build': 1, 'release': 1, 'last_successful_build': 1}
 
 
 @bp.route('/jobs', methods=['GET', 'POST'])

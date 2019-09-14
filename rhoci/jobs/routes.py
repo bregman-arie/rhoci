@@ -127,6 +127,8 @@ def search():
     q = {}
     if form.name.data:
         q['name'] = form.name.data
+    if form.release.data:
+        q['release'] = form.release.data
     if form.DFG.data:
         q['DFG'] = form.DFG.data
     if form.squad.data:
