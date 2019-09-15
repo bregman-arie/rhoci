@@ -11,4 +11,13 @@
 {% include "jobs/table.html" -%}
 {% include "jobs/table.js" -%}
 
+          <div class="row">
+<br>
+{% include "jobs/pie_chart_per_status.html" -%}
+<br>
+{% include "jobs/pie_chart_per_release.html" -%}
+<br>
+{% include "jobs/pie_chart_per_tester.html" -%}
+          </div>
+
 {% endblock %}

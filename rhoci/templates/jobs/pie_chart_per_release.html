@@ -1,0 +1,78 @@
+  <div class="container-fluid col-md-4 col-lg-offset-4">
+              <div class="card shadow mb-4 h-100 text-center">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header">
+                  <h6 class="m-0 font-weight-bold text-primary">Releases</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-pie pt-4 pb-2">
+<canvas id="release_chart" width="20" height="20"></canvas>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+
+<script>
+  var ctx = document.getElementById("release_chart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'horizontalBar',
+    data: {
+      labels: [{% for key,item in releases.items() %} {{ key }}, {% endfor %}],
+        datasets: [{
+          data: [{% for key,item in releases.items() %} {{ item }}, {% endfor %}],
+            backgroundColor: [
+                'rgba(255,99,132,0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(255, 192, 192, 0.5)',
+                'rgba(204, 192, 192, 0.5)',
+                'rgba(204, 204, 19, 0.5)',
+                'rgba(04, 204, 19, 0.5)',
+                'rgba(152, 64, 19, 0.5)',
+                'rgba(152, 4, 19, 0.5)',
+                'rgba(152, 63, 212, 0.5)',
+                'rgba(11, 11, 125, 0.5)',
+                'rgba(11, 11, 5, 0.5)',
+            ],
+            borderColor: [
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+            ],
+            borderWidth: 0.3
+        }]
+    },
+    options: {
+       legend: {
+            display: false
+         },
+        scales: {
+            yAxes: [{
+              scaleLabel: {
+        display: true,
+        labelString: 'release number'
+      },
+                ticks: {
+                    beginAtZero:true
+                }
+            }],
+          xAxes: [{
+              scaleLabel: {
+        display: true,
+        labelString: 'number of jobs'
+      }
+          }]
+        }
+    }
+});
+
+</script>

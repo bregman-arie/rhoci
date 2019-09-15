@@ -137,17 +137,15 @@ class Job(object):
              build_number=None, query_str=None, **kwargs):
         """Returns find query."""
         query = {}
-        if (name or (query_str and "name" in query_str)) and not exact_match:
-            regex = re.compile(name or query_str['name'], re.IGNORECASE)
-            query['name'] = regex
-        elif name:
-            query['name'] = name
         if build_number:
             query['builds.number'] = build_number
         if last_build_result:
             query['last_build.result'] = last_build_result
         for k, v in kwargs.items():
             query[k] = v
+        if name:
+            regex = re.compile(name, re.IGNORECASE)
+            query['name'] = regex
         if query_str and "last_added" not in query_str:
             if "name" in query_str:
                 regex = re.compile(query_str['name'], re.IGNORECASE)

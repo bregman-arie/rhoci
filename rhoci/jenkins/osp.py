@@ -41,6 +41,8 @@ def get_tester(job):
         return 'rally'
     if 'sts' in job:
         return 'sts'
+    if 'director' in job:
+        return 'tempest'
 
 
 def get_DFG_name(job_name):
@@ -59,4 +61,7 @@ def get_component_name(job_name, DFG_name):
 
 def get_release(job_name):
     m = re.search(r"-\d{1,2}", job_name)
-    return m.group().split('-')[1] if m else None
+    if m:
+        rel = m.group().split('-')[1]
+        if int(rel) > 7 and int(rel) < 30:
+            return rel

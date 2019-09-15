@@ -1,0 +1,65 @@
+  <div class="center-block container-fluid col-md-4 col-lg-offset-4">
+              <div class="card shadow mb-4 h-100 text-center">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header">
+                  <h6 class="m-0 font-weight-bold text-primary">Jobs Status</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-pie pt-4 pb-2">
+<canvas id="overall_status_chart" width="20" height="20"></canvas>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+
+<script>
+  var ctx = document.getElementById("overall_status_chart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: [ 'FAILURE', 'UNSTABLE', 'SUCCESS' ],
+        datasets: [{
+          data: [ {{ statuses['FAILURE'] }}, {{ statuses['UNSTABLE'] }} , {{ statuses['SUCCESS'] }} ],
+            backgroundColor: [
+                'rgba(255,99,132,0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(255, 192, 192, 0.5)',
+                'rgba(204, 192, 192, 0.5)',
+                'rgba(204, 204, 19, 0.5)',
+                'rgba(04, 204, 19, 0.5)',
+                'rgba(152, 64, 19, 0.5)',
+                'rgba(152, 4, 19, 0.5)',
+                'rgba(152, 63, 212, 0.5)',
+                'rgba(11, 11, 125, 0.5)',
+                'rgba(11, 11, 5, 0.5)',
+            ],
+            borderColor: [
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+                'rgba(0,0,0,1)',
+            ],
+            borderWidth: 0.3
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+</script>

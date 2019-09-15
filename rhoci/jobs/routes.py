@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+from collections import Counter
 from bson import json_util
 from flask import current_app as app
 from flask import jsonify
@@ -30,6 +31,8 @@ from rhoci.forms.job import JobSearch
 from rhoci.forms.build import BuildSearch
 from rhoci.forms.test import TestSearch
 
+PROJECTION = {'name': 1, 'last_build': 1, 'release': 1, 'last_successful_build': 1,
+              'tester': 1}
 LOG = logging.getLogger(__name__)
 
 from rhoci.jobs import bp  # noqa
@@ -41,12 +44,26 @@ def index():
     """All jobs."""
     jenkins_url = app.config['custom']['jenkins']['url']
     query_str = request.args.to_dict()
+    query_s = request.args.to_dict()
     if 'query' in query_str:
-        query_str = query_str['query']
+        query_str = eval(query_str['query'])
+        jobs = Job.find(query_str=query_str, projection=PROJECTION)
+    else:
+        jobs = Job.find(projection=PROJECTION)
     form = Dummy()
+    statuses = Counter([job['last_build']['status'] for job in jobs if 'status' in job['last_build']])
+    releases = Counter([job['release'] for job in jobs if 'release' in job and job['release']])
+    testers = Counter([job['tester'] for job in jobs if 'tester' in job and job['tester']])
+    if "query" in query_s:
+        query_string = query_s['query']
+    else:
+        query_string = query_s
     return render_template('jobs/index.html',
                            jenkins_url=jenkins_url,
-                           query_str=query_str,
+                           query_str=query_string,
+                           releases=dict(releases),
+                           statuses=dict(statuses),
+                           testers=dict(testers),
                            form=form)
 
 
