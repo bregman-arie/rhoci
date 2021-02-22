@@ -34,6 +34,7 @@ def all_tests():
             if 'tests' in build:
                 for test in build['tests']:
                     results['data'].append(test)
+    print(results['data'][0])
     return jsonify(results)
 
 

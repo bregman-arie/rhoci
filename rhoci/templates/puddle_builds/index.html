@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!-- Main container -->
+<br>
+<div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
+
+{% include "builds/table.html" -%}
+{% include "builds/table.js" -%}
+
+{% endblock %}

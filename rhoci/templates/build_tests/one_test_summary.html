@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!-- Main container -->
+<br>
+<div class="container-fluid col-md-custom col-md-offset-custom">
+  <div class="row text-center">
+  </div>
+
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-xl-9 col-lg-7 mb-4">
+              <div class="card shadow mb-4 h-100">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Test Duration for Every Build</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-area">
+                    {% include "tests/duration.html" -%}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="col-xl-3 col-lg-5 mb-4">
+              <div class="card shadow mb-4 h-100 text-center">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header">
+                  <h6 class="m-0 font-weight-bold text-primary">Test Statuses</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="chart-pie pt-4 pb-2">
+                     {% include "tests/pie_chart.html" -%}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+</div>
+
+{% endblock %}

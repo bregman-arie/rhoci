@@ -1,0 +1,22 @@
+<div class="col-md-3">
+  <div class="card text-center">
+    <a href="{{ puddle['url_for'] }}" style="text-decoration: none">
+      <h3>
+        <div class="card-header"> {{ puddle['id'] }} </div>
+      </h3>
+      <div "card-pf-top-element text-center">
+      </div>
+      <div class="text-info text-center mt-2">
+        <h4></h4>
+      </div>
+    </a>
+  </div>
+</div>
+
+<script>
+  function no_image(source) {
+    source.onerror = "";
+    source.src = "{{ url_for('static', filename='images/users.png') }}";
+    return true;
+  }
+</script>

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+
+  <div class="form-group center-block container-fluid col-md-2 col-lg-offset-1">
+<form method="post">
+    {{ form.csrf_token }}
+  <!-- form start-->
+
+    <label>Job:</label>
+    <br>
+    {{ form.job }}
+    <br>
+    <label>Build number:</label>
+    <br>
+    {{ form.number }}
+    <br>
+    <label>Status:</label>
+    <br>
+    {{ form.status }}
+    <br>
+    <label>Parameters:</label>
+    <br>
+    {{ form.parameters }}
+    <br>
+    <label>Artifacts:</label>
+    <br>
+    {{ form.artifacts }}
+    <br>
+    <br>
+    <label>Cleanup:</label>
+    {{ form.cleanup }}
+    <br>
+  <!-- form end-->
+  <br>
+
+
+      <button type="submit" class="btn btn-primary">Search</button>
+</div>
+</form>
+
+{% endblock %}

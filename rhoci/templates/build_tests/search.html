@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<br>
+
+
+  <div class="form-group center-block container-fluid col-md-2 col-lg-offset-1">
+<form method="post">
+    {{ form.csrf_token }}
+  <!-- form start-->
+
+    <label>Class name:</label>
+    <br>
+    {{ form.class_name }}
+    <br>
+    <label>Test name:</label>
+    <br>
+    {{ form.test_name }}
+    <br>
+    <label>Status:</label>
+    <br>
+    {{ form.status }}
+    <br>
+    <label>Failed since:</label>
+    <br>
+    {{ form.failed_since }}
+    <br>
+    <label>Skipped message:</label>
+    <br>
+    {{ form.skipped_message }}
+    <br>
+    <label>Stdout:</label>
+    <br>
+    {{ form.stdout }}
+    <br>
+    <label>Stderr:</label>
+    <br>
+    {{ form.stderr }}
+    <br>
+    <label>Skipped:</label>
+    {{ form.skipped }}
+    <br>
+
+  <!-- form end-->
+  <br>
+
+
+      <button type="submit" class="btn btn-primary">Search</button>
+</div>
+</form>
+
+{% endblock %}

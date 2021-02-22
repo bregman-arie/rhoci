@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+
+  <!-- Breadcrumbs-->
+  {% with breadcrumb_section=title %}
+     {% include "breadcrumb.html" %}
+  {% endwith %}
+
+  <div class="row">
+
+     {% for puddle in puddles %}
+       {% with puddle=puddle %}
+         {% include "puddle_card.html" -%}
+       {% endwith %}
+     {% endfor %}
+
+  </div> <!-- row -->
+
+</div> <!-- /container-fluid -->
+
+        
+
+{% endblock %}

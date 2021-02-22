@@ -12,6 +12,7 @@ jinja2 = "*"
 urllib3 = "*"
 flask-login = "*"
 flask-wtf = "*"
+elasticsearch = "*"
 
 [dev-packages]
 
