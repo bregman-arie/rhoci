@@ -13,6 +13,7 @@
 #    under the License.
 from __future__ import absolute_import
 
+from collections import defaultdict
 from elasticsearch import Elasticsearch
 from flask import flash
 from flask import jsonify
@@ -27,6 +28,7 @@ import logging
 from werkzeug.urls import url_parse
 import yaml
 
+from rhoci.jenkins.osp import get_release
 from rhoci.forms.login import Login
 from rhoci.forms.register import Register
 from rhoci.models.job import Job
@@ -102,6 +104,7 @@ def build_tests(job_name, build_number):
 
 @bp.route('/puddle/<puddle_id>/builds')
 def get_puddle_builds(puddle_id):
+    jobs = defaultdict(dict)
     with open(r'/etc/arie.yaml') as file:
         data = yaml.load(file, Loader=yaml.FullLoader)
     body = {"query": {"bool": { "must": [{"exists": {"field": "job_name.keyword"}}, {"match": {"core_puddle.keyword": puddle_id}}]}}, "size": 9000, "_source": ["job_name", "build_num"],  "aggs": { "jobs": { "terms": {"field": "job_name.keyword"}, "aggregations": {"builds": {"terms": { "field": "build_num" }}}}}}
@@ -112,7 +115,15 @@ def get_puddle_builds(puddle_id):
         for build in job['builds']['buckets']:
             body = {"query": {"bool": { "must": [{"exists": {"field": "build_result.keyword"}}, {"match": {"job_name.keyword": job['key']}}, {"match": {"build_num": build['key']}}]}}, "size": 9000, "_source": ["job_name", "build_num", "build_result"]}
             builds_res = es.search(index="logstash", body=body)
-            results['data'].append({'number': build['key'], 'job_name': job['key'], 'status': builds_res['hits']['hits'][0]['_source']['build_result']})
+            if builds_res['hits']['hits']:
+                for build_res in builds_res['hits']['hits']:
+                    build_result = build_res['_source']['build_result']
+                    jobs[job['key']] = {'job_name': job['key'], 'status': build_result, 'number': build['key']}
+            else:
+                jobs[job['key']] = {'job_name': job['key'], 'status': 'In Progress', 'number': build['key']}
+    for job_name, value in jobs.items():
+        results['data'].append(value)
+    print(results)
     return jsonify(results)
 
 @bp.route('/puddle/<puddle_id>')
@@ -131,7 +142,8 @@ def release_summary(release_number):
         "size": 0,
         "aggs" : {
             "jobs" : {
-                "terms" : { "field" : "core_puddle.keyword",  "size" : 4000 }
+                "terms" : {"field" : "core_puddle.keyword",
+                           "size" : 4000 }
             }
         }
     }

@@ -1,4 +1,5 @@
 flask
+elasticsearch
 flask-login
 flask-wtf
 pymongo

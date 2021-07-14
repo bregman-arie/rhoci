@@ -13,7 +13,9 @@
 #    under the License.
 from __future__ import absolute_import
 
+from elasticsearch import Elasticsearch
 import re
+import yaml
 
 from rhoci.database import Database
 
@@ -47,14 +49,20 @@ class DFG(object):
         DFG name from the job name and makes sure the set is unique.
         """
         DFGs = []
-        regex = re.compile('DFG-', re.IGNORECASE)
-        DFG_jobs = Database.find(collection='jobs',
-                                 query={'name': regex})
-        for job in DFG_jobs:
-            jname = job['name']
-            DFG_name = jname.split('-')[1] if '-' in jname else jname
-            if DFG_name not in DFGs:
-                DFGs.append(DFG_name)
+        with open(r'/etc/arie.yaml') as file:
+            data = yaml.load(file, Loader=yaml.FullLoader)
+        es = Elasticsearch(data['elk']['es_url'])
+        body = {
+            "size": 0,
+            "aggs" : {
+                "jobs" : {
+                    "terms" : { "field" : "DFG.keyword",  "size" : 4000 }
+                }
+            }
+        }
+        result = es.search(index="logstash", body=body)
+        for bucket in result["aggregations"]['jobs']['buckets']:
+            DFGs.append(bucket['key'])
         return DFGs
 
     @classmethod

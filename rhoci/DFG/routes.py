@@ -35,8 +35,6 @@ def DFGs():
     for DFG_name in all_DFGs:
         uf = url_for('DFG.summary', DFG_name=DFG_name)
         DFGs_data.append({'name': DFG_name,
-                          'num_of_jobs': Job.count(
-                              name="DFG-{}".format(DFG_name)),
                           'summary_url_for': uf})
     return render_template('DFG/all.html', DFGs=DFGs_data, title=title)
 
@@ -84,12 +82,14 @@ def summary(DFG_name):
     squads_uf = {}
     uf = url_for('api.get_jobs', DFG_name=DFG_name)
     jenkins_url = app.config['custom']['jenkins']['url']
-    pie = Job.get_builds_count_per_release(DFG=DFG_name)
-    found_DFG = DFG.find_one(DFG_name)
-    if found_DFG['squads']:
-        for squad in found_DFG['squads']:
-            squads_uf[squad] = url_for('DFG.squad_summary',
-                                       DFG_name=DFG_name, squad_name=squad)
+    # pie = Job.get_builds_count_per_release(DFG=DFG_name)
+    pie = {}
+    found_DFG = {'squads': []}
+    # found_DFG = DFG.find_one(DFG_name)
+    # if found_DFG['squads']:
+    #    for squad in found_DFG['squads']:
+    #        squads_uf[squad] = url_for('DFG.squad_summary',
+    #                                   DFG_name=DFG_name, squad_name=squad)
     return render_template('DFG/summary.html', DFG_name=DFG_name, uf=uf,
                            jenkins_url=jenkins_url, pie=pie,
                            squads=found_DFG['squads'], squads_uf=squads_uf)
@@ -102,11 +102,12 @@ def squad_summary(DFG_name, squad_name):
     uf = url_for('api.get_jobs', DFG_name=DFG_name, squad_name=squad_name)
     jenkins_url = app.config['custom']['jenkins']['url']
     pie = Job.get_builds_count_per_release(DFG=DFG_name, squad=squad_name)
-    components = DFG.get_squad_components(DFG_name, squad_name)
-    for component in components:
-        comps_uf[component] = url_for(
-            'DFG.component_summary', DFG_name=DFG_name,
-            component_name=component)
+    components = []
+    # components = DFG.get_squad_components(DFG_name, squad_name)
+    # for component in components:
+    #    comps_uf[component] = url_for(
+    #        'DFG.component_summary', DFG_name=DFG_name,
+    #        component_name=component)
     return render_template('DFG/summary.html', DFG_name=DFG_name,
                            squad_name=squad_name, uf=uf, pie=pie,
                            components=components,

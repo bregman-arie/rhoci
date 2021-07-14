@@ -60,8 +60,8 @@ def get_component_name(job_name, DFG_name):
 
 
 def get_release(job_name):
-    m = re.search(r"-\d{1,2}", job_name)
+    m = re.search(r"-\d{1,2}(\.\d)?", job_name)
     if m:
         rel = m.group().split('-')[1]
-        if int(rel) > 7 and int(rel) < 30:
+        if float(rel) > 7 and float(rel) < 30:
             return rel
