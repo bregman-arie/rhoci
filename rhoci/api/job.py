@@ -17,6 +17,7 @@ from collections import defaultdict
 from elasticsearch import Elasticsearch
 from flask import jsonify
 from flask import request
+import json
 import yaml
 
 import logging
@@ -43,12 +44,55 @@ def jobs(query_str=None):
     return jsonify(results)
 
 
+@bp.route('/jobs/filtered', methods=['GET', 'POST'])
+@bp.route('/jobs/filtered?filters=<filters>', methods=['GET', 'POST'])
+def get_filtered_jobs(filters=None):
+    filters = request.args.get('filters')
+    if filters and filters != "undefined":
+        filters_dict = json.loads(filters)
+    else:
+        filters_dict = {}
+    results = {'data': []}
+    with open(r'/etc/arie.yaml') as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+    es = Elasticsearch(data['elk']['es_url'])
+    body = {
+        "query": {
+            "bool": {}},
+        "size": 0,
+        "aggs": {
+            "jobs": {
+                "terms": {"field": "job_name.keyword",
+                          "size": 1000},
+                "aggs": {
+                    "builds": {
+                        "terms": {"field": "build_num"},
+                        "aggs": {
+                            "status": {
+                                "terms": {"field": "build_result.keyword"}
+                }
+            }
+        }}}}}
+    if filters_dict:
+        body["query"]["bool"]["filter"] = []
+        filters_modified = {"{}.keyword".format(k):v for k,v in filters_dict.items()}
+        for f,v in filters_modified.items():
+            body["query"]["bool"]["filter"].append({ "term": {f:v} })
+    res = es.search(index="logstash", body=body)
+    for job in res['aggregations']['jobs']['buckets']:
+        if job['builds']['buckets'] and job['builds']['buckets'][-1]['status']['buckets']:
+            status = job['builds']['buckets'][-1]['status']['buckets'][-1]['key']
+        else:
+            status = "None"
+        results['data'].append({'job_name': job['key'], 'build_number': int(job['builds']['buckets'][-1]['key']), 'status': status})
+    return jsonify(results)
+
+
+
 @bp.route('/jobs/<DFG_name>/<status>')
 @bp.route('/jobs/DFG=<DFG_name>')
 @bp.route('/jobs/<job_name>')
 @bp.route('/jobs/all')
-@bp.route('/jobs/<DFG_name>/squad/<squad_name>')
-@bp.route('/jobs/<DFG_name>/component/<component_name>')
 def get_jobs(DFG_name=None, squad_name=None,
              component_name=None, job_name=None, status=None):
     """Returns jobs."""

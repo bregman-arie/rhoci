@@ -118,8 +118,19 @@ def generate():
 @bp.route('/search', methods=['GET', 'POST'])
 def search():
     uf = url_for('api.get_jobs')
-    filters = [('name', 'type', ['val1', 'val2', 'val3'])]
-    return render_template('builds/search.html', uf=uf, search_pane=False, filters=filters)
+    custom_search_uf = url_for('api.get_filtered_jobs')
+    filters = [
+        ('ip_version', str, ['ipv4', 'ipv6']),
+        ('overcloud_ssl', str, ['yes', 'no']),
+        ('storage_backend', str, ['ceph']),
+        ('network_backend', str, ['geneve', 'vlan', 'vxlan']),
+        ('l2gw', str, ['no', 'yes']),
+        ('dvr', str, ['yes', 'no']),
+        ('bgpvpn', str, ['yes', 'no']),
+        ('osp_release', str, ['13', '14', '15', '16', '16.1', '16.2', '17'])
+        ]
+    return render_template('builds/search.html', uf=uf, search_pane=False, filters=filters,
+                           custom_search_uf=custom_search_uf)
 
 
 @bp.route('/tests/search', methods=['GET', 'POST'])

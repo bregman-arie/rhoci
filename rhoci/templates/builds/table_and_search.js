@@ -13,6 +13,13 @@ var filters_array = [];
 {% endfor %}
 init_filter_widget(filters_array, function() {get_results(filters_array)});
 
+  function get_results(filters) {
+    var table = $("#builds_table").DataTable();
+    table.ajax.data = {'filters': filters};
+    console.log(get_active_filter())
+    table.ajax.url("{{ custom_search_uf }}?filters=" + JSON.stringify(get_active_filter()) ).load();
+  };
+
 $("#builds_table").DataTable({
     "ajax": "{{ uf }}",
         "columns": [
