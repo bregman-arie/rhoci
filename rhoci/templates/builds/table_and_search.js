@@ -6,15 +6,6 @@ $('#menu li:nth-child(1) a').addClass('active');
 $("#execute_button").css('display', 'inline');
 $("#graph_button").css('display', 'inline');
 
-if (get_active_filter() == undefined) {
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
-    var yyyy = today.getFullYear() - 1;
-    var year_ago = yyyy + '-' + mm + '-' + dd;
-    window.history.pushState('', '', '?start_date=' + year_ago);
-};
-
 var filters_array = [];
 {% for filter in filters %}
     var filter_tuple = ["{{ filter[0]|safe }}", String("{{ filter[1]|safe }}"), {{ filter[2]|safe }}];
