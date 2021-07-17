@@ -1,5 +1,26 @@
 <script>
-$(document).ready(function() {
+
+{% include "builds/filter_widget.js" -%}
+
+$('#menu li:nth-child(1) a').addClass('active');
+$("#execute_button").css('display', 'inline');
+$("#graph_button").css('display', 'inline');
+
+if (get_active_filter() == undefined) {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear() - 1;
+    var year_ago = yyyy + '-' + mm + '-' + dd;
+    window.history.pushState('', '', '?start_date=' + year_ago);
+};
+
+var filters_array = [];
+{% for filter in filters %}
+    var filter_tuple = ["{{ filter[0]|safe }}", String("{{ filter[1]|safe }}"), {{ filter[2]|safe }}];
+    filters_array.push(filter_tuple);
+{% endfor %}
+init_filter_widget(filters_array, function() {get_results(filters_array)});
 
 $("#builds_table").DataTable({
     "ajax": "{{ uf }}",
@@ -31,9 +52,6 @@ $("#builds_table").DataTable({
                 }
             },
             {
-                searchPanes: {
-                    show: false
-                },
                 targets:[2],
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[3] != 0 ){
@@ -43,11 +61,6 @@ $("#builds_table").DataTable({
                 }
             },
             {
-                {% if not search_pane|default(true) %}
-                searchPanes: {
-                    show: false,
-                },
-                {% endif %}
                 targets:[1],
                 render: function ( data, type, row, meta ) {
                   data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['job_name'] + '/' + row['build_number'] + '">' + data + '</a>';
@@ -79,18 +92,8 @@ $("#builds_table").DataTable({
                 }
             },
         ],
-  dom: 'Plfrtip',
   select: true,
-{% if search_pane|default(true) %}
-  searchPane: {
-        columns: [1],
-        preSelect: ['FAILURE']
-    },
-{% endif %}
   search: { "regex": true }, 
   deferRender: true,
 });
-
-});
 </script>
-<!-- -->

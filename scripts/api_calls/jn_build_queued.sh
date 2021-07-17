@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Jenkins Notification build queued (this is first phase, before 'started')
-curl -H "Content-type: application/json" -X POST http://127.0.0.1:5000/api/jenkins_update -d '{u'url': u'job/DFG-network-neutron-33-unit-rhos/', u'display_name': u'DFG-network-neutron-33-unit-rhos', u'name': u'DFG-network-neutron-33-unit-rhos', u'build': {u'scm': {}, u'log': u'', u'parameters': {u'OCTARIO_GERRIT_CHANGE': u'', u'DISABLE_CLEANUP': u'false', u'IR_GERRIT_CHANGE': u'', u'GERRIT_REFSPEC': u'+refs/heads/$GERRIT_BRANCH:refs/remotes/origin/$GERRIT_BRANCH', u'ANSIBLE_VERBOSITY': u'1', u'GERRIT_BRANCH': u'rhos-10.0-patches'}, u'url': u'job/DFG-network-neutron-33-unit-rhos/291/', u'timestamp': 1553685903752, u'number': 291, u'artifacts': {}, u'queue_id': 19388, u'phase': u'QUEUED', u'full_url': u'https://rhos-qe-jenkins.rhev-ci-vms.eng.rdu2.redhat.com/job/DFG-network-neutron-33-unit-rhos/291/'}}'

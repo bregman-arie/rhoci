@@ -6,7 +6,7 @@
 <div class="container-fluid">
 
   <!-- Breadcrumbs-->
-  {% with breadcrumb_section=title %}
+  {% with breadcrumb_section='release' %}
      {% include "breadcrumb.html" %}
   {% endwith %}
 
@@ -19,6 +19,21 @@
      {% endfor %}
 
   </div> <!-- row -->
+
+  <br>
+  <!-- Breadcrumbs-->
+  {% with breadcrumb_section='DFGs' %}
+     {% include "breadcrumb.html" %}
+  {% endwith %}
+
+  <div class="row">
+
+     {% for DFG in DFGs %}
+       {% with DFG=DFG %}
+         {% include "DFG/one_grp_card.html" -%}
+       {% endwith %}
+     {% endfor %}
+
 
 </div> <!-- /container-fluid -->
 

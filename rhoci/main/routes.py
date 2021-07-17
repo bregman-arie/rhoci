@@ -81,7 +81,34 @@ def index():
         uf = url_for('main.release_summary', release_number=release['key'])
         releases.append({'number': release['key'], 'doc_count': release['doc_count'],
                          'url_for': uf})
-    return render_template('index.html', title="releases", releases=releases)
+
+    DFGs_data = []
+    all_DFGs = DFG.get_all_DFGs_based_on_jobs()
+    for DFG_name in all_DFGs:
+        uf = url_for('DFG.summary', DFG_name=DFG_name)
+        failure_uf = url_for('DFG.builds_in_status', DFG_name=DFG_name, status='FAILURE')
+        success_uf = url_for('DFG.builds_in_status', DFG_name=DFG_name, status='SUCCESS')
+        unstable_uf = url_for('DFG.builds_in_status', DFG_name=DFG_name, status='UNSTABLE')
+        DFGs_data.append({'name': DFG_name,
+                          'summary_url_for': uf,
+                          'failure_builds_uf': failure_uf,
+                          'success_builds_uf': success_uf,
+                          'unstable_builds_uf': unstable_uf,
+                         })
+    return render_template('index.html', title="releases", releases=releases, DFGs=DFGs_data)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @bp.route('/tests/<job_name>/<build_number>')

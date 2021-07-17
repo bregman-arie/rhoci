@@ -41,31 +41,8 @@ from rhoci.jobs import bp  # noqa
 @bp.route('/index')
 @bp.route('/')
 def index():
-    """All jobs."""
-    jenkins_url = app.config['custom']['jenkins']['url']
-    query_str = request.args.to_dict()
-    query_s = request.args.to_dict()
-    if 'query' in query_str:
-        query_str = eval(query_str['query'])
-        jobs = Job.find(query_str=query_str, projection=PROJECTION)
-    else:
-        jobs = Job.find(projection=PROJECTION)
-    form = Dummy()
-    statuses = Counter([job['last_build']['status'] for job in jobs if 'status' in job['last_build']])
-    releases = Counter([job['release'] for job in jobs if 'release' in job and job['release']])
-    testers = Counter([job['tester'] for job in jobs if 'tester' in job and job['tester']])
-    if "query" in query_s:
-        query_string = query_s['query']
-    else:
-        query_string = query_s
-    return render_template('jobs/index.html',
-                           jenkins_url=jenkins_url,
-                           query_str=query_string,
-                           releases=dict(releases),
-                           statuses=dict(statuses),
-                           testers=dict(testers),
-                           form=form)
-
+    uf = url_for('api.get_jobs')
+    return render_template('builds/index.html', uf=uf)
 
 @bp.route('/last_added')
 def last_added():
@@ -140,27 +117,9 @@ def generate():
 
 @bp.route('/search', methods=['GET', 'POST'])
 def search():
-    form = JobSearch()
-    q = {}
-    if form.name.data:
-        q['name'] = form.name.data
-    if form.release.data:
-        q['release'] = form.release.data
-    if form.DFG.data:
-        q['DFG'] = form.DFG.data
-    if form.squad.data:
-        q['squad'] = form.squad.data
-    if form.component.data:
-        q['component'] = form.component.data
-    if form.tester.data:
-        q['tester'] = form.tester.data
-    if form.job_class.data:
-        q['class'] = form.job_class.data
-
-    if request.method == 'POST':
-        return redirect(url_for('jobs.index', query=q))
-    else:
-        return render_template('jobs/search.html', form=form)
+    uf = url_for('api.get_jobs')
+    filters = [('name', 'type', ['val1', 'val2', 'val3'])]
+    return render_template('builds/search.html', uf=uf, search_pane=False, filters=filters)
 
 
 @bp.route('/tests/search', methods=['GET', 'POST'])

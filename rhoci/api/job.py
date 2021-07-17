@@ -43,46 +43,55 @@ def jobs(query_str=None):
     return jsonify(results)
 
 
+@bp.route('/jobs/<DFG_name>/<status>')
 @bp.route('/jobs/DFG=<DFG_name>')
 @bp.route('/jobs/<job_name>')
+@bp.route('/jobs/all')
 @bp.route('/jobs/<DFG_name>/squad/<squad_name>')
 @bp.route('/jobs/<DFG_name>/component/<component_name>')
 def get_jobs(DFG_name=None, squad_name=None,
-             component_name=None, job_name=None):
+             component_name=None, job_name=None, status=None):
     """Returns jobs."""
-    results = {'data': []}
     jobs = defaultdict(dict)
-    if squad_name:
-        jobs = Job.find(squad=squad_name, projection=PROJECTION)
-    elif component_name:
-        jobs = Job.find(query_str={'DFG': DFG_name, 'component': component_name},
-                        projection=PROJECTION)
-    elif DFG_name:
-        with open(r'/etc/arie.yaml') as file:
-            data = yaml.load(file, Loader=yaml.FullLoader)
-        body = {"query": {"bool": { "must": [{"exists": {"field": "job_name.keyword"}}, {"match": {"DFG.keyword": DFG_name}}]}}, "size": 9000, "_source": ["job_name", "build_num"],  "aggs": { "jobs": { "terms": {"field": "job_name.keyword"}, "aggregations": {"builds": {"terms": { "field": "build_num" }}}}}}
-        es = Elasticsearch(data['elk']['es_url'])
+    results = {'data': []}
+    with open(r'/etc/arie.yaml') as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+    es = Elasticsearch(data['elk']['es_url'])
+    body = {
+        "query": {
+            "bool": {
+                "must": [{"exists": {"field": "build_result.keyword"}} ],
+                # "filter": [
+                #    { "term": { "DFG.keyword": DFG_name}}
+                #]
+            }},
+        "size": 0,
+        "aggs": {
+            "jobs": {
+                "terms": {"field": "job_name.keyword",
+                          "size": 1000},
+                "aggs": {
+                    "builds": {
+                        "terms": {"field": "build_num"},
+                        "aggs": {
+                            "status": {
+                                "terms": {"field": "build_result.keyword"}
+                }
+            }
+        }}}}}
+    if DFG_name and status:
+        body["query"]["bool"]["filter"] = [{ "term": { "DFG.keyword": DFG_name}}]
         res = es.search(index="logstash", body=body)
-        results = {'data': []}
         for job in res['aggregations']['jobs']['buckets']:
-            for build in job['builds']['buckets']:
-                body = {"query": {"bool": { "must": [{"exists": {"field": "build_result.keyword"}}, {"match": {"job_name.keyword": job['key']}}, {"match": {"build_num": build['key']}}]}}, "size": 9000, "_source": ["job_name", "build_num", "build_result"]}
-                builds_res = es.search(index="logstash", body=body)
-                if builds_res['hits']['hits']:
-                    for build_res in builds_res['hits']['hits']:
-                        build_result = build_res['_source']['build_result']
-                        if job['key'] in jobs:
-                            if build['key'] > jobs[job['key']]['last_build']['number']:
-                                jobs[job['key']]['last_build'] = {'number': build['key'], 'status': build_result, 'name': job['key']}
-                            elif build_result == "SUCCESS" and build['key'] > jobs[job['key']]['last_successful_build']['number']:
-                                jobs[job['key']]['last_successful_build'] = {'number': build['key'], 'status': build_result, 'name': job['key']}
-                        else:
-                            jobs[job['key']] = {'name': job['key'], 'release': get_release(job['key']), 'last_build': {'number': build['key'], 'status': build_result, 'name': job['key']}}
-                            if build_result == "SUCCESS":
-                                jobs[job['key']]['last_successful_build'] = {'number': build['key'], 'status': build_result, 'name': job['key']}
-    elif job_name:
-        jobs = Job.find(name=job_name, exact_match=True,
-                        projection=PROJECTION)
-    for job_name, value in jobs.items():
-        results['data'].append(value)
+            if job['builds']['buckets'][-1]['status']['buckets'][-1]['key'] == status:
+                results['data'].append({'job_name': job['key'], 'build_number': int(job['builds']['buckets'][-1]['key']), 'status': status})
+    elif DFG_name:
+        body["query"]["bool"]["filter"] = [{ "term": { "DFG.keyword": DFG_name}}]
+        res = es.search(index="logstash", body=body)
+        for job in res['aggregations']['jobs']['buckets']:
+            results['data'].append({'job_name': job['key'], 'build_number': int(job['builds']['buckets'][-1]['key']), 'status': job['builds']['buckets'][-1]['status']['buckets'][-1]['key']})
+    else:
+        res = es.search(index="logstash", body=body)
+        for job in res['aggregations']['jobs']['buckets']:
+            results['data'].append({'job_name': job['key'], 'build_number': int(job['builds']['buckets'][-1]['key']), 'status': job['builds']['buckets'][-1]['status']['buckets'][-1]['key']})
     return jsonify(results)

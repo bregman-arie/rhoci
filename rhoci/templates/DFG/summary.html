@@ -129,10 +129,12 @@ $("#jobs_table").DataTable({
                 }
             },
         ],
-  processing: true,
   order: [[ 2, "desc" ]],
+  dom: 'Plfrtip',
+  select: true,
   searchPane: {
-        columns: [1, 2],
+        columns: [1],
+        preSelect: ['FAILURE']
     },
   search: { "regex": true }, 
 });

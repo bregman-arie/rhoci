@@ -7,7 +7,19 @@
       <div class="{{ DFG['name'] }} card-pf-top-element text-center">
         <img id="{{ DFG['name'] }}" src="{{ url_for('static', filename='images/DFG/{0}.png'.format(DFG['name'])) }}" onerror="no_image(this)" width=70 height=70>
       </div>
+
     </a>
+      <div class="{{ DFG['name'] }} card-pf-bottom-element text-center">
+        <a href="{{ DFG['success_builds_uf'] }}" style="text-decoration: none">
+            <button type="button" class="btn btn-info" id="submit_job">Success</button>
+        </a>
+        <a href="{{ DFG['failure_builds_uf'] }}" style="text-decoration: none">
+            <button type="button" class="btn btn-danger" id="submit_job">Failures</button>
+        </a>
+        <a href="{{ DFG['unstable_builds_uf'] }}" style="text-decoration: none">
+            <button type="button" class="btn btn-warning" id="submit_job">Unstable</button>
+        </a>
+      </div>
   </div>
 </div>
 

@@ -72,7 +72,7 @@ $("#jobs_table").DataTable({
         ],
   processing: true,
   searchPane: {
-        columns: [1, 2],
+        columns: [1],
     },
   search: { "regex": true }, 
   deferRender: true,
