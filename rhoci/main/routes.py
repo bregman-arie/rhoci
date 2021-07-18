@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 from collections import defaultdict
 from elasticsearch import Elasticsearch
+from flask import current_app as app
 from flask import flash
 from flask import jsonify
 from flask import render_template
@@ -63,10 +64,7 @@ def get_DFGs_result_summary(DFGs):
 @bp.route('/')
 def index():
     """Main page route."""
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {
         "size": 0,
         "aggs" : {
@@ -113,9 +111,7 @@ def index():
 
 @bp.route('/tests/<job_name>/<build_number>')
 def get_tests(job_name, build_number):
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {"query": {"bool": { "must": [{"exists": {"field": "tests.name.keyword"}}, {"match": {"job_name.keyword": job_name}}, {"match": {"build_num": build_number}}]}}, "size": 9000, "_source": ["tests"]} 
     res = es.search(index="logstash", body=body)
     results = {'data': []}
@@ -132,10 +128,8 @@ def build_tests(job_name, build_number):
 @bp.route('/puddle/<puddle_id>/builds')
 def get_puddle_builds(puddle_id):
     jobs = defaultdict(dict)
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
     body = {"query": {"bool": { "must": [{"exists": {"field": "job_name.keyword"}}, {"match": {"core_puddle.keyword": puddle_id}}]}}, "size": 9000, "_source": ["job_name", "build_num"],  "aggs": { "jobs": { "terms": {"field": "job_name.keyword"}, "aggregations": {"builds": {"terms": { "field": "build_num" }}}}}}
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     res = es.search(index="logstash", body=body)
     results = {'data': []}
     for job in res['aggregations']['jobs']['buckets']:
@@ -161,10 +155,7 @@ def puddle_summary(puddle_id):
 
 @bp.route('/release/<release_number>')
 def release_summary(release_number):
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {
         "size": 0,
         "aggs" : {

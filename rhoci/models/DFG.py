@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 from elasticsearch import Elasticsearch
+from flask import current_app as app
 import re
 import yaml
 
@@ -49,9 +50,7 @@ class DFG(object):
         DFG name from the job name and makes sure the set is unique.
         """
         DFGs = []
-        with open(r'/etc/arie.yaml') as file:
-            data = yaml.load(file, Loader=yaml.FullLoader)
-        es = Elasticsearch(data['elk']['es_url'])
+        es = Elasticsearch(app.config['custom']['elk']['es']['url'])
         body = {
             "size": 0,
             "aggs" : {

@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 from collections import defaultdict
 from elasticsearch import Elasticsearch
+from flask import current_app as app
 from flask import jsonify
 from flask import request
 import json
@@ -53,9 +54,7 @@ def get_filtered_jobs(filters=None):
     else:
         filters_dict = {}
     results = {'data': []}
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {
         "query": {
             "bool": {}},
@@ -98,9 +97,7 @@ def get_jobs(DFG_name=None, squad_name=None,
     """Returns jobs."""
     jobs = defaultdict(dict)
     results = {'data': []}
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {
         "query": {
             "bool": {

@@ -31,8 +31,6 @@ from rhoci.forms.job import JobSearch
 from rhoci.forms.build import BuildSearch
 from rhoci.forms.test import TestSearch
 
-PROJECTION = {'name': 1, 'last_build': 1, 'release': 1, 'last_successful_build': 1,
-              'tester': 1}
 LOG = logging.getLogger(__name__)
 
 from rhoci.jobs import bp  # noqa

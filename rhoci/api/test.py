@@ -14,6 +14,7 @@
 from __future__ import absolute_import
 
 from elasticsearch import Elasticsearch
+from flask import current_app as app
 from flask import jsonify
 import logging
 import yaml
@@ -30,9 +31,7 @@ from rhoci.api import bp  # noqa
 def all_tests():
     """All builds API route."""
     results = {'data': []}
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {
         "query": {
             "bool": {
@@ -61,9 +60,7 @@ def all_tests():
 def test_to_jobs(class_name=None, test_name=None):
     """All builds API route."""
     results = {'data': []}
-    with open(r'/etc/arie.yaml') as file:
-        data = yaml.load(file, Loader=yaml.FullLoader)
-    es = Elasticsearch(data['elk']['es_url'])
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
     body = {
         "query": {
             "bool": {
