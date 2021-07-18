@@ -11,7 +11,7 @@ $("#jobs_table").DataTable({
           {"data": "status",
            "defaultContent": "None"
           },
-          {"data": "duration",
+          {"data": "Jobs",
            "defaultContent": "None"
           },
           ],
@@ -33,8 +33,16 @@ $("#jobs_table").DataTable({
                   else { return data; }
                 }
             },
+            {
+                targets:[3],
+                render: function ( data, type, row, meta ) {
+                    if(type === 'display' && row[0] != 0){
+                       data = '<a href="/tests/class/' + row['className'] + '/name/' + row['name'] + '">' + 'Jobs' + '</a>';
+                    }
+                    return data;
+                }
+            },
         ],
-  processing: true,
   search: { "regex": true }, 
   deferRender: true,
 });

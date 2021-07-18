@@ -13,8 +13,10 @@
 #    under the License.
 from __future__ import absolute_import
 
+from elasticsearch import Elasticsearch
 from flask import jsonify
 import logging
+import yaml
 
 from rhoci.models.job import Job
 from rhoci.jenkins.tests import get_tests as load_tests
@@ -28,25 +30,56 @@ from rhoci.api import bp  # noqa
 def all_tests():
     """All builds API route."""
     results = {'data': []}
-    jobs = Job.find()
-    for job in jobs:
-        for build in job['builds']:
-            if 'tests' in build:
-                for test in build['tests']:
-                    results['data'].append(test)
-    print(results['data'][0])
+    with open(r'/etc/arie.yaml') as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+    es = Elasticsearch(data['elk']['es_url'])
+    body = {
+        "query": {
+            "bool": {
+                "must": [{"exists": {"field": "tests.name.keyword"}} ],
+            }},
+        "size": 1000,
+        "aggs": {
+            "jobs": {
+                "terms": {"field": "job_name.keyword",
+                          "size": 1000},
+                "aggs": {
+                    "builds": {
+                        "terms": {"field": "build_num"},
+        }}}}}
+    res = es.search(index="logstash", body=body)
+    for test in res['hits']['hits']:
+        if "tests.classname" in test['_source']:
+            classname = test['_source']['tests.classname']
+        else:
+            classname = "None"
+        results['data'].append({'name': test['_source']['tests.name'], 'className': classname, 'status': test['_source']['tests.status'].upper() })
+
     return jsonify(results)
 
-
-@bp.route('/job/<job_name>/<build_number>/tests')
-def get_tests(job_name=None, build_number=None):
-    """Return builds"""
+@bp.route('/test_to_jobs/<class_name>/<test_name>')
+def test_to_jobs(class_name=None, test_name=None):
+    """All builds API route."""
     results = {'data': []}
-    job = Job.find(job_name, build_number=int(build_number), exact_match=True,
-                   projection={'builds.$.tests': 1, '_id': 0})
-    if 'tests' in job[0]['builds'][0]:
-        tests = job[0]['builds'][0]['tests']
-    else:
-        tests = load_tests(job=job_name, build=build_number)
-    results = {'data': tests}
+    with open(r'/etc/arie.yaml') as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+    es = Elasticsearch(data['elk']['es_url'])
+    body = {
+        "query": {
+            "bool": {
+                "must": [{"exists": {"field": "tests.name.keyword"}} ],
+            }},
+        "size": 1000,
+        "aggs": {
+            "jobs": {
+                "terms": {"field": "job_name.keyword",
+                          "size": 1000},
+                "aggs": {
+                    "builds": {
+                        "terms": {"field": "build_num"},
+        }}}}}
+    body["query"]["bool"]["filter"] = [{ "term": { "tests.name.keyword": test_name}}]
+    res = es.search(index="logstash", body=body)
+    for test in res['hits']['hits']:
+        results['data'].append({'job_name': test['_source']['job_name'], 'build_number': test['_source']['build_num'], 'status': test['_source']['tests.status'].upper() })
     return jsonify(results)

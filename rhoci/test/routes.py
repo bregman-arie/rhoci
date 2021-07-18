@@ -34,7 +34,8 @@ def index():
                            uf=uf)
 
 
-@bp.route('/<name>')
-def test(name):
+@bp.route('/class/<class_name>/name/<name>')
+def test(class_name, name):
     """Specific test summary."""
-    return render_template('tests/one_test_summary.html')
+    uf = url_for('api.test_to_jobs', class_name=class_name, test_name=name)
+    return render_template('tests/test_to_jobs.html', uf=uf)

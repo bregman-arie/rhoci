@@ -21,4 +21,4 @@ scripts/quick_run.sh
 
 ### Home page
 
-<div align="center"><img src="./doc/home_page.png" alt="RHOCI Home Page"></div><hr/>
+<div align="center"><img src="./docs/home_page.png" alt="RHOCI Home Page"></div><hr/>
