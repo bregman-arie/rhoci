@@ -50,7 +50,7 @@ $("#builds_table").DataTable({
                 targets:4,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display' && row[1] != 0 && (row['status'] == 'SUCCESS' || row['status'] == 'UNSTABLE')){
-                    data = '<a href="/job/' + row['job_name'] + '/' + row['number'] + '/tests' + '">Tests</a>';
+                    data = '<a href="/jobs/' + row['job_name'] + '/' + row['number'] + '/tests' + '">Tests</a>';
                     }
                     else {
                       data = 'No Tests';

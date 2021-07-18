@@ -25,7 +25,8 @@ $("#builds_table").DataTable({
                 targets:0,
                 render: function ( data, type, row, meta ) {
                     if(type === 'display'){
-                        data = '<a href="/jobs/' + data + '">' + data + '</a>';
+                    <!-- data = '<a href="/jobs/' + data + '">' + data + '</a>'; -->
+                      data = '<a href="' + "{{ jenkins_url }}" + '/job/' + row['job_name'] + '/' + row['build_number'] + '">' + data + '</a>';
                     }
                     return data;
                 }

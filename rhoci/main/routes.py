@@ -144,7 +144,6 @@ def get_puddle_builds(puddle_id):
                 jobs[job['key']] = {'job_name': job['key'], 'status': 'In Progress', 'number': build['key']}
     for job_name, value in jobs.items():
         results['data'].append(value)
-    print(results)
     return jsonify(results)
 
 @bp.route('/puddle/<puddle_id>')

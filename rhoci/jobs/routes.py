@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 from collections import Counter
 from bson import json_util
+from elasticsearch import Elasticsearch
 from flask import current_app as app
 from flask import jsonify
 from flask import redirect
@@ -53,7 +54,6 @@ def last_added():
                            query_str=query_str,
                            form=form)
 
-
 @bp.route('/builds')
 def builds():
     """All builds."""
@@ -73,8 +73,6 @@ def tests():
 def job(name):
     """Specific job summary."""
     uf = url_for('api.get_builds', job_name=name)
-    job = Job.find(name=name)
-    job[0].pop('_id')
     entity_json = json.dumps(job, indent=4, sort_keys=True,
                              default=json_util.default)
     jenkins_url = app.config['custom']['jenkins']['url']
@@ -155,3 +153,37 @@ def search_builds():
 @bp.route('/builds/active', methods=['GET', 'POST'])
 def active_builds():
     pass
+
+
+@bp.route('/<job_name>/<build_number>/tests')
+def build_tests(job_name, build_number):
+    """build tests."""
+    jenkins_url = app.config['custom']['jenkins']['url']
+    uf = url_for('api.build_tests', job_name=job_name, build_number=build_number)
+    results = {'data': []}
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
+    body = {
+        "query": {
+            "bool": {
+                "must": [{"exists": {"field": "tests.name.keyword"}} ],
+            }},
+        "size": 1000,
+        "aggs": {
+            "jobs": {
+                "terms": {"field": "job_name.keyword",
+                          "size": 1000},
+                "aggs": {
+                    "builds": {
+                        "terms": {"field": "build_num"},
+        }}}}}
+    body["query"]["bool"]["filter"] = [{ "term": { "job_name.keyword": job_name}}]
+    body["query"]["bool"]["filter"].append({ "term": { "build_num": int(build_number)}})
+    res = es.search(index="logstash", body=body)
+    if res['hits']['hits']:
+        for test in res['hits']['hits']:
+            results['data'].append({'job_name': test['_source']['job_name'], 'build_number': test['_source']['build_num'], 'status': test['_source']['tests.status'].upper() })
+    if not results['data']:
+         return redirect("{}/job/{}/{}/artifact/tempest-results".format(jenkins_url, job_name, build_number), code=200)
+    return render_template('tests/index.html',
+                           jenkins_url=jenkins_url,
+                           uf=uf)

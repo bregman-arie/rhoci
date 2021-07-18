@@ -56,6 +56,36 @@ def all_tests():
 
     return jsonify(results)
 
+@bp.route('/job/<job_name>/build/<build_number>/tests')
+def build_tests(job_name, build_number):
+    jenkins_url = app.config['custom']['jenkins']['url']
+    results = {'data': []}
+    es = Elasticsearch(app.config['custom']['elk']['es']['url'])
+    body = {
+        "query": {
+            "bool": {
+                "must": [{"exists": {"field": "tests.name.keyword"}} ],
+            }},
+        "size": 1000,
+        "aggs": {
+            "jobs": {
+                "terms": {"field": "job_name.keyword",
+                          "size": 1000},
+                "aggs": {
+                    "builds": {
+                        "terms": {"field": "build_num"},
+        }}}}}
+    body["query"]["bool"]["filter"] = [{ "term": { "job_name.keyword": job_name}}]
+    body["query"]["bool"]["filter"].append({ "term": { "build_num": int(build_number)}})
+    res = es.search(index="logstash", body=body)
+    if res['hits']['hits']:
+        for test in res['hits']['hits']:
+            results['data'].append({'job_name': test['_source']['job_name'], 'build_number': test['_source']['build_num'], 'status': test['_source']['tests.status'].upper() })
+    if not results['data']:
+         print("yay")
+         return redirect("{}/job/{}/{}".format(jenkins_url, job_name, build_number), code=200)
+    return jsonify(results)
+
 @bp.route('/test_to_jobs/<class_name>/<test_name>')
 def test_to_jobs(class_name=None, test_name=None):
     """All builds API route."""
